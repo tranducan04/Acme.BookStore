@@ -1,0 +1,53 @@
+.admin-reviews-page {
+    background-color: #f8fafc;
+    min-height: 85vh;
+}
+
+.fs-7 {
+    font-size: 0.875rem;
+}
+
+.table th {
+    font-size: 0.825rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #64748b;
+    font-weight: 700;
+    border-bottom: 1.5px solid #e2e8f0;
+}
+
+.table td {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+.admin-reviews-page {
+    background-color: #f8fafc;
+    min-height: 85vh;
+    overflow-x: hidden;
+}
+
+.fs-7 {
+    font-size: 0.875rem;
+}
+
+.table {
+    width: 100% !important;
+    margin-bottom: 0 !important;
+
+    th {
+        font-size: 0.825rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #64748b;
+        font-weight: 700;
+        border-bottom: 1.5px solid #e2e8f0;
+        white-space: nowrap;
+    }
+
+    td {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+        word-break: break-word;
+    }
+}

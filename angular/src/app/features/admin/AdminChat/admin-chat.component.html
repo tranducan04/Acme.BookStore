@@ -1,0 +1,71 @@
+<div class="admin-chat-layout">
+  <!-- Conversation Sidebar -->
+  <div class="conversation-sidebar">
+    <div class="sidebar-header">
+      <h4><i class="fas fa-comments"></i> Khách hàng cần hỗ trợ</h4>
+    </div>
+    <div class="conversation-list">
+      <div *ngIf="conversations.length === 0" class="empty-list">
+        <p>Chưa có cuộc trò chuyện nào.</p>
+      </div>
+
+      <div
+        *ngFor="let conv of conversations"
+        class="conversation-item"
+        [class.active]="selectedUser?.userId === conv.userId"
+        (click)="selectConversation(conv)"
+      >
+        <div class="user-avatar">
+          <i class="fas fa-user-circle"></i>
+        </div>
+        <div class="user-info">
+          <div class="user-name">
+            {{ conv.userName || 'Khách hàng' }}
+            <span *ngIf="conv.unreadCount && conv.unreadCount > 0" class="badge bg-danger">
+              {{ conv.unreadCount }}
+            </span>
+          </div>
+          <div class="last-msg">{{ conv.lastMessage }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat Main Panel -->
+  <div class="chat-main">
+    <div *ngIf="!selectedUser" class="no-selection">
+      <i class="fas fa-headset"></i>
+      <p>Vui lòng chọn một cuộc trò chuyện ở cột bên trái để bắt đầu tư vấn.</p>
+    </div>
+
+    <ng-container *ngIf="selectedUser">
+      <div class="chat-header">
+        <h4><i class="fas fa-user"></i> {{ selectedUser.userName || 'Khách hàng' }}</h4>
+      </div>
+
+      <div class="chat-messages" id="admin-chat-messages-box">
+        <div
+          *ngFor="let msg of messages"
+          class="message-bubble"
+          [ngClass]="{ 'my-message': msg.isMyMessage, 'other-message': !msg.isMyMessage }"
+        >
+          <div class="message-sender" *ngIf="!msg.isMyMessage">{{ msg.senderName }}</div>
+          <div class="message-content">{{ msg.message }}</div>
+          <div class="message-time">{{ msg.creationTime | date: 'HH:mm dd/MM' }}</div>
+        </div>
+      </div>
+
+      <div class="chat-input-box">
+        <input
+          type="text"
+          [(ngModel)]="newMessage"
+          (keyup.enter)="send()"
+          placeholder="Nhập câu trả lời tư vấn..."
+        />
+        <button (click)="send()" [disabled]="!newMessage.trim()">
+          <i class="fas fa-paper-plane"></i> Gửi
+        </button>
+      </div>
+    </ng-container>
+  </div>
+</div>

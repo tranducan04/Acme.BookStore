@@ -1,0 +1,115 @@
+<div class="card shadow-sm border-0 rounded-3" @pageEnter>
+  <!-- TIÊU ĐỀ & Ô TÌM KIẾM + NÚT THÊM MỚI -->
+  <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <h5 class="fw-bold mb-0 text-dark">✍️ Quản Lý Tác Giả</h5>
+    <div class="d-flex align-items-center gap-2">
+      <div class="search-input-wrapper" style="width: 220px;">
+        <span class="search-icon text-muted">🔍</span>
+        <input type="text" class="form-control form-control-sm shadow-sm" placeholder="Tìm tên tác giả..."
+          [value]="searchTerm()" (input)="searchTerm.set($any($event.target).value)" />
+      </div>
+      @if (permission.getGrantedPolicy('BookStore.Authors.Create')) {
+      <button class="btn btn-sm btn-primary fw-bold shadow-sm text-nowrap" (click)="openCreateModal()">
+        ➕ Thêm Tác Giả Mới
+      </button>
+      }
+    </div>
+  </div>
+  <!-- BẢNG DANH SÁCH TÁC GIẢ -->
+  <div class="card-body p-0">
+    @if (isLoading()) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary" role="status"></div>
+      <p class="mt-2 text-muted">Đang tải danh sách tác giả...</p>
+    </div>
+    } @else if (filteredAuthors().length === 0) {
+    <div class="text-center py-5">
+      <h5>Chưa có tác giả nào phù hợp!</h5>
+    </div>
+    } @else {
+    <div class="w-100 overflow-hidden">
+      <table class="table table-hover align-middle mb-0 w-100">
+        <thead class="table-dark">
+          <tr>
+            <th class="ps-3" style="width: 25%;">TÊN TÁC GIẢ</th>
+            <th style="width: 20%;">NGÀY SINH</th>
+            <th style="width: 35%;">GIỚI THIỆU</th>
+            <th class="text-end pe-3" style="width: 20%;">HÀNH ĐỘNG</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (author of filteredAuthors(); track author.id) {
+          <tr>
+            <!-- Tên Tác Giả -->
+            <td class="ps-3 fw-bold text-dark fs-6">{{ author.name }}</td>
+            <!-- Ngày Sinh -->
+            <td>
+              <span class="fw-semibold text-secondary">
+                📅 {{ author.birthDate | date:'dd/MM/yyyy' }}
+              </span>
+            </td>
+            <!-- Tiểu sử ngắn -->
+            <td>
+              <span class="text-muted small text-truncate d-inline-block" style="max-width: 350px;">
+                {{ author.shortBio || 'Chưa cập nhật tiểu sử' }}
+              </span>
+            </td>
+            <!-- Nút Hành Động (Chỉ Admin thấy) -->
+            <td class="text-end pe-3">
+
+              <button class="btn btn-sm btn-primary me-1 shadow-sm" (click)="openEditModal(author)">
+                ✏️ Sửa
+              </button>
+              <button class="btn btn-sm btn-danger shadow-sm" (click)="author.id && deleteAuthor(author.id)">
+                🗑️ Xóa
+              </button>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    }
+  </div>
+</div>
+<!-- 🌟 MODAL POPUP THUẦN ANGULAR SIGNAL & ONE-WAY BINDING -->
+@if (isModalOpen()) {
+<div class="modal d-block show" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.5);">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content shadow-lg border-0 rounded-3">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title fw-bold">{{ isEditMode() ? '✏️ Chỉnh Sửa Tác Giả' : '➕ Thêm Tác Giả Mới' }}</h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeModal()"></button>
+      </div>
+      <div class="modal-body p-4">
+        <form (submit)="$event.preventDefault(); saveAuthor()">
+          <!-- Tên Tác Giả (One-Way Binding [value] + (input)) -->
+          <div class="mb-3">
+            <label class="form-label fw-bold">Tên Tác Giả <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" [value]="selectedAuthor().name || ''"
+              (input)="updateAuthorField('name', $event)" required placeholder="Nhập tên tác giả...">
+          </div>
+          <!-- Ngày Sinh -->
+          <div class="mb-3">
+            <label class="form-label fw-bold">Ngày Sinh</label>
+            <input type="date" class="form-control" [value]="selectedAuthor().birthDate || ''"
+              (input)="updateAuthorField('birthDate', $event)">
+          </div>
+          <!-- Tiểu Sử -->
+          <div class="mb-3">
+            <label class="form-label fw-bold">Giới Thiệu</label>
+            <textarea class="form-control" rows="3" [value]="selectedAuthor().shortBio || ''"
+              (input)="updateAuthorField('shortBio', $event)" placeholder="Nhập tóm tắt tiểu sử tác giả..."></textarea>
+          </div>
+          <div class="modal-footer px-0 pb-0 pt-3 border-top">
+            <button type="button" class="btn btn-secondary" (click)="closeModal()">Hủy</button>
+            <button type="submit" class="btn btn-primary fw-bold">
+              💾 {{ isEditMode() ? 'Lưu Thay Đổi' : 'Tạo Tác Giả Mới' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+}

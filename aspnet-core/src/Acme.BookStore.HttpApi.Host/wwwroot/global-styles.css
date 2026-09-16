@@ -1,0 +1,218 @@
+/* Your Global Styles */
+
+:root .lpx-brand-logo {
+    --lpx-logo: url('/images/logo/leptonx/logo-light.png');
+    --lpx-logo-icon: url('/images/logo/leptonx/logo-light-thumbnail.png');
+}
+
+/* ===================================================
+   🌟 GIAO DIỆN ĐĂNG NHẬP HIỆN ĐẠI & TRẺ TRUNG (BOOKSTORE)
+   =================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+/* 🎨 Background toàn trang */
+body,
+html {
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    background: radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(236, 72, 153, 0.15) 0%, transparent 40%),
+        linear-gradient(135deg, #f0f4ff 0%, #fdf2f8 50%, #f8fafc 100%) !important;
+    min-height: 100vh !important;
+}
+
+/* 🎯 Căn chỉnh độ rộng cho cột đăng nhập */
+.abp-account-layout .container {
+    max-width: 960px !important;
+    width: 100% !important;
+    margin: 40px auto !important;
+}
+
+.abp-account-layout .col-md-8.col-lg-5 {
+    width: 100% !important;
+    max-width: 480px !important;
+    flex: 0 0 100% !important;
+    margin: 0 auto !important;
+}
+
+/* 🎨 Logo & Thương hiệu */
+.account-brand-title,
+.lpx-brand-logo-text,
+.brand-logo-text {
+    font-weight: 800 !important;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #4318ff 0%, #868ebd 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 1.85rem !important;
+    text-align: center !important;
+    display: block !important;
+    margin: 10px 0 20px 0 !important;
+}
+
+/* 📦 Khung Tenant & Chọn ngôn ngữ */
+.card:first-child:not(:last-child),
+.tenant-switch-box {
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.7) !important;
+    border-radius: 18px !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.03) !important;
+    margin-bottom: 20px !important;
+    width: 100% !important;
+}
+
+/* 💎 Card Form Đăng Nhập Chính (Glassmorphism) */
+.card,
+.account-card,
+.lpx-login-card {
+    background: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(16px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.8) !important;
+    border-radius: 24px !important;
+    box-shadow: 0 20px 40px -15px rgba(67, 24, 255, 0.12),
+        0 0 0 1px rgba(255, 255, 255, 0.8) inset !important;
+    width: 100% !important;
+}
+
+/* 📝 Tiêu đề */
+h2,
+h4,
+.card-title,
+.account-title {
+    font-weight: 800 !important;
+    color: #1e293b !important;
+    font-size: 1.6rem !important;
+    margin-bottom: 0.35rem !important;
+}
+
+/* ✏️ Input Fields Trẻ Trung & Bo Tròn */
+.form-control {
+    background-color: #f8fafc !important;
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 14px !important;
+    padding: 0.75rem 1.15rem !important;
+    font-size: 0.95rem !important;
+    font-weight: 500 !important;
+    color: #1e293b !important;
+    transition: all 0.25s ease !important;
+}
+
+.form-control:focus {
+    background-color: #ffffff !important;
+    border-color: #4318ff !important;
+    box-shadow: 0 0 0 4px rgba(67, 24, 255, 0.12) !important;
+}
+
+/* 👁️ CĂN CHỈNH HOÀN HẢO NÚT ẨN/HIỆN MẬT KHẨU TRONG .INPUT-GROUP */
+.input-group {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: stretch !important;
+    position: relative !important;
+}
+
+.input-group>.form-control {
+    flex: 1 1 auto !important;
+    width: 1% !important;
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    border-right: none !important;
+}
+
+.input-group>.btn,
+.input-group>button {
+    flex: 0 0 auto !important;
+    margin: 0 !important;
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    border-top-right-radius: 14px !important;
+    border-bottom-right-radius: 14px !important;
+    background-color: #f8fafc !important;
+    border: 1.5px solid #e2e8f0 !important;
+    border-left: none !important;
+    color: #64748b !important;
+    padding: 0 1.15rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: none !important;
+    transition: all 0.2s ease !important;
+}
+
+.input-group>.btn:hover,
+.input-group>button:hover {
+    background-color: #ffffff !important;
+    color: #4318ff !important;
+    transform: none !important;
+}
+
+.input-group:focus-within>.form-control {
+    border-color: #4318ff !important;
+}
+
+.input-group:focus-within>.btn,
+.input-group:focus-within>button {
+    border-color: #4318ff !important;
+    background-color: #ffffff !important;
+    color: #4318ff !important;
+}
+
+/* 🚀 Nút Bấm Đăng Nhập (Gradient Button) */
+.btn-primary,
+button[type="submit"] {
+    background: linear-gradient(135deg, #4318ff 0%, #7551ff 50%, #905cfc 100%) !important;
+    border: none !important;
+    border-radius: 14px !important;
+    padding: 0.85rem 1.5rem !important;
+    font-weight: 700 !important;
+    font-size: 1.05rem !important;
+    color: #ffffff !important;
+    box-shadow: 0 10px 25px -5px rgba(67, 24, 255, 0.4) !important;
+    width: 100% !important;
+    margin-top: 1rem !important;
+    transition: all 0.3s ease !important;
+}
+
+.btn-primary:hover,
+button[type="submit"]:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 15px 30px -5px rgba(67, 24, 255, 0.55) !important;
+    filter: brightness(1.05);
+}
+
+/* 🔘 Nút Chuyển đổi Tenant */
+.btn-outline-primary {
+    border: 1.5px solid #4318ff !important;
+    color: #4318ff !important;
+    border-radius: 12px !important;
+    font-weight: 600 !important;
+    padding: 0.4rem 1rem !important;
+}
+
+.btn-outline-primary:hover {
+    background-color: #4318ff !important;
+    color: #ffffff !important;
+}
+
+/* 🔗 Links & Checkbox */
+a {
+    color: #4318ff !important;
+    font-weight: 600 !important;
+    text-decoration: none !important;
+}
+
+a:hover {
+    color: #2b00d9 !important;
+    text-decoration: underline !important;
+}
+
+.form-check-input:checked {
+    background-color: #4318ff !important;
+    border-color: #4318ff !important;
+}
+
+.form-check-input {
+    border-radius: 6px !important;
+    border: 1.5px solid #cbd5e1 !important;
+}

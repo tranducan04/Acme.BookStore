@@ -1,0 +1,21 @@
+# Visual Studio / VS Code
+.vscode/
+.vs/
+*.user
+*.suo
+
+# Build & compiled outputs (.NET)
+**/bin/
+**/obj/
+*.dll
+*.pdb
+
+# Node & Angular
+node_modules/
+**/node_modules/
+.angular/
+dist/
+
+# Logs & temp
+Logs/
+*.log

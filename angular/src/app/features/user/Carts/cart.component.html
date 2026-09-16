@@ -1,0 +1,235 @@
+<div class="card shadow-sm border-0 rounded-3" @pageEnter>
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h3 class="mb-0 fw-bold text-dark">🛒 Giỏ Hàng Của Tôi</h3>
+        <a routerLink="/books" class="btn btn-outline-primary btn-sm rounded-pill px-3 shadow-sm d-flex align-items-center gap-1.5" title="Quay lại danh mục sách để tiếp tục mua sắm">
+            <span>📚</span>
+            <span class="fw-semibold">Tiếp tục chọn sách</span>
+        </a>
+    </div>
+    <div class="card-body">
+        @if (cartStore.isLoading()) {
+        <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2 text-muted">Đang tải giỏ hàng...</p>
+        </div>
+        } @else if (!cartStore.cart() || cartStore.cart()?.items?.length === 0) {
+        <div class="text-center py-5">
+            <div class="display-4 text-muted mb-3">🛒</div>
+            <h5 class="fw-bold text-dark mb-2">Giỏ hàng của bạn đang trống!</h5>
+            <p class="text-muted small mb-4">Hãy khám phá danh mục sách và chọn cho mình những cuốn sách yêu thích.</p>
+            <a routerLink="/books" class="btn btn-primary fw-bold rounded-pill px-4 shadow-sm">
+                📚 Khám Phá Ngay
+            </a>
+        </div>
+        } @else {
+        <table class="table table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th class="ps-3">Tên Sách</th>
+                    <th>Đơn Giá</th>
+                    <th style="width: 140px;">Số Lượng</th>
+                    <th>Thành Tiền</th>
+                    <th class="text-end pe-3">Hành Động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (item of cartStore.cart()?.items; track item.id) {
+                <tr>
+                    <td class="ps-3 fw-bold text-dark">{{ item.bookName }}</td>
+                    <td>{{ item.price | currency:'VND':'symbol':'1.0-0' }}</td>
+                    <td>
+                        <div class="quantity-stepper">
+                            <button class="btn-step" type="button" [disabled]="(item.count || 1) <= 1"
+                                (click)="item.bookId && cartStore.updateCount(item.bookId, (item.count || 1) - 1)">-</button>
+                            <span class="step-value">{{ item.count }}</span>
+                            <button class="btn-step" type="button"
+                                (click)="item.bookId && cartStore.updateCount(item.bookId, (item.count || 1) + 1)">+</button>
+                        </div>
+                    </td>
+                    <td class="fw-bold text-danger">{{ item.totalPrice | currency:'VND':'symbol':'1.0-0' }}</td>
+                    <td class="text-end pe-3">
+                        <button class="btn btn-sm btn-outline-danger border-0"
+                            (click)="item.bookId && removeItem(item.bookId)">
+                            🗑️ Xóa
+                        </button>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+        <div class="d-flex justify-content-between align-items-center mt-4 p-3.5 soft-pastel-card">
+            <h5 class="mb-0 text-dark">Tổng số sản phẩm: <span class="badge bg-primary px-3 py-2 ms-1">{{
+                    cartStore.cart()?.totalCount
+                    }}</span></h5>
+            <div class="d-flex align-items-center gap-3">
+                <h4 class="mb-0 text-dark">Tổng tiền thanh toán: <span class="text-danger fw-bold fs-3 ms-1">{{
+                        cartStore.cart()?.totalPrice | currency:'VND':'symbol':'1.0-0' }}</span></h4>
+                <button class="btn btn-lg btn-success fw-bold px-4 shadow-sm rounded-pill" (click)="openCheckout()">
+                    📦 Tiến Hành Đặt Hàng
+                </button>
+            </div>
+        </div>
+        }
+    </div>
+</div>
+
+<!-- ========== CHECKOUT MODAL ========== -->
+@if (showCheckoutModal()) {
+<div class="modal-backdrop fade show"></div>
+<div class="modal d-block fade show" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title mb-0">📦 Thông Tin Đặt Hàng & Thanh Toán</h5>
+                <button type="button" class="btn-close btn-close-white" (click)="closeCheckout()"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Họ và tên người nhận *</label>
+                    <input type="text" class="form-control" [class.is-invalid]="nameError()" [value]="receiverName()"
+                        (input)="onInput('receiverName', $event)" placeholder="Nhập tên người nhận">
+                    @if (nameError()) {
+                    <div class="text-danger small mt-1 fw-bold">{{ nameError() }}</div>
+                    }
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Số điện thoại *</label>
+                    <input type="text" class="form-control" [class.is-invalid]="phoneError()" [value]="receiverPhone()"
+                        (input)="onInput('receiverPhone', $event)" placeholder="Nhập số điện thoại">
+                    @if (phoneError()) {
+                    <div class="text-danger small mt-1 fw-bold">{{ phoneError() }}</div>
+                    }
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Địa chỉ giao hàng *</label>
+                    <textarea class="form-control" rows="2" [class.is-invalid]="addressError()"
+                        [value]="shippingAddress()" (input)="onInput('shippingAddress', $event)"
+                        placeholder="Nhập địa chỉ giao hàng"></textarea>
+                    @if (addressError()) {
+                    <div class="text-danger small mt-1 fw-bold">{{ addressError() }}</div>
+                    }
+                </div>
+                <!-- LỰA CHỌN PHƯƠNG THỨC THANH TOÁN -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Phương thức thanh toán *</label>
+                    <div class="form-check border rounded p-2 mb-2">
+                        <input class="form-check-input ms-1" type="radio" name="pMethod" id="pCod" [value]="0"
+                            [checked]="paymentMethod() === 0" (change)="onPaymentMethodChange($event)">
+                        <label class="form-check-label ms-2 fw-bold" for="pCod">
+                            💵 Thanh toán khi nhận hàng (COD)
+                        </label>
+                    </div>
+                    <div class="form-check border rounded p-2">
+                        <input class="form-check-input ms-1" type="radio" name="pMethod" id="pQr" [value]="1"
+                            [checked]="paymentMethod() === 1" (change)="onPaymentMethodChange($event)">
+                        <label class="form-check-label ms-2 fw-bold text-primary" for="pQr">
+                            📱 Chuyển khoản QR Code (VietQR / Banking)
+                        </label>
+                    </div>
+                </div>
+                <!-- THÔNG BÁO NHẸ KHI CHỌN QR -->
+                @if (paymentMethod() === 1) {
+                <div class="alert alert-primary py-2 px-3 d-flex align-items-center gap-2 mb-3">
+                    <span class="fs-5">📱</span>
+                    <small class="fw-semibold">Mã QR thanh toán sẽ hiển thị sau khi bạn xác nhận đặt hàng.</small>
+                </div>
+                }
+                <div class="alert alert-info d-flex justify-content-between align-items-center mb-0">
+                    <span><strong>Tổng thanh toán:</strong></span>
+                    <span class="fs-4 text-danger font-weight-bold">{{ cartStore.cart()?.totalPrice |
+                        currency:'VND':'symbol':'1.0-0' }}</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="closeCheckout()">Hủy</button>
+                <button type="button" class="btn btn-success fw-bold px-4" (click)="placeOrder()"
+                    [disabled]="isOrdering()">
+                    @if (isOrdering()) {
+                    ⏳ Đang xử lý...
+                    } @else {
+                    ✅ Xác Nhận Đặt Hàng
+                    }
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+}
+
+<!-- ========== QR CODE MODAL (Hiển thị SAU KHI đặt hàng thành công) ========== -->
+@if (isQrModalOpen()) {
+<div class="modal-backdrop fade show" style="z-index: 1060;"></div>
+<div class="modal d-block fade show" tabindex="-1" style="z-index: 1065;">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg qr-modal-content">
+            <!-- Header -->
+            <div class="modal-header qr-modal-header">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="fs-4">✅</span>
+                    <div>
+                        <h5 class="modal-title mb-0 fw-bold text-white">Đặt hàng thành công!</h5>
+                        <small class="text-white-50">Quét mã QR để thanh toán</small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" (click)="closeQrModal()"></button>
+            </div>
+            <!-- Body -->
+            <div class="modal-body text-center p-4">
+                <!-- Mã đơn hàng -->
+                <div class="mb-3">
+                    <span class="badge bg-success-subtle text-success px-3 py-2 fs-6 fw-bold rounded-pill">
+                        🧾 Mã đơn: {{ createdOrderNo() }}
+                    </span>
+                </div>
+                <!-- QR Image -->
+                <div class="qr-image-wrapper mb-3">
+                    <img [src]="qrCodeUrl()" alt="VietQR Payment" class="img-fluid rounded shadow"
+                        style="max-height: 300px; border: 3px solid #e0e0e0;">
+                </div>
+                <!-- Thông tin chuyển khoản -->
+                <div class="text-start bg-light rounded-3 p-3 mb-3">
+                    <h6 class="fw-bold mb-2 text-primary">📋 Thông tin chuyển khoản:</h6>
+                    <table class="table table-sm table-borderless mb-0">
+                        <tbody>
+                            <tr>
+                                <td class="text-muted" style="width: 140px;">Ngân hàng:</td>
+                                <td class="fw-bold">Vietcombank (VCB)</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Số tài khoản:</td>
+                                <td class="fw-bold">9394235730</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Chủ tài khoản:</td>
+                                <td class="fw-bold">TRAN DUC AN</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Số tiền:</td>
+                                <td class="fw-bold text-danger">{{ cartStore.cart()?.totalPrice |
+                                    currency:'VND':'symbol':'1.0-0' }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Nội dung CK:</td>
+                                <td class="fw-bold text-primary">{{ createdOrderNo() }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Cảnh báo -->
+                <div class="alert alert-warning py-2 px-3 mb-0 d-flex align-items-start gap-2">
+                    <span class="fs-5">⚠️</span>
+                    <small class="text-start">Vui lòng chuyển khoản <strong>đúng số tiền</strong> và ghi <strong>đúng
+                            nội dung</strong> để đơn hàng được xác nhận nhanh nhất. Đơn hàng sẽ được xử lý sau khi xác
+                        nhận thanh toán.</small>
+                </div>
+            </div>
+            <!-- Footer -->
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-primary fw-bold px-4" (click)="closeQrModal()">
+                    👍 Đã thanh toán xong — Xem đơn hàng
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+}

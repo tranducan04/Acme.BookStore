@@ -1,0 +1,40 @@
+<div class="chat-container">
+  <div class="chat-header">
+    <div class="header-info">
+      <div class="avatar"><i class="fas fa-headset"></i></div>
+      <div>
+        <h3>Hỗ trợ Trực tuyến 💬</h3>
+        <span class="status"><i class="fas fa-circle online-dot"></i> Đang hoạt động</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="chat-messages" id="chat-messages-box">
+    <div *ngIf="messages.length === 0" class="empty-state">
+      <i class="fas fa-comments"></i>
+      <p>Xin chào! Bạn cần hỗ trợ gì từ chúng tôi hôm nay?</p>
+    </div>
+
+    <div
+      *ngFor="let msg of messages"
+      class="message-bubble"
+      [ngClass]="{ 'my-message': msg.isMyMessage, 'other-message': !msg.isMyMessage }"
+    >
+      <div class="message-sender" *ngIf="!msg.isMyMessage">{{ msg.senderName }}</div>
+      <div class="message-content">{{ msg.message }}</div>
+      <div class="message-time">{{ msg.creationTime | date: 'HH:mm dd/MM' }}</div>
+    </div>
+  </div>
+
+  <div class="chat-input-box">
+    <input
+      type="text"
+      [(ngModel)]="newMessage"
+      (keyup.enter)="send()"
+      placeholder="Nhập tin nhắn..."
+    />
+    <button (click)="send()" [disabled]="!newMessage.trim()">
+      <i class="fas fa-paper-plane"></i> Gửi
+    </button>
+  </div>
+</div>

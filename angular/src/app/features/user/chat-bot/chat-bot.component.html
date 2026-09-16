@@ -1,0 +1,121 @@
+@if (isCustomer) {
+<!-- 💬 NÚT TRÒN NỔI GÓC DƯỚI BÊN PHẢI -->
+<button type="button" class="btn-chat-toggle shadow-lg" (click)="toggleChat()"
+    [title]="isOpen() ? 'Đóng chat' : 'Chat với AI Gemini'">
+    @if (!isOpen()) {
+    <span class="fs-3">🤖</span>
+    } @else {
+    <span class="fs-4 fw-bold">✕</span>
+    }
+</button>
+
+<!-- 🪟 KHUNG CỬA SỔ CHATBOX -->
+@if (isOpen()) {
+<div class="chatbox-card shadow-lg border-0 rounded-4 overflow-hidden">
+    <!-- HEADER -->
+    <div class="chatbox-header d-flex justify-content-between align-items-center p-3 text-white">
+        <div class="d-flex align-items-center gap-2">
+            <div
+                class="bot-avatar rounded-circle bg-white text-primary d-flex align-items-center justify-content-center shadow-sm">
+                🤖
+            </div>
+            <div>
+                <h6 class="mb-0 fw-bold">BookStore </h6>
+                <small class="text-white-50 fs-8 d-flex align-items-center gap-1">
+                    <span class="online-dot"></span> Sẵn sàng tư vấn
+                </small>
+            </div>
+        </div>
+        <button type="button" class="btn-close btn-close-white" (click)="toggleChat()"></button>
+    </div>
+
+    <!-- BODY: DANH SÁCH TIN NHẮN -->
+    <div class="chatbox-body p-3 overflow-y-auto">
+        @for (msg of messages(); track $index) {
+        <div class="d-flex mb-3" [ngClass]="msg.sender === 'user' ? 'justify-content-end' : 'justify-content-start'">
+            @if (msg.sender === 'bot') {
+            <div class="bot-bubble-avatar me-2">🤖</div>
+            }
+            <div class="bubble p-2.5 px-3 rounded-4 shadow-sm"
+                [ngClass]="msg.sender === 'user' ? 'bubble-user' : 'bubble-bot'">
+                <div class="message-text" style="white-space: pre-line;">{{ formatText(msg.text) }}</div>
+
+                <!-- 🛒 DANH SÁCH THẺ SÁCH GỢI Ý MUA HÀNG -->
+                @if (msg.books && msg.books.length > 0) {
+                <div class="recommended-books-container mt-2 pt-2 border-top">
+                    <div class="small fw-bold text-primary mb-1.5 d-flex align-items-center gap-1">
+                        <span>✨ Sách gợi ý mua ngay:</span>
+                    </div>
+                    <div class="d-flex flex-column gap-2">
+                        @for (book of msg.books; track book.id) {
+                        <div
+                            class="card-book-mini p-2 bg-white rounded-3 border d-flex align-items-center justify-content-between shadow-xs">
+                            <div class="d-flex align-items-center gap-2 overflow-hidden">
+                                <img [src]="book.coverImage || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=100&q=80'"
+                                    (error)="$any($event.target).src = 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=100&q=80'"
+                                    class="book-mini-thumb rounded-3 shadow-xs" alt="{{ book.name }}">
+                                <div class="book-mini-info text-truncate ms-1">
+                                    <div class="book-mini-title text-truncate">{{ book.name }}</div>
+                                    <span class="book-mini-price badge mt-1">{{ book.price | number:'1.0-0' }} đ</span>
+                                </div>
+                            </div>
+                            <button
+                                class="btn btn-sm btn-primary rounded-pill px-2.5 py-1 fs-8 d-flex align-items-center gap-1 flex-shrink-0"
+                                (click)="addToCart(book)" [disabled]="addingBookId() === book.id">
+                                @if (addingBookId() === book.id) {
+                                <span>✓ Đã thêm</span>
+                                } @else {
+                                <span>🛒 Mua</span>
+                                }
+                            </button>
+                        </div>
+                        }
+                    </div>
+                </div>
+                }
+
+                <small class="time-text d-block text-end mt-1">{{ msg.time | date:'HH:mm' }}</small>
+            </div>
+        </div>
+        }
+
+        <!-- Hiệu ứng Gemini đang suy nghĩ -->
+        @if (isTyping()) {
+        <div class="d-flex align-items-center gap-2 text-muted small p-2">
+            <div class="spinner-grow spinner-grow-sm text-primary" role="status"></div>
+            <span class="fst-italic">Gemini đang tìm sách phù hợp...</span>
+        </div>
+        }
+    </div>
+
+    <!-- GỢI Ý NHANH (QUICK CHIPS) -->
+    <div class="chatbox-chips px-3 py-1.5 bg-light border-top d-flex flex-wrap gap-1">
+        <button class="btn btn-sm btn-white border rounded-pill py-0.5 px-2 fs-8"
+            (click)="sendMessage('Gợi ý những cuốn sách bán chạy nhất')">
+            🔥 Sách hot
+        </button>
+        <button class="btn btn-sm btn-white border rounded-pill py-0.5 px-2 fs-8"
+            (click)="sendMessage('Có sách nào giá dưới 100k không?')">
+            💰 Dưới 100k
+        </button>
+        <button class="btn btn-sm btn-white border rounded-pill py-0.5 px-2 fs-8"
+            (click)="sendMessage('Tư vấn sách hay đọc cuối tuần')">
+            📖 Đọc cuối tuần
+        </button>
+    </div>
+
+    <!-- Ô NHẬP TIN NHẮN -->
+    <div class="chatbox-footer p-2 bg-white border-top">
+        <form class="d-flex gap-2" (submit)="$event.preventDefault(); sendMessage()">
+            <input type="text" class="form-control rounded-pill px-3 fs-7"
+                placeholder="Hỏi AI bất cứ điều gì về sách..." [value]="inputMessage()"
+                (input)="inputMessage.set($any($event.target).value)" [disabled]="isTyping()">
+            <button type="submit" class="btn btn-primary rounded-circle shadow-sm"
+                [disabled]="!inputMessage().trim() || isTyping()" style="width: 40px; height: 40px;">
+                🚀
+            </button>
+        </form>
+    </div>
+</div>
+}
+}

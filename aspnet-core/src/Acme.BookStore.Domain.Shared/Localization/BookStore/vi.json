@@ -1,0 +1,21 @@
+{
+  "culture": "vi",
+  "texts": {
+    "AppName": "BookStore Official",
+    "Menu:Home": "Trang chủ 🏠",
+    "Menu:BookStore": "Danh mục Sách 📚",
+    "Menu:Books": "Danh sách Sách",
+    "Menu:Authors": "Tác giả 👤",
+    "Welcome": "Chào mừng bạn đến với Cửa Hàng Sách BookStore",
+    "LongWelcomeMessage": "Khám phá hàng ngàn đầu sách hay nhất mọi thời đại!",
+    "Permission:BookStore": "Quản lý Cửa Hàng Sách",
+    "Permission:Books": "Quản lý Sách",
+    "Permission:Books.Create": "Thêm sách mới",
+    "Permission:Books.Edit": "Chỉnh sửa sách",
+    "Permission:Books.Delete": "Xóa sách",
+    "Permission:Authors": "Quản lý Tác giả",
+    "Permission:Authors.Create": "Thêm tác giả mới",
+    "Permission:Authors.Edit": "Chỉnh sửa tác giả",
+    "Permission:Authors.Delete": "Xóa tác giả"
+  }
+}

@@ -1,0 +1,169 @@
+:host {
+    display: block;
+}
+
+.btn-chat-toggle {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.8);
+    background: linear-gradient(135deg, #4318ff 0%, #7551ff 100%) !important;
+    color: white !important;
+    z-index: 999999 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 8px 25px rgba(67, 24, 255, 0.5) !important;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+    &:hover {
+        transform: scale(1.12);
+        box-shadow: 0 12px 30px rgba(67, 24, 255, 0.7) !important;
+    }
+}
+
+.chatbox-card {
+    position: fixed;
+    bottom: 100px;
+    right: 28px;
+    width: 390px;
+    height: 540px;
+    background: white;
+    z-index: 999999 !important;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.22) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+
+    @media (max-width: 576px) {
+        width: calc(100vw - 32px);
+        right: 16px;
+        bottom: 95px;
+        height: 480px;
+    }
+}
+
+.chatbox-header {
+    background: linear-gradient(135deg, #4318ff 0%, #868ebd 100%);
+}
+
+.bot-avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+}
+
+.online-dot {
+    width: 8px;
+    height: 8px;
+    background-color: #00e676;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.chatbox-body {
+    flex: 1;
+    background: #f8fafc;
+}
+
+.bubble {
+    max-width: 88%;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    border-radius: 18px !important;
+}
+
+.bubble-user {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    color: white;
+    border-bottom-right-radius: 4px !important;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25) !important;
+}
+
+.bubble-bot {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
+    color: #0f172a;
+    border: 1px solid #e2e8f0;
+    border-bottom-left-radius: 4px !important;
+}
+
+// 🌟 STYLE CHO THẺ SÁCH GỢI Ý MINI CAO CẤP
+.card-book-mini {
+    background: #ffffff !important;
+    border-color: #e2e8f0 !important;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+
+    &:hover {
+        background: #ffffff !important;
+        border-color: rgba(99, 102, 241, 0.4) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(99, 102, 241, 0.12) !important;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+        border: none !important;
+        box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25) !important;
+        transition: all 0.2s ease !important;
+
+        &:hover {
+            transform: scale(1.05) !important;
+            box-shadow: 0 6px 14px rgba(79, 70, 229, 0.4) !important;
+        }
+    }
+}
+
+.book-mini-thumb {
+    width: 42px;
+    height: 54px;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 1px solid #f1f5f9;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.book-mini-info {
+    max-width: 160px;
+}
+
+.book-mini-title {
+    font-weight: 700 !important;
+    font-size: 0.85rem !important;
+    letter-spacing: -0.2px !important;
+    color: #0f172a !important;
+    line-height: 1.3;
+}
+
+.book-mini-price {
+    background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%) !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    font-size: 0.72rem !important;
+    padding: 0.25em 0.6em !important;
+    border-radius: 50rem !important;
+    letter-spacing: 0.2px;
+}
+
+.time-text {
+    font-size: 0.65rem;
+    opacity: 0.7;
+}
+
+.fs-8 {
+    font-size: 0.75rem;
+}
+
+.chatbox-chips {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}

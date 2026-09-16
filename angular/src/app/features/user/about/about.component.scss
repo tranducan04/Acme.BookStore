@@ -1,0 +1,12 @@
+/* About Component SCSS */
+:host {
+  display: block;
+}
+
+/* 🌟 KHUNG OPTION 2: ELEGANT SOFT PASTEL GRADIENT */
+.soft-pastel-card {
+  background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 50%, #e0e7ff 100%) !important;
+  border: 1px solid #ddd6fe !important;
+  border-radius: 16px !important;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.08) !important;
+}

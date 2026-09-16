@@ -1,0 +1,139 @@
+/* Styles for the home component */
+.card-bg-image {
+  position: absolute;
+  width: 630px;
+  height: auto;
+  bottom: 0;
+  right: 0;
+  z-index: 1;
+}
+
+.starting-content {
+  position: relative;
+  z-index: 2;
+}
+
+@media (min-width: 1199px) {
+  .h-lg-100 {
+    height: 100% !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .h-md-100 {
+    height: 100% !important;
+  }
+}
+
+/* 💖 Nút thả tim */
+.btn-heart-toggle {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(4px);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 5;
+
+  &:hover {
+    transform: scale(1.2);
+    background: #ffffff;
+  }
+
+  &.active {
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  }
+}
+
+/* 🌟 PHỦ KÍN TOÀN MÀN HÌNH 100% (CHE CẢ SIDEBAR GIỐNG BÊN ADMIN) */
+.modal {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 99999 !important;
+  /* Đặt cao hơn tất cả để che cả Sidebar */
+  background: rgba(0, 0, 0, 0.65) !important;
+  /* Lớp nền đen mờ chuẩn xịn */
+  backdrop-filter: blur(5px) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow-y: auto !important;
+}
+
+.modal-dialog {
+  z-index: 100000 !important;
+  max-width: 750px !important;
+  width: 95% !important;
+  margin: auto !important;
+}
+
+/* 🌟 KHUNG OPTION 2: ELEGANT SOFT PASTEL GRADIENT */
+.soft-pastel-card {
+  background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 50%, #e0e7ff 100%) !important;
+  border: 1px solid #ddd6fe !important;
+  border-radius: 16px !important;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.08) !important;
+}
+
+/* 🌟 BANNER CHỮ CHẠY (ANNOUNCEMENT MARQUEE) */
+.announcement-bar {
+  background: linear-gradient(135deg, #4318ff 0%, #6366f1 50%, #4f46e5 100%);
+  border-radius: 14px;
+  color: #ffffff;
+  padding: 0.65rem 1rem;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+
+  .announcement-content {
+    display: flex;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .marquee-track {
+    display: inline-flex;
+    align-items: center;
+    gap: 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    /* Hiệu ứng animation chạy chữ từ phải qua trái liên tục 25s */
+    animation: marqueeScroll 25s linear infinite;
+
+    span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .dot {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 1.2rem;
+    }
+  }
+}
+
+/* 🎥 Keyframe định nghĩa chuyển động chạy từ phải (0%) sang trái (-50%) */
+@keyframes marqueeScroll {
+  0% {
+    transform: translateX(0%);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}

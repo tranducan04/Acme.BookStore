@@ -1,0 +1,103 @@
+<div class="card shadow-sm border-0 rounded-4" @pageEnter>
+    <!-- Header: Tiêu đề & Nút Thêm mới -->
+    <div
+        class="card-header bg-white py-3 border-bottom d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div>
+            <h4 class="fw-bold text-dark mb-1">🏷️ Quản Lý Danh Mục Sách</h4>
+
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <!-- Tìm kiếm -->
+            <div class="search-input-wrapper" style="width: 220px;">
+                <span class="search-icon text-muted">🔍</span>
+                <input type="text" class="form-control form-control-sm shadow-sm" placeholder="Tìm danh mục..."
+                    [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" />
+            </div>
+            <button class="btn btn-primary btn-sm rounded-pill px-3.5 shadow-sm fw-bold text-nowrap"
+                (click)="openCreateModal()">
+                ➕ Thêm Danh Mục
+            </button>
+        </div>
+    </div>
+    <!-- BẢNG Danh sách Danh mục -->
+    <div class="card-body p-0">
+        @if (isLoading()) {
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary"></div>
+            <p class="text-muted small mt-2 mb-0">Đang tải danh mục...</p>
+        </div>
+        } @else if (filteredCategories().length === 0) {
+        <div class="text-center py-5">
+            <div class="fs-1 mb-2">🏷️</div>
+            <h5 class="fw-bold text-dark">Chưa có danh mục nào!</h5>
+            <p class="text-muted small">Bấm nút "Thêm Danh Mục" để tạo danh mục đầu tiên.</p>
+        </div>
+        } @else {
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 w-100">
+                <thead class="table-dark">
+                    <tr>
+                        <th class="ps-4" style="width: 30%;">TÊN DANH MỤC</th>
+                        <th style="width: 45%;">MÔ TẢ</th>
+                        <th class="text-end pe-4" style="width: 25%;">HÀNH ĐỘNG</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (cat of filteredCategories(); track cat.id) {
+                    <tr>
+                        <td class="ps-4">
+                            <span class="badge-category-pill">{{ cat.name }}</span>
+                        </td>
+                        <td class="text-muted">{{ cat.description || 'Chưa có mô tả' }}</td>
+                        <td class="text-end pe-4">
+                            <div class="d-flex justify-content-end gap-2">
+                                <button class="btn btn-sm btn-primary rounded-pill px-3" (click)="openEditModal(cat)">
+                                    ✏️ Sửa
+                                </button>
+                                <button class="btn btn-sm btn-danger rounded-pill px-3"
+                                    (click)="deleteCategory(cat.id, cat.name)">
+                                    🗑️ Xóa
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        }
+    </div>
+</div>
+<!-- Modal Thêm / Sửa Danh Mục -->
+@if (isModalOpen()) {
+<div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);" (click)="closeModal()">
+    <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()">
+        <div class="modal-content rounded-4 border-0 shadow-lg overflow-hidden">
+            <div class="modal-header bg-primary text-white p-3">
+                <h5 class="modal-title fw-bold">{{ isEditMode() ? '✏️ Chỉnh Sửa Danh Mục' : '➕ Thêm Danh Mục Mới' }}
+                </h5>
+                <button type="button" class="btn-close btn-close-white" (click)="closeModal()"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="mb-3">
+                    <label class="form-label fw-bold small text-dark">Tên danh mục <span
+                            class="text-danger">*</span></label>
+                    <input type="text" class="form-control" placeholder="Ví dụ: Tâm lý học, Kinh tế..."
+                        [(ngModel)]="selectedCategory().name" required />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold small text-dark">Mô tả danh mục</label>
+                    <textarea class="form-control" rows="3" placeholder="Nhập mô tả ngắn..."
+                        [(ngModel)]="selectedCategory().description"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer bg-light p-2.5">
+                <button type="button" class="btn btn-light rounded-pill px-4" (click)="closeModal()">Hủy</button>
+                <button type="button" class="btn btn-primary rounded-pill px-4 fw-bold" (click)="saveCategory()">
+                    💾 Lưu Lại
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+}

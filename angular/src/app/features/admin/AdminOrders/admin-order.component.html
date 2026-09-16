@@ -1,0 +1,307 @@
+<div class="card shadow-sm border-0 rounded-4" @pageEnter>
+    <div class="card-header d-flex justify-content-between align-items-center bg-white py-3">
+        <div class="d-flex align-items-center gap-3">
+            @if (isFromNotification()) {
+            <a routerLink="/notifications" class="btn btn-sm btn-outline-secondary rounded-pill px-3 shadow-sm d-flex align-items-center gap-1.5" title="Quay lại danh sách thông báo">
+                <span>⬅️</span>
+                <span class="fw-semibold small">Quay lại thông báo</span>
+            </a>
+            }
+            <h4 class="mb-0 fw-bold text-dark">👑 Admin - Quản lý tất cả Đơn hàng</h4>
+        </div>
+        <button class="btn btn-sm btn-light border text-dark fw-bold rounded-pill px-3 shadow-sm"
+            (click)="loadAllOrders()">🔄 Refresh</button>
+    </div>
+
+    <!-- 🔍 THANH TÌM KIẾM & BỘ LỌC -->
+    <div class="card-body border-bottom bg-white py-3 px-4">
+        <div class="row g-3 align-items-end">
+            <!-- Ô tìm kiếm -->
+            <div class="col-md-4">
+
+                <div class="search-input-wrapper">
+                    <span class="search-icon text-muted">🔍</span>
+                    <input type="text" class="form-control form-control-sm shadow-sm"
+                        placeholder="Nhập mã đơn, tên khách, SĐT..." [value]="searchKeyword()"
+                        (input)="onSearchInput($event)">
+                </div>
+            </div>
+            <!-- Lọc trạng thái -->
+            <div class="col-md-3">
+
+                <select class="form-select form-select-sm shadow-sm"
+                    [value]="filterStatus() !== null ? filterStatus()!.toString() : ''"
+                    (change)="onFilterStatusChange($event)">
+                    <option value="">Tất cả trạng thái</option>
+                    <option value="0">🆕 Đã đặt hàng</option>
+                    <option value="1">⚙️ Đang xử lý</option>
+                    <option value="2">🚚 Đang giao hàng</option>
+                    <option value="3">✅ Hoàn thành</option>
+                    <option value="4">❌ Đã hủy</option>
+                </select>
+            </div>
+            <!-- Lọc phương thức thanh toán -->
+            <div class="col-md-3">
+
+                <select class="form-select form-select-sm shadow-sm"
+                    [value]="filterPaymentMethod() !== null ? filterPaymentMethod()!.toString() : ''"
+                    (change)="onFilterPaymentChange($event)">
+                    <option value="">Tất cả phương thức thanh toán</option>
+                    <option value="0">💵 COD</option>
+                    <option value="1">📱 QR Code</option>
+                    <option value="2">💳 MoMo</option>
+                </select>
+            </div>
+            <!-- Nút xóa bộ lọc -->
+            <div class="col-md-2">
+                <button class="btn btn-sm btn-outline-secondary w-100 shadow-sm" (click)="clearFilters()">
+                    🗑️ Xóa bộ lọc
+                </button>
+            </div>
+        </div>
+        <!-- Hiển thị số kết quả -->
+        <div class="mt-2">
+            <small class="text-secondary">
+                Tìm thấy <strong class="text-primary">{{ totalCount() }}</strong> đơn hàng
+                @if (searchKeyword()) {
+                — từ khóa: "<strong>{{ searchKeyword() }}</strong>"
+                }
+            </small>
+        </div>
+    </div>
+
+    <div class="card-body p-0">
+        @if (isLoading()) {
+        <p class="text-center py-4">Đang tải danh sách đơn hàng...</p>
+        } @else if (filteredOrders().length === 0) {
+        <div class="text-center py-4">
+            <h5>🔍 Không tìm thấy đơn hàng nào!</h5>
+            <p class="text-muted small">Thử thay đổi từ khóa hoặc bộ lọc.</p>
+            <button class="btn btn-sm btn-outline-primary" (click)="clearFilters()">Xóa bộ lọc</button>
+        </div>
+        } @else {
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Mã đơn</th>
+                        <th>Ngày đặt</th>
+                        <th>Khách hàng</th>
+                        <th>Tổng tiền</th>
+                        <th>Thanh toán</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác Duyệt</th>
+                        <th>Chi tiết</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (order of filteredOrders(); track order.id) {
+                    <tr>
+                        <td class="fw-bold text-primary">{{ order.orderNo }}</td>
+                        <td><small>{{ order.creationTime | date:'dd/MM/yyyy HH:mm' }}</small></td>
+                        <td>
+                            <strong>{{ order.receiverName }}</strong><br>
+                            <small class="text-muted">📞 {{ order.receiverPhone }}</small>
+                        </td>
+                        <td class="fw-bold text-danger">{{ order.totalAmount | currency:'VND':'symbol':'1.0-0' }}</td>
+                        <td>
+                            @switch (order.paymentMethod) {
+                            @case (0) {
+                            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+                                💵 COD
+                            </span>
+                            }
+                            @case (1) {
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1">
+                                📱 QR Code
+                            </span>
+                            }
+                            @case (2) {
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">
+                                💳 MoMo
+                            </span>
+                            }
+                            @default {
+                            <span class="badge bg-secondary-subtle text-secondary px-2 py-1">—</span>
+                            }
+                            }
+                        </td>
+                        <td>
+                            <span class="badge" [ngClass]="getStatusBadgeClass(order.status!)">
+                                @switch (order.status) {
+                                @case (0) { 🆕 Đã đặt hàng }
+                                @case (1) { ⚙️ Đang xử lý }
+                                @case (2) { 🚚 Đang giao hàng }
+                                @case (3) { ✅ Hoàn thành }
+                                @case (4) { ❌ Đã hủy }
+                                }
+                            </span>
+                        </td>
+                        <td>
+                            @if (order.status === 4) {
+                            <span class="badge bg-secondary border text-white px-2.5 py-1.5">🔒 Đã hủy</span>
+                            } @else if (order.status === 3) {
+                            <span class="badge bg-success border text-white px-2.5 py-1.5">🎉 Hoàn thành</span>
+                            } @else {
+                            <select class="form-select form-select-sm fw-bold border-secondary"
+                                [value]="order.status?.toString()" (change)="changeStatus(order.id!, $event)">
+                                <option value="0">🆕 Đã đặt hàng</option>
+                                <option value="1">⚙️ Đang xử lý</option>
+                                <option value="2">🚚 Đang giao hàng</option>
+                                <option value="3">✅ Hoàn thành</option>
+                                <option value="4">❌ Đã hủy</option>
+                            </select>
+                            }
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary rounded-pill px-3"
+                                (click)="viewDetail(order)">
+                                Chi tiết
+                            </button>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        }
+    </div>
+</div>
+<!-- 📦 MODAL CHI TIẾT ĐƠN HÀNG - SẠCH SẼ, KHÔNG KHUNG HỘP THÔ -->
+@if (selectedOrder()) {
+<div class="modal d-block" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow-lg overflow-hidden bg-white">
+            <!-- Header Modal màu Xanh Indigo -->
+            <div class="modal-header bg-primary text-white p-3.5 px-4 border-0">
+                <h5 class="modal-title fw-bold mb-0 text-white d-flex align-items-center gap-2 fs-5">
+                    <span>📦 Chi tiết đơn hàng</span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white shadow-none"
+                    (click)="selectedOrder.set(null)"></button>
+            </div>
+
+            <div class="modal-body p-4 bg-white">
+                <!-- 1. HÀNG THÔNG TIN MÃ ĐƠN HÀNG & TRẠNG THÁI (DẠNG PHẲNG) -->
+                <div class="d-flex align-items-center justify-content-between pb-3 mb-4 border-bottom">
+                    <div>
+                        <span class="text-muted small d-block">Mã đơn hàng</span>
+                        <h4 class="text-primary fw-bold mb-0">{{ selectedOrder()?.orderNo }}</h4>
+                        <small class="text-muted">📅 {{ selectedOrder()?.creationTime | date:'dd/MM/yyyy HH:mm'
+                            }}</small>
+                    </div>
+                    <div class="text-end">
+                        <span class="text-muted small d-block mb-1">Trạng thái</span>
+                        <span class="badge fs-6 px-3.5 py-2 shadow-sm"
+                            [ngClass]="getStatusBadgeClass(selectedOrder()?.status)">
+                            @switch (selectedOrder()?.status) {
+                            @case (0) { 🆕 Đã đặt hàng }
+                            @case (1) { ⚙️ Đang xử lý }
+                            @case (2) { 🚚 Đang giao hàng }
+                            @case (3) { ✅ Hoàn thành }
+                            @case (4) { ❌ Đã hủy }
+                            }
+                        </span>
+                    </div>
+                </div>
+
+                <!-- 2. THÔNG TIN GIAO HÀNG (DẠNG GRID THÔNG THOÁNG KHÔNG BOX) -->
+                <div class="mb-4 pb-3 border-bottom">
+                    <h6 class="fw-bold text-dark mb-3 fs-5">👤 Thông tin giao hàng</h6>
+                    <div class="row g-3 fs-6">
+                        <div class="col-md-4">
+                            <span class="text-muted d-block small">Người nhận:</span>
+                            <strong class="text-dark fs-5">{{ selectedOrder()?.receiverName }}</strong>
+                        </div>
+                        <div class="col-md-4">
+                            <span class="text-muted d-block small">Số điện thoại:</span>
+                            <strong class="text-dark fs-5">{{ selectedOrder()?.receiverPhone }}</strong>
+                        </div>
+                        <div class="col-md-4">
+                            <span class="text-muted d-block small">Địa chỉ nhận hàng:</span>
+                            <strong class="text-dark fs-6">{{ selectedOrder()?.shippingAddress }}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2.5 PHƯƠNG THỨC THANH TOÁN -->
+                <div class="mb-4 pb-3 border-bottom">
+                    <h6 class="fw-bold text-dark mb-3 fs-5">💳 Phương thức thanh toán</h6>
+                    <div class="d-flex align-items-center gap-3">
+                        @switch (selectedOrder()?.paymentMethod) {
+                        @case (0) {
+                        <div
+                            class="d-flex align-items-center gap-2 bg-success-subtle text-success rounded-pill px-3 py-2 border border-success-subtle">
+                            <span class="fs-5">💵</span>
+                            <span class="fw-bold">Thanh toán khi nhận hàng (COD)</span>
+                        </div>
+                        }
+                        @case (1) {
+                        <div
+                            class="d-flex align-items-center gap-2 bg-primary-subtle text-primary rounded-pill px-3 py-2 border border-primary-subtle">
+                            <span class="fs-5">📱</span>
+                            <span class="fw-bold">Chuyển khoản QR Code</span>
+                        </div>
+                        }
+                        @case (2) {
+                        <div
+                            class="d-flex align-items-center gap-2 bg-danger-subtle text-danger rounded-pill px-3 py-2 border border-danger-subtle">
+                            <span class="fs-5">💳</span>
+                            <span class="fw-bold">Ví MoMo</span>
+                        </div>
+                        }
+                        @default {
+                        <span class="text-muted">Chưa xác định</span>
+                        }
+                        }
+                    </div>
+                </div>
+
+                <!-- 3. DANH SÁCH SẢN PHẨM SÁCH (BẢNG DANH SÁCH GỌN GÀNG KHÔNG KHUNG) -->
+                <div class="mb-4">
+                    <h6 class="fw-bold text-dark mb-3 fs-5">📚 Sản phẩm đã đặt ({{ selectedOrder()?.items?.length }}
+                        loại)</h6>
+                    <div class="d-flex flex-column gap-2">
+                        @for (item of selectedOrder()?.items; track item.id) {
+                        <div class="d-flex align-items-center justify-content-between py-2.5 px-1 border-bottom">
+                            <div class="d-flex align-items-center gap-3">
+                                <img [src]="item.coverImage || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80'"
+                                    (error)="$any($event.target).src = 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80'"
+                                    class="rounded-3 shadow-sm border"
+                                    style="width: 50px; height: 65px; object-fit: cover;">
+                                <div>
+                                    <h6 class="mb-1 fw-bold text-dark fs-5">{{ item.bookName }}</h6>
+                                    <span class="text-muted fs-6">Số lượng: <strong class="text-primary fw-bold">x{{
+                                            item.count }}</strong></span>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-bold text-danger fs-5">{{ item.unitPrice |
+                                    currency:'VND':'symbol':'1.0-0' }}</div>
+                                <small class="text-muted">Tổng: {{ ((item.unitPrice || 0) * (item.count || 0)) |
+                                    currency:'VND':'symbol':'1.0-0' }}</small>
+                            </div>
+                        </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- 4. TỔNG TIỀN -->
+                <div class="d-flex justify-content-between align-items-center pt-2">
+                    <span class="fw-bold fs-4 text-dark">Tổng cộng thanh toán:</span>
+                    <span class="fw-bold fs-2 text-danger">{{ selectedOrder()?.totalAmount |
+                        currency:'VND':'symbol':'1.0-0' }}</span>
+                </div>
+            </div>
+
+            <!-- Footer Modal -->
+            <div class="modal-footer border-0 p-3 px-4 bg-white d-flex justify-content-end">
+                <button type="button" class="btn btn-primary rounded-pill px-4 py-2 fw-bold fs-6 shadow-sm"
+                    (click)="selectedOrder.set(null)">
+                    Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+}

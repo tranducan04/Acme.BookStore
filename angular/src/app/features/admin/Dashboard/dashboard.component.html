@@ -1,0 +1,217 @@
+<div class="dashboard-container p-4" @pageEnter>
+  <div class="mb-4 d-flex justify-content-between align-items-center">
+    <div>
+      <h2 class="fw-bold text-dark mb-1">📊 Báo Cáo Thống Kê & Phân Tích</h2>
+      <p class="text-muted mb-0">Theo dõi doanh thu, cơ cấu sản phẩm và hiệu suất kinh doanh</p>
+    </div>
+    <button class="btn btn-primary btn-sm rounded-pill px-4 fw-bold shadow-sm" [disabled]="isRefreshing()"
+      (click)="refreshData()">
+      <span *ngIf="isRefreshing()" class="spinner-border spinner-border-sm me-1"></span>
+      🔄 {{ isRefreshing() ? 'Đang cập nhật...' : 'Cập Nhật Dữ Liệu' }}
+    </button>
+  </div>
+  <!-- 4 THẺ CHỈ SỐ KPI BẤM VÀO XEM DANH SÁCH CHI TIẾT -->
+  <div class="row g-4 mb-4">
+    <!-- Thẻ 1: Doanh thu -->
+    <div class="col-md-3">
+      <div class="card shadow-sm border-0 rounded-3 p-3 bg-white cursor-pointer hover-card"
+        style="border-left: 5px solid #10b981 !important; cursor: pointer;" (click)="openOrdersModal('completed')"
+        title="Bấm để xem danh sách đơn hàng đã bán / hoàn thành">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <span class="text-uppercase text-muted fw-bold small d-block mb-1">Tổng Doanh Thu</span>
+            <h3 class="fw-bold text-dark mb-0">{{ totalRevenue() | currency:'VND':'symbol':'1.0-0' }}</h3>
+            <small class="text-success fw-semibold">🔍 Xem đơn đã bán ❯</small>
+          </div>
+          <div
+            class="p-3 rounded-circle bg-success-subtle text-success fs-3 d-flex align-items-center justify-content-center"
+            style="width: 54px; height: 54px;">
+            💵
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Thẻ 2: Tổng đơn hàng -->
+    <div class="col-md-3">
+      <div class="card shadow-sm border-0 rounded-3 p-3 bg-white cursor-pointer hover-card"
+        style="border-left: 5px solid #3b82f6 !important; cursor: pointer;" (click)="openOrdersModal('all')"
+        title="Bấm để xem danh sách tất cả đơn hàng">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <span class="text-uppercase text-muted fw-bold small d-block mb-1">Tổng Số Đơn Hàng</span>
+            <h3 class="fw-bold text-dark mb-0">{{ totalOrdersCount() }}</h3>
+            <small class="text-primary fw-semibold">🔍 Xem tất cả đơn ❯</small>
+          </div>
+          <div
+            class="p-3 rounded-circle bg-primary-subtle text-primary fs-3 d-flex align-items-center justify-content-center"
+            style="width: 54px; height: 54px;">
+            📦
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Thẻ 3: Đơn cần xử lý -->
+    <div class="col-md-3">
+      <div class="card shadow-sm border-0 rounded-3 p-3 bg-white cursor-pointer hover-card"
+        style="border-left: 5px solid #f59e0b !important; cursor: pointer;" (click)="openOrdersModal('pending')"
+        title="Bấm để xem danh sách đơn hàng cần xử lý">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <span class="text-uppercase text-muted fw-bold small d-block mb-1">Đơn Cần Xử Lý</span>
+            <h3 class="fw-bold text-dark mb-0">{{ pendingOrdersCount() }}</h3>
+            <small class="text-warning fw-semibold">🔍 Xem đơn cần xử lý ❯</small>
+          </div>
+          <div
+            class="p-3 rounded-circle bg-warning-subtle text-warning fs-3 d-flex align-items-center justify-content-center"
+            style="width: 54px; height: 54px;">
+            ⏳
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Thẻ 4: Tổng số Sách -->
+    <div class="col-md-3">
+      <div class="card shadow-sm border-0 rounded-3 p-3 bg-white cursor-pointer hover-card"
+        style="border-left: 5px solid #8b5cf6 !important; cursor: pointer;" (click)="openOrdersModal('books')"
+        title="Bấm để chuyển sang Quản lý Sách">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <span class="text-uppercase text-muted fw-bold small d-block mb-1">Sách Đang Bán</span>
+            <h3 class="fw-bold text-dark mb-0">{{ totalBooksCount() }}</h3>
+            <small class="text-info fw-semibold">📚 Quản lý Sách ❯</small>
+          </div>
+          <div class="p-3 rounded-circle bg-info-subtle text-info fs-3 d-flex align-items-center justify-content-center"
+            style="width: 54px; height: 54px;">
+            📚
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 🌟 KHU VỰC 3 BIỂU ĐỒ (1 CỘT + 2 TRÒN) -->
+  <div class="row g-4 mb-4">
+    <!-- 📊 Biểu đồ cột: Doanh thu 12 tháng -->
+    <div class="col-12 col-xl-6">
+      <div class="card shadow-sm border-0 rounded-3 p-4 bg-white h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold text-dark mb-0">📊 Doanh Thu Theo Tháng (VNĐ)</h5>
+          <span class="badge bg-light text-secondary border">Năm 2026</span>
+        </div>
+        <div style="height: 280px; position: relative;">
+          <canvas #revenueBarChart></canvas>
+        </div>
+      </div>
+    </div>
+    <!-- 🍩 Biểu đồ tròn 1: Cơ cấu Doanh số theo Thể loại Sách -->
+    <div class="col-12 col-md-6 col-xl-3">
+      <div class="card shadow-sm border-0 rounded-3 p-4 bg-white h-100">
+        <h5 class="fw-bold text-dark mb-3">🍩 Doanh Số Thể Loại</h5>
+        <div class="d-flex align-items-center justify-content-center" style="height: 280px; position: relative;">
+          <canvas #categoryPieChart></canvas>
+        </div>
+      </div>
+    </div>
+    <!-- 🥧 Biểu đồ tròn 2: Tỷ lệ Trạng thái Đơn hàng -->
+    <div class="col-12 col-md-6 col-xl-3">
+      <div class="card shadow-sm border-0 rounded-3 p-4 bg-white h-100">
+        <h5 class="fw-bold text-dark mb-3">🥧 Trạng Thái Đơn Hàng</h5>
+        <div class="d-flex align-items-center justify-content-center" style="height: 280px; position: relative;">
+          <canvas #orderStatusChart></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- BẢNG TÓM TẮT ĐƠN HÀNG GẦN ĐÂY -->
+  <div class="card shadow-sm border-0 rounded-3">
+    <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+      <h5 class="mb-0 fw-bold text-dark">📋 Đơn Hàng Mới Nhất</h5>
+      <small class="text-muted">Cập nhật theo thời gian thực</small>
+    </div>
+    <div class="card-body p-0" style="overflow-x: hidden;">
+      <table class="table table-hover align-middle mb-0 w-100" style="table-layout: fixed;">
+        <thead class="table-light text-muted">
+          <tr>
+            <th class="ps-3">Mã đơn</th>
+            <th>Ngày đặt</th>
+            <th>Khách hàng</th>
+            <th>Tổng tiền</th>
+            <th>Phương thức</th>
+            <th class="text-center">Trạng thái</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (order of recentOrders(); track order.id) {
+          <tr>
+            <td class="ps-3 fw-bold text-primary">{{ order.orderNo }}</td>
+            <td><small class="text-muted">{{ order.creationTime | date:'dd/MM/yyyy HH:mm' }}</small></td>
+            <td><strong class="text-dark">{{ order.receiverName }}</strong></td>
+            <td class="fw-bold text-danger">{{ order.totalAmount | currency:'VND':'symbol':'1.0-0' }}</td>
+            <td>
+              <span class="fw-semibold text-dark">
+                {{ order.paymentMethod === 1 ? '📱 Chuyển khoản QR' : '💵 COD' }}
+              </span>
+            </td>
+            <td class="text-center">
+              <span class="badge rounded-pill px-3 py-1" [ngClass]="getStatusClass(order.status)">
+                {{ getStatusText(order.status) }}
+              </span>
+            </td>
+          </tr>
+          } @empty {
+          <tr>
+            <td colspan="6" class="text-center py-4 text-muted">Chưa có đơn hàng nào!</td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <!-- 🌟 MODAL POPUP HIỂN THỊ CHI TIẾT DANH SÁCH ĐƠN HÀNG THEO THẺ DỮ LIỆU -->
+  @if (isFilterModalOpen()) {
+  <div class="modal d-block show" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.5); z-index: 1060;">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content shadow-lg border-0 rounded-4 overflow-hidden">
+        <div class="modal-header bg-primary text-white p-3">
+          <h5 class="modal-title fw-bold">{{ modalTitle() }}</h5>
+          <button type="button" class="btn-close btn-close-white" (click)="closeModal()"></button>
+        </div>
+        <div class="modal-body p-0" style="max-height: 450px; overflow-y: auto; overflow-x: hidden;">
+          <table class="table table-hover align-middle mb-0 w-100" style="table-layout: fixed;">
+            <thead class="table-light">
+              <tr>
+                <th class="ps-3" style="width: 25%;">MÃ ĐƠN HÀNG</th>
+                <th style="width: 20%;">KHÁCH HÀNG</th>
+                <th style="width: 20%;">SỐ ĐIỆN THOẠI</th>
+                <th style="width: 18%;">TỔNG TIỀN</th>
+                <th style="width: 17%;">TRẠNG THÁI</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (order of filteredModalOrders(); track order.id) {
+              <tr>
+                <td class="ps-3 fw-bold text-primary">{{ order.orderNo }}</td>
+                <td><strong>{{ order.receiverName }}</strong></td>
+                <td>{{ order.receiverPhone }}</td>
+                <td class="fw-bold text-danger">{{ order.totalAmount | currency:'VND':'symbol':'1.0-0' }}</td>
+                <td>
+                  <span class="badge rounded-pill px-3 py-1" [ngClass]="getStatusClass(order.status)">
+                    {{ getStatusText(order.status) }}
+                  </span>
+                </td>
+              </tr>
+              } @empty {
+              <tr>
+                <td colspan="5" class="text-center py-4 text-muted">Không tìm thấy đơn hàng nào trong mục này!</td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="modal-footer bg-light p-2">
+          <button type="button" class="btn btn-secondary rounded-pill px-4" (click)="closeModal()">Đóng</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+</div>

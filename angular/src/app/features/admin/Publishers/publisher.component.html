@@ -1,0 +1,111 @@
+<div class="card shadow-sm border-0 rounded-3" @pageEnter>
+    <!-- HEADER & NÚT THAO TÁC -->
+    <div class="card-header bg-white py-3 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div>
+            <h4 class="fw-bold text-dark mb-1">🏢 Quản Lý Nhà Xuất Bản</h4>
+            <p class="text-muted small mb-0">Quản lý danh sách các nhà xuất bản phát hành sách</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <!-- Ô tìm kiếm -->
+            <div class="search-input-wrapper" style="width: 220px;">
+                <span class="search-icon text-muted">🔍</span>
+                <input type="text" class="form-control form-control-sm shadow-sm" placeholder="Tìm NXB, địa chỉ, SĐT..."
+                    [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" />
+            </div>
+            <button class="btn btn-sm btn-light border text-dark fw-bold rounded-pill px-3 shadow-sm"
+                (click)="loadPublishers()">
+                🔄 Cập Nhật
+            </button>
+            <button class="btn btn-sm btn-primary fw-bold rounded-pill px-3 shadow-sm" (click)="openCreateModal()">
+                ➕ Thêm NXB Mới
+            </button>
+        </div>
+    </div>
+    <!-- BẢNG DANH SÁCH -->
+    <div class="card-body p-0" style="overflow-x: hidden;">
+        @if (isLoading()) {
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2 text-muted">Đang tải danh sách Nhà xuất bản...</p>
+        </div>
+        } @else {
+        <table class="table table-hover align-middle mb-0 w-100" style="table-layout: fixed;">
+            <thead class="table-dark">
+                <tr>
+                    <th class="ps-3" style="width: 30%;">TÊN NHÀ XUẤT BẢN</th>
+                    <th style="width: 35%;">ĐỊA CHỈ</th>
+                    <th style="width: 20%;">SỐ ĐIỆN THOẠI</th>
+                    <th class="text-end pe-3" style="width: 15%;">HÀNH ĐỘNG</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (pub of filteredPublishers(); track pub.id) {
+                <tr>
+                    <td class="ps-3 fw-bold text-dark fs-6">🏢 {{ pub.name }}</td>
+                    <td class="text-muted">{{ pub.address || 'Chưa cập nhật' }}</td>
+                    <td>
+                        <span class="fw-semibold text-primary">📞 {{ pub.phoneNumber || '---' }}</span>
+                    </td>
+                    <td class="text-end pe-3">
+                        <button class="btn btn-sm btn-primary me-1 shadow-sm" (click)="openEditModal(pub)">
+                            ✏️ Sửa
+                        </button>
+                        <button class="btn btn-sm btn-danger shadow-sm" (click)="pub.id && deletePublisher(pub.id)">
+                            🗑️ Xóa
+                        </button>
+                    </td>
+                </tr>
+                } @empty {
+                <tr>
+                    <td colspan="4" class="text-center py-5 text-muted">
+                        Chưa có Nhà xuất bản nào. Hãy bấm <strong>"➕ Thêm NXB Mới"</strong> để tạo!
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+        }
+    </div>
+</div>
+<!-- 🌟 MODAL THÊM / SỬA NHÀ XUẤT BẢN -->
+@if (isModalOpen()) {
+<div class="modal d-block show" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.5); z-index: 1060;">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0 rounded-4 overflow-hidden">
+            <div class="modal-header bg-primary text-white p-3">
+                <h5 class="modal-title fw-bold">{{ isEditMode() ? '✏️ Chỉnh Sửa NXB' : '➕ Thêm Nhà Xuất Bản Mới' }}</h5>
+                <button type="button" class="btn-close btn-close-white" (click)="closeModal()"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form (submit)="$event.preventDefault(); savePublisher()">
+                    <!-- Tên NXB -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tên Nhà Xuất Bản <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" [value]="formName()" (input)="onInput('name', $event)"
+                            placeholder="Ví dụ: NXB Kim Đồng, NXB Trẻ..." required>
+                    </div>
+                    <!-- Địa chỉ -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Địa Chỉ Trụ Sở</label>
+                        <input type="text" class="form-control" [value]="formAddress()"
+                            (input)="onInput('address', $event)" placeholder="Ví dụ: 55 Quang Trung, Hà Nội">
+                    </div>
+                    <!-- Số điện thoại -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Số Điện Thoại Liên Hệ</label>
+                        <input type="text" class="form-control" [value]="formPhoneNumber()"
+                            (input)="onInput('phone', $event)" placeholder="Ví dụ: 024 3943 4730">
+                    </div>
+                    <div class="modal-footer px-0 pb-0 pt-3 border-top">
+                        <button type="button" class="btn btn-secondary rounded-pill px-3"
+                            (click)="closeModal()">Hủy</button>
+                        <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">
+                            💾 {{ isEditMode() ? 'Lưu Thay Đổi' : 'Tạo Mới' }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+}

@@ -1,0 +1,168 @@
+:host {
+  display: block;
+}
+
+
+/* 🌟 BẢNG QUẢN LÝ SÁCH ADMIN CAO CẤP */
+.table {
+  width: 100% !important;
+  max-width: 100% !important;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0;
+
+  thead {
+    tr {
+      background: #f8fafc !important; // 👈 Đổi nền tiêu đề sang xám sáng cực kỳ nhẹ nhàng, sang trọng
+
+      th {
+        background: #f8fafc !important;
+        color: #475569 !important;
+        font-size: 0.8rem !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        border-bottom: 2px solid #edf2f7 !important;
+        border-top: none !important;
+        padding: 1rem 0.75rem !important;
+      }
+    }
+  }
+
+  tbody {
+    tr {
+      transition: background-color 0.15s ease;
+
+      &:hover {
+        background-color: #f1f5f9 !important;
+      }
+
+      td {
+        vertical-align: middle;
+        padding: 0.85rem 0.75rem !important;
+        border-bottom: 1px solid #f1f5f9 !important;
+      }
+    }
+  }
+
+  // Cột 1: Bìa sách
+  th:nth-child(1),
+  td:nth-child(1) {
+    width: 85px;
+  }
+
+  // Cột 2: Tên sách
+  th:nth-child(2),
+  td:nth-child(2) {
+    width: 18%;
+  }
+
+  // Cột 3: Thể loại
+  th:nth-child(3),
+  td:nth-child(3) {
+    width: 14%;
+  }
+
+  // Cột 4: Tác giả
+  th:nth-child(4),
+  td:nth-child(4) {
+    width: 12%;
+  }
+
+  // Cột 5: Nhà xuất bản
+  th:nth-child(5),
+  td:nth-child(5) {
+    width: 15%;
+  }
+
+  // Cột 6: Giá bán
+  th:nth-child(6),
+  td:nth-child(6) {
+    width: 12%;
+  }
+
+  // Cột 7: Trạng thái
+  th:nth-child(7),
+  td:nth-child(7) {
+    width: 13%;
+  }
+
+  // Nút Thao tác
+  th:nth-child(8),
+  td:nth-child(8) {
+    width: 140px;
+    text-align: center;
+  }
+}
+
+.search-input-wrapper {
+  position: relative;
+  .search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    pointer-events: none;
+    font-size: 0.85rem;
+  }
+  input {
+    padding-left: 32px !important;
+  }
+}
+
+/* 💖 Nút thả tim trên thẻ sách */
+.btn-heart-toggle {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(4px);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 5;
+
+  &:hover {
+    transform: scale(1.2);
+    background: #ffffff;
+  }
+
+  &.active {
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  }
+}
+
+/* 🌟 PHỦ KÍN TOÀN MÀN HÌNH 100% (CHE CẢ SIDEBAR GIỐNG TRANG CHỦ) */
+.modal {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 99999 !important;
+  /* Đặt cao hơn tất cả để che cả Sidebar */
+  background: rgba(0, 0, 0, 0.65) !important;
+  /* Lớp nền đen mờ chuẩn xịn */
+  backdrop-filter: blur(5px) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow-y: auto !important;
+}
+
+.modal-dialog {
+  z-index: 100000 !important;
+  max-width: 750px !important;
+  width: 95% !important;
+  margin: auto !important;
+}

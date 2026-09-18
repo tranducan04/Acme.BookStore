@@ -30,6 +30,7 @@ using Volo.Abp.Swashbuckle;
 using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
 using Acme.BookStore.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Acme.BookStore;
 
@@ -65,6 +66,7 @@ public class BookStoreHttpApiHostModule : AbpModule
         var hostingEnvironment = context.Services.GetHostingEnvironment();
 
         context.Services.AddSignalR();
+        context.Services.AddSingleton<IUserIdProvider, AbpUserIdProvider>();
 
         ConfigureAuthentication(context);
         ConfigureBundles();
@@ -199,6 +201,18 @@ public class BookStoreHttpApiHostModule : AbpModule
         app.MapAbpStaticAssets();
         app.UseRouting();
         app.UseCors();
+
+        app.Use(async (httpContext, next) =>
+        {
+            var accessToken = httpContext.Request.Query["access_token"];
+            var path = httpContext.Request.Path;
+            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/signalr-hubs"))
+            {
+                httpContext.Request.Headers["Authorization"] = "Bearer " + accessToken;
+            }
+            await next();
+        });
+
         app.UseAuthentication();
         app.UseAbpOpenIddictValidation();
 

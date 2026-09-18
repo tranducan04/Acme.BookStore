@@ -6,13 +6,14 @@ import { Chart, registerables } from 'chart.js';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { BookReviewService } from '../../../proxy/book-reviews/book-review.service';
 import { BookReviewDto } from '../../../proxy/book-reviews/models';
+import { LocalizationPipe } from '@abp/ng.core';
 
 Chart.register(...registerables);
 
 @Component({
     selector: 'app-admin-reviews',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, LocalizationPipe],
     templateUrl: './admin-reviews.component.html',
     styleUrls: ['./admin-reviews.component.scss'],
     animations: [

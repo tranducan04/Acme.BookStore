@@ -7,11 +7,12 @@ import { OrderService } from '../../../proxy/orders/order.service';
 import { OrderDto } from '../../../proxy/orders/models';
 import { OrderStatus } from '../../../proxy/orders/order-status.enum';
 import { PaymentMethod } from '../../../proxy/orders/payment-method.enum';
+import { LocalizationPipe } from '@abp/ng.core';
 
 @Component({
     selector: 'app-admin-order',
     standalone: true,
-    imports: [CommonModule, FormsModule, RouterModule],
+    imports: [CommonModule, FormsModule, RouterModule, LocalizationPipe],
     templateUrl: './admin-order.component.html',
     styleUrl: './admin-order.component.scss',
     animations: [

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { firstValueFrom } from 'rxjs';
-import { PermissionService } from '@abp/ng.core';
+import { PermissionService, LocalizationPipe } from '@abp/ng.core';
 import { WishlistService } from '../../../proxy/wishlists/wishlist.service';
 import { WishlistItemDto, FavoriteBookStatDto } from '../../../proxy/wishlists/models';
 import { CartSignalStore } from '../Carts/cart-signal.store';
@@ -11,7 +11,7 @@ import { CartSignalStore } from '../Carts/cart-signal.store';
 @Component({
     selector: 'app-wishlist',
     standalone: true,
-    imports: [CommonModule, RouterModule],
+    imports: [CommonModule, RouterModule, LocalizationPipe],
     templateUrl: './wishlist.component.html',
     styleUrls: ['./wishlist.component.scss'],
     animations: [

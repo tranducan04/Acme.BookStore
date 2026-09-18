@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BookService, BookDto, CreateUpdateBookDto, bookTypeOptions } from '@proxy/books';
 import { AuthorService } from '@proxy/authors';
-import { AuthService, PermissionService } from '@abp/ng.core';
+import { AuthService, PermissionService, LocalizationPipe } from '@abp/ng.core';
 import { CartSignalStore } from '../../user/Carts/cart-signal.store';
 import { firstValueFrom } from 'rxjs';
 import { PublisherService } from '../../../proxy/publishers/publisher.service';
@@ -20,7 +20,7 @@ import { trigger, transition, style, animate } from '@angular/animations';
   standalone: true,
   templateUrl: './book.component.html',
   styleUrl: './book.component.scss',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LocalizationPipe],
   animations: [
     trigger('pageEnter', [
       transition(':enter', [

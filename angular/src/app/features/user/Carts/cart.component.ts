@@ -8,12 +8,14 @@ import { CartSignalStore } from './cart-signal.store';
 import { OrderService } from '../../../proxy/orders/order.service';
 import { PaymentService } from '../../../proxy/payments/payment.service';
 
+import { CoreModule } from '@abp/ng.core';
+
 @Component({
   selector: 'app-cart',
   standalone: true,
   templateUrl: './cart.component.html',
   styleUrl: './cart.component.scss',
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, CoreModule],
   animations: [
     trigger('pageEnter', [
       transition(':enter', [

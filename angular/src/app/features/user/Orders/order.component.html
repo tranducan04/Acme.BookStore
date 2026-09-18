@@ -4,54 +4,54 @@
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
             <div class="d-flex align-items-center gap-3">
                 @if (searchOrderNo()) {
-                <a routerLink="/notifications" class="btn btn-outline-secondary rounded-pill px-3 shadow-sm d-flex align-items-center gap-1.5" title="Quay lại danh sách thông báo">
+                <a routerLink="/notifications" class="btn btn-outline-secondary rounded-pill px-3 shadow-sm d-flex align-items-center gap-1.5" [title]="'::Orders:BackToNotifications' | abpLocalization">
                     <span>⬅️</span>
-                    <span class="fw-semibold small">Quay lại thông báo</span>
+                    <span class="fw-semibold small">{{ '::Orders:BackToNotifications' | abpLocalization }}</span>
                 </a>
                 }
                 <div>
-                    <h2 class="fw-bold text-dark mb-1">📦 Lịch Sử & Theo Dõi Đơn Hàng</h2>
-                    <p class="text-muted small mb-0">Theo dõi hành trình vận chuyển và quản lý trạng thái các đơn hàng của bạn.</p>
+                    <h2 class="fw-bold text-dark mb-1">📦 {{ '::Orders:UserTitle' | abpLocalization }}</h2>
+                    <p class="text-muted small mb-0">{{ '::Orders:UserSubtitle' | abpLocalization }}</p>
                 </div>
             </div>
             <button class="btn btn-outline-primary rounded-pill px-4 shadow-sm" (click)="loadOrders()">
-                🔄 Làm mới
+                🔄 {{ '::Refresh' | abpLocalization }}
             </button>
         </div>
         <!-- Filter Tabs (Tất cả, Chờ xử lý, Đang giao, Hoàn thành, Đã hủy) -->
         <div class="order-tabs d-flex gap-2 overflow-auto pb-2 mb-4">
             <button class="tab-btn" [class.active]="selectedTab() === -1" (click)="selectedTab.set(-1)">
-                Tất cả ({{ orders().length }})
+                {{ '::Orders:TabAll' | abpLocalization }} ({{ orders().length }})
             </button>
             <button class="tab-btn" [class.active]="selectedTab() === 0" (click)="selectedTab.set(0)">
-                ⏳ Chờ xác nhận ({{ getCountByStatus(0) }})
+                ⏳ {{ '::Orders:TabPending' | abpLocalization }} ({{ getCountByStatus(0) }})
             </button>
             <button class="tab-btn" [class.active]="selectedTab() === 1" (click)="selectedTab.set(1)">
-                📦 Đang đóng gói ({{ getCountByStatus(1) }})
+                📦 {{ '::Orders:TabPackaging' | abpLocalization }} ({{ getCountByStatus(1) }})
             </button>
             <button class="tab-btn" [class.active]="selectedTab() === 2" (click)="selectedTab.set(2)">
-                🚚 Đang vận chuyển ({{ getCountByStatus(2) }})
+                🚚 {{ '::Orders:TabShipping' | abpLocalization }} ({{ getCountByStatus(2) }})
             </button>
             <button class="tab-btn" [class.active]="selectedTab() === 3" (click)="selectedTab.set(3)">
-                🎉 Hoàn thành ({{ getCountByStatus(3) }})
+                🎉 {{ '::Orders:TabCompleted' | abpLocalization }} ({{ getCountByStatus(3) }})
             </button>
             <button class="tab-btn" [class.active]="selectedTab() === 4" (click)="selectedTab.set(4)">
-                ❌ Đã hủy ({{ getCountByStatus(4) }})
+                ❌ {{ '::Orders:TabCancelled' | abpLocalization }} ({{ getCountByStatus(4) }})
             </button>
         </div>
         <!-- Orders List -->
         @if (isLoading()) {
         <div class="card border-0 shadow-sm rounded-4 text-center py-5">
             <div class="spinner-border text-primary mx-auto mb-3"></div>
-            <p class="text-muted">Đang tải danh sách đơn hàng...</p>
+            <p class="text-muted">{{ '::Orders:LoadingOrders' | abpLocalization }}</p>
         </div>
         } @else if (filteredOrders().length === 0) {
         <div class="card border-0 shadow-sm rounded-4 text-center py-5 px-3">
             <div class="fs-1 mb-2">🛍️</div>
-            <h5 class="fw-bold text-dark mb-2">Chưa có đơn hàng nào!</h5>
-            <p class="text-muted small mb-4">Hãy khám phá kho sách tuyệt vời và đặt cuốn sách bạn yêu thích.</p>
+            <h5 class="fw-bold text-dark mb-2">{{ '::Orders:EmptyTitle' | abpLocalization }}</h5>
+            <p class="text-muted small mb-4">{{ '::Orders:EmptyDesc' | abpLocalization }}</p>
             <a routerLink="/books" class="btn btn-primary rounded-pill px-4 mx-auto fw-bold">
-                📖 Mua Sách Ngay
+                📖 {{ '::Orders:BuyNow' | abpLocalization }}
             </a>
         </div>
         } @else {
@@ -64,13 +64,20 @@
                     <div class="d-flex align-items-center gap-3">
                         <span class="fw-bold text-dark fs-6">{{ order.orderNo }}</span>
                         <span class="custom-badge" [ngClass]="getStatusBadgeClass(order.status)">
-                            {{ getStatusLabel(order.status) }}
+                            @switch (order.status) {
+                                @case (0) { ⏳ {{ '::Orders:TabPending' | abpLocalization }} }
+                                @case (1) { 📦 {{ '::Orders:TabPackaging' | abpLocalization }} }
+                                @case (2) { 🚚 {{ '::Orders:TabShipping' | abpLocalization }} }
+                                @case (3) { 🎉 {{ '::Orders:TabCompleted' | abpLocalization }} }
+                                @case (4) { ❌ {{ '::Orders:TabCancelled' | abpLocalization }} }
+                                @default { {{ '::Home:Unknown' | abpLocalization }} }
+                            }
                         </span>
                         <span class="badge bg-light text-secondary border">
-                            {{ order.paymentMethod === 1 ? '📱 Chuyển khoản QR' : '💵 Thanh toán khi nhận hàng (COD)' }}
+                            {{ order.paymentMethod === 1 ? ('📱 ' + ('::Cart:PaymentQR' | abpLocalization)) : ('💵 ' + ('::Cart:PaymentCOD' | abpLocalization)) }}
                         </span>
                     </div>
-                    <small class="text-muted">📅 Ngày đặt: {{ order.creationTime | date:'dd/MM/yyyy HH:mm' }}</small>
+                    <small class="text-muted">📅 {{ '::Orders:OrderDateLabel' | abpLocalization }} {{ order.creationTime | date:'dd/MM/yyyy HH:mm' }}</small>
                 </div>
                 <!-- Body đơn hàng & Stepper Tiến trình -->
                 <div class="card-body p-4">
@@ -80,49 +87,49 @@
                         <div class="step-item" [class.completed]="(order.status ?? 0) >= 0"
                             [class.current]="order.status === 0">
                             <div class="step-circle">🛒</div>
-                            <div class="step-label">Đã đặt hàng</div>
+                            <div class="step-label">{{ '::Orders:StepOrdered' | abpLocalization }}</div>
                         </div>
                         <div class="step-line" [class.active]="(order.status ?? 0) >= 1"></div>
 
                         <div class="step-item" [class.completed]="(order.status ?? 0) >= 1"
                             [class.current]="order.status === 1">
                             <div class="step-circle">📦</div>
-                            <div class="step-label">Đang đóng gói</div>
+                            <div class="step-label">{{ '::Orders:StepPackaging' | abpLocalization }}</div>
                         </div>
                         <div class="step-line" [class.active]="(order.status ?? 0) >= 2"></div>
 
                         <div class="step-item" [class.completed]="(order.status ?? 0) >= 2"
                             [class.current]="order.status === 2">
                             <div class="step-circle">🚚</div>
-                            <div class="step-label">Đang vận chuyển</div>
+                            <div class="step-label">{{ '::Orders:StepShipping' | abpLocalization }}</div>
                         </div>
                         <div class="step-line" [class.active]="(order.status ?? 0) >= 3"></div>
 
                         <div class="step-item" [class.completed]="order.status === 3"
                             [class.current]="order.status === 3">
                             <div class="step-circle">🎉</div>
-                            <div class="step-label">Giao thành công</div>
+                            <div class="step-label">{{ '::Orders:StepDelivered' | abpLocalization }}</div>
                         </div>
                     </div>
                     } @else {
                     <div class="alert alert-danger rounded-3 py-2 px-3 mb-4 d-flex align-items-center gap-2">
                         <span>❌</span>
-                        <span>Đơn hàng này đã được hủy. Số lượng sách đã được hoàn trả lại vào kho.</span>
+                        <span>{{ '::Orders:CancelledAlert' | abpLocalization }}</span>
                     </div>
                     }
                     <!-- Thông tin người nhận -->
                     <div class="receiver-info p-3.5 soft-pastel-card mb-4">
                         <div class="row g-2 small">
                             <div class="col-md-4">
-                                <span class="text-muted">Người nhận:</span> <strong class="text-dark">{{
+                                <span class="text-muted">{{ '::Orders:Receiver' | abpLocalization }}:</span> <strong class="text-dark">{{
                                     order.receiverName }}</strong>
                             </div>
                             <div class="col-md-4">
-                                <span class="text-muted">Số điện thoại:</span> <strong class="text-dark">{{
+                                <span class="text-muted">{{ '::Orders:Phone' | abpLocalization }}:</span> <strong class="text-dark">{{
                                     order.receiverPhone }}</strong>
                             </div>
                             <div class="col-md-4">
-                                <span class="text-muted">Địa chỉ nhận hàng:</span> <strong class="text-dark">{{
+                                <span class="text-muted">{{ '::Orders:Address' | abpLocalization }}:</span> <strong class="text-dark">{{
                                     order.shippingAddress }}</strong>
                             </div>
                         </div>
@@ -132,7 +139,7 @@
                         @if (!order.items || order.items.length === 0) {
                         <div class="alert alert-warning rounded-3 py-2 px-3 mb-2 d-flex align-items-center gap-2 small">
                             <span>⚠️</span>
-                            <span>Sản phẩm trong đơn hàng này đã bị Admin xóa hoặc ngừng kinh doanh khỏi hệ thống.</span>
+                            <span>{{ '::Orders:ItemsMissingAlert' | abpLocalization }}</span>
                         </div>
                         }
                         @for (item of order.items; track item.id) {
@@ -143,19 +150,19 @@
                                     style="width: 48px; height: 58px;">
                                 <div>
                                     <h6 class="mb-0 fw-bold text-dark">{{ item.bookName }}</h6>
-                                    <small class="text-muted">Số lượng: x{{ item.count }}</small>
+                                    <small class="text-muted">{{ '::Orders:Quantity' | abpLocalization }}: x{{ item.count }}</small>
                                 </div>
                             </div>
                             <div class="d-flex align-items-center gap-3 text-end">
                                 <div>
                                     <span class="fw-bold text-dark">{{ item.totalPrice | currency:'VND':'symbol':'1.0-0' }}</span>
-                                    <small class="text-muted d-block fs-8">{{ item.unitPrice | currency:'VND':'symbol':'1.0-0' }}/cuốn</small>
+                                    <small class="text-muted d-block fs-8">{{ item.unitPrice | currency:'VND':'symbol':'1.0-0' }}{{ '::Orders:PerBook' | abpLocalization }}</small>
                                 </div>
                                 <!-- NÚT VIẾT ĐÁNH GIÁ CHỈ HIỆN KHI ĐƠN HÀNG Ở TRẠNG THÁI GIAO THÀNH CÔNG (3) -->
                                 @if (order.status === 3) {
                                 <button class="btn btn-sm btn-outline-warning text-dark fw-bold rounded-pill px-3 shadow-sm"
                                     (click)="openReviewModal(item.bookId, item.bookName)">
-                                    ⭐ Viết đánh giá
+                                    ⭐ {{ '::Orders:WriteReview' | abpLocalization }}
                                 </button>
                                 }
                             </div>
@@ -170,7 +177,7 @@
                             @if (order.status === 0 || order.status === 1) {
                             <button class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-semibold shadow-none me-2"
                                 (click)="cancelOrder(order)">
-                                ❌ Hủy đơn hàng này
+                                ❌ {{ '::Orders:CancelThisOrder' | abpLocalization }}
                             </button>
                             }
 
@@ -180,16 +187,16 @@
                                 [disabled]="isReordering()"
                                 (click)="reorder(order)">
                                 @if (isReordering()) {
-                                <span class="spinner-border spinner-border-sm me-1"></span> Đang kiểm tra...
+                                <span class="spinner-border spinner-border-sm me-1"></span> {{ '::Orders:CheckingReorder' | abpLocalization }}
                                 } @else {
-                                🛒 Đặt lại đơn này
+                                🛒 {{ '::Orders:ReorderThis' | abpLocalization }}
                                 }
                             </button>
                             }
                         </div>
 
                         <div class="text-md-end">
-                            <span class="text-muted me-2 small">Tổng thanh toán:</span>
+                            <span class="text-muted me-2 small">{{ '::Orders:TotalPayment' | abpLocalization }}:</span>
                             <span class="fs-4 fw-bold text-danger">{{ order.totalAmount |
                                 currency:'VND':'symbol':'1.0-0' }}</span>
                         </div>
@@ -209,19 +216,19 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-4">
             <div class="modal-header bg-warning text-dark border-0 rounded-top-4">
-                <h5 class="modal-title mb-0 fw-bold">⭐ Viết Đánh Giá Sản Phẩm</h5>
+                <h5 class="modal-title mb-0 fw-bold">⭐ {{ '::Orders:ReviewModalTitle' | abpLocalization }}</h5>
                 <button type="button" class="btn-close" (click)="closeReviewModal()"></button>
             </div>
             <div class="modal-body p-4">
                 <!-- Tên sách -->
                 <div class="alert alert-light border rounded-3 p-3 mb-3">
-                    <small class="text-muted d-block">Sản phẩm đánh giá:</small>
+                    <small class="text-muted d-block">{{ '::Orders:ReviewProductLabel' | abpLocalization }}</small>
                     <strong class="text-primary fs-6">{{ selectedBookForReview()?.bookName }}</strong>
                 </div>
 
                 <!-- Chọn số sao Rating -->
                 <div class="mb-4 text-center">
-                    <label class="form-label fw-bold text-dark d-block mb-2">Đánh giá của bạn:</label>
+                    <label class="form-label fw-bold text-dark d-block mb-2">{{ '::Orders:YourRating' | abpLocalization }}</label>
                     <div class="d-flex justify-content-center gap-2">
                         @for (star of [1, 2, 3, 4, 5]; track star) {
                         <button type="button" class="btn p-1 fs-3 border-0 bg-transparent text-warning transition-transform"
@@ -231,26 +238,26 @@
                         }
                     </div>
                     <small class="text-muted mt-1 d-block fw-semibold">
-                        {{ reviewRating() === 5 ? '😍 Rất tuyệt vời' : reviewRating() === 4 ? '😊 Hài lòng' : reviewRating() === 3 ? '😐 Bình thường' : reviewRating() === 2 ? '😕 Tạm được' : '😡 Rất tệ' }}
+                        {{ reviewRating() === 5 ? ('::Orders:Rating5' | abpLocalization) : reviewRating() === 4 ? ('::Orders:Rating4' | abpLocalization) : reviewRating() === 3 ? ('::Orders:Rating3' | abpLocalization) : reviewRating() === 2 ? ('::Orders:Rating2' | abpLocalization) : ('::Orders:Rating1' | abpLocalization) }}
                     </small>
                 </div>
 
                 <!-- Nhập nội dung nhận xét -->
                 <div class="mb-3">
-                    <label class="form-label fw-bold text-dark">Nhận xét chi tiết *</label>
+                    <label class="form-label fw-bold text-dark">{{ '::Orders:ReviewDetailLabel' | abpLocalization }} *</label>
                     <textarea class="form-control rounded-3" rows="4" [(ngModel)]="reviewComment"
-                        placeholder="Hãy chia sẻ cảm nhận của bạn về cuốn sách này nhé (chất lượng in, nội dung sách, thời gian giao hàng...)..."></textarea>
+                        [placeholder]="'::Orders:ReviewPlaceholder' | abpLocalization"></textarea>
                 </div>
             </div>
 
             <div class="modal-footer border-0">
-                <button type="button" class="btn btn-secondary rounded-pill px-4" (click)="closeReviewModal()">Hủy</button>
+                <button type="button" class="btn btn-secondary rounded-pill px-4" (click)="closeReviewModal()">{{ '::Cancel' | abpLocalization }}</button>
                 <button type="button" class="btn btn-warning fw-bold text-dark rounded-pill px-4 shadow-sm"
                     (click)="submitReview()" [disabled]="isSubmittingReview()">
                     @if (isSubmittingReview()) {
-                    ⏳ Đang gửi...
+                    ⏳ {{ '::Orders:Submitting' | abpLocalization }}
                     } @else {
-                    🚀 Gửi Đánh Giá
+                    🚀 {{ '::Orders:SubmitReview' | abpLocalization }}
                     }
                 </button>
             </div>

@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, effect } from '@angular/core';
 import { InternetConnectionStatusComponent, LoaderBarComponent, NavItemsService } from '@abp/ng.theme.shared';
-import { ConfigStateService, DynamicLayoutComponent, PermissionService, RoutesService } from '@abp/ng.core';
+import { ConfigStateService, DynamicLayoutComponent, PermissionService, RoutesService, LocalizationService } from '@abp/ng.core';
 import { CartSignalStore } from './features/user/Carts/cart-signal.store';
 import { NotificationBellComponent } from './features/user/Notifications/notification-bell.component';
 import { ChatBotComponent } from './features/user/chat-bot/chat-bot.component';
@@ -20,6 +20,7 @@ export class AppComponent implements OnInit {
   private routesService = inject(RoutesService);
   private permissionService = inject(PermissionService);
   private configState = inject(ConfigStateService);
+  private localization = inject(LocalizationService);
   private cartStore = inject(CartSignalStore);
   private navItems = inject(NavItemsService);
 
@@ -42,7 +43,8 @@ export class AppComponent implements OnInit {
       if (!isAdmin) {
         const cartRoute = this.routesService.find(r => r.path === '/cart');
         if (cartRoute) {
-          const cartLabel = count > 0 ? `Giỏ hàng 🔴${count} 🛒` : 'Giỏ hàng 🛒';
+          const localizedCartName = this.localization.instant('::Menu:Cart') || 'Cart 🛒';
+          const cartLabel = count > 0 ? `${localizedCartName.replace('🛒', '').trim()} 🔴${count} 🛒` : localizedCartName;
           this.routesService.patch(cartRoute.name, { name: cartLabel });
         }
       }
@@ -54,14 +56,13 @@ export class AppComponent implements OnInit {
 
     this.configState.getAll$().subscribe(() => {
       const isAdmin = this.permissionService.getGrantedPolicy('BookStore.Books.Edit');
-      const cartRoute = this.routesService.find(r => r.path === '/cart');
-      if (cartRoute) {
-        this.routesService.patch(cartRoute.name, { invisible: isAdmin });
-      }
-      this.routesService.patch('Đơn hàng của tôi 📋', { invisible: isAdmin });
-      this.routesService.patch('Tác giả 👤', { invisible: isAdmin });
-      this.routesService.patch('Giới thiệu ℹ️', { invisible: isAdmin });
-      this.routesService.patch('Liên hệ 📞', { invisible: isAdmin });
+      const hideForAdminPaths = ['/cart', '/orders', '/about', '/contact', '/chat-support'];
+      hideForAdminPaths.forEach(path => {
+        const route = this.routesService.find(r => r.path === path);
+        if (route) {
+          this.routesService.patch(route.name, { invisible: isAdmin });
+        }
+      });
     });
   }
 }

@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { CoreModule } from '@abp/ng.core';
 import { trigger, transition, style, animate } from '@angular/animations';
 
 @Component({
   selector: 'app-about',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, CoreModule],
   templateUrl: './about.component.html',
   styleUrl: './about.component.scss',
   animations: [

@@ -3,15 +3,14 @@
   <div class="announcement-bar mb-3 shadow-sm">
     <div class="announcement-content">
       <div class="marquee-track">
-        <span>🔥 <strong>FLASH SALE:</strong> Giảm giá lên đến 50% cho toàn bộ sách hot hôm nay!</span>
+        <span>🔥 <strong>{{ '::Home:FlashSalePrefix' | abpLocalization }}</strong> {{ '::Home:FlashSaleContent' | abpLocalization }}</span>
         <span class="dot">•</span>
-        <span>🚀 <strong>FREESHIP:</strong> Miễn phí vận chuyển cho tất cả đơn hàng từ 200.000đ!</span>
+        <span>🚀 <strong>{{ '::Home:FreeShipPrefix' | abpLocalization }}</strong> {{ '::Home:FreeShipContent' | abpLocalization }}</span>
         <span class="dot">•</span>
-        <span>🎁 <strong>ƯU ĐÃI:</strong> Nhập mã <strong>BOOKSTORE20K</strong> giảm ngay 20.000đ khi thanh toán VietQR
-          / MoMo!</span>
+        <span>🎁 <strong>{{ '::Home:PromoPrefix' | abpLocalization }}</strong> {{ '::Home:PromoContent' | abpLocalization }}</span>
         <span class="dot">•</span>
         <!-- Lặp lại 1 lần nữa để chữ chạy lặp vô tận mượt mà không hẫng -->
-        <span>🔥 <strong>FLASH SALE:</strong> Giảm giá lên đến 50% cho toàn bộ sách hot hôm nay!</span>
+        <span>🔥 <strong>{{ '::Home:FlashSalePrefix' | abpLocalization }}</strong> {{ '::Home:FlashSaleContent' | abpLocalization }}</span>
         <span class="dot">•</span>
       </div>
     </div>
@@ -20,14 +19,13 @@
   <div class="p-5 mb-4 bg-primary text-white rounded-4 shadow-sm text-center position-relative overflow-hidden"
     style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);">
     <div class="container-fluid py-3">
-      <h1 class="display-5 fw-bold mb-3">📚 Welcome to BookStore Official</h1>
+      <h1 class="display-5 fw-bold mb-3">📚 {{ '::Welcome' | abpLocalization }}</h1>
       <p class="col-md-8 fs-5 mx-auto text-light opacity-75">
-        Khám phá hàng ngàn đầu sách hay nhất mọi thời đại. Từ văn học, công nghệ, tiểu thuyết phiêu lưu cho đến tri thức
-        cuộc sống!
+        {{ '::LongWelcomeMessage' | abpLocalization }}
       </p>
       <div class="mt-4">
         <a routerLink="/books" class="btn btn-warning btn-lg px-4 fw-bold rounded-pill shadow-sm">
-          📖 Khám phá kho sách
+          📖 {{ '::ExploreBooks' | abpLocalization }}
         </a>
       </div>
     </div>
@@ -35,11 +33,11 @@
   <!-- TIÊU ĐỀ SÁCH NỔI BẬT -->
   <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-      <h4 class="fw-bold text-dark mb-0">🔥 Sách Nổi Bật</h4>
-      <small class="text-muted">Những cuốn sách bán chạy & được yêu thích nhất (Bấm vào để xem chi tiết)</small>
+      <h4 class="fw-bold text-dark mb-0">🔥 {{ '::FeaturedBooks' | abpLocalization }}</h4>
+      <small class="text-muted">{{ '::FeaturedBooksSub' | abpLocalization }}</small>
     </div>
     <a routerLink="/books" class="btn btn-outline-primary btn-sm rounded-pill px-3">
-      Xem tất cả sách →
+      {{ '::ExploreBooks' | abpLocalization }} →
     </a>
   </div>
   <!-- DANH SÁCH SÁCH NỔI BẬT -->
@@ -65,7 +63,7 @@
           <!-- 💖 NÚT THẢ TIM YÊU THÍCH -->
           <button type="button" class="btn-heart-toggle" [class.active]="isBookInWishlist(book.id)"
             (click)="toggleWishlist($event, book.id)"
-            [title]="isBookInWishlist(book.id) ? 'Bỏ yêu thích' : 'Thêm vào yêu thích'">
+            [title]="isBookInWishlist(book.id) ? ('::Home:RemoveFromWishlist' | abpLocalization) : ('::Home:AddToWishlist' | abpLocalization)">
             {{ isBookInWishlist(book.id) ? '❤️' : '🤍' }}
           </button>
         </div>
@@ -77,18 +75,18 @@
               {{ getBookTypeName(book.type) }}
             </span>
             @if (book.ageLimit === 1) {
-            <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2.5 py-1 fs-8">👶 Nhi Đồng</span>
+            <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2.5 py-1 fs-8">{{ '::Home:AgeChild' | abpLocalization }}</span>
             } @else if (book.ageLimit === 2) {
-            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1 fs-8">🧑‍🎓 Thiếu Niên</span>
+            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1 fs-8">{{ '::Home:AgeTeen' | abpLocalization }}</span>
             } @else if (book.ageLimit === 3) {
-            <span class="badge bg-warning-subtle text-dark border border-warning-subtle rounded-pill px-2.5 py-1 fs-8">👔 Trưởng Thành</span>
+            <span class="badge bg-warning-subtle text-dark border border-warning-subtle rounded-pill px-2.5 py-1 fs-8">{{ '::Home:AgeAdult' | abpLocalization }}</span>
             } @else {
             <small class="text-warning fw-semibold fs-8">★ Premium</small>
             }
           </div>
           <h6 class="card-title fw-bold text-dark mb-1 text-truncate" [title]="book.name">{{ book.name }}</h6>
-          <p class="small text-muted mb-0">Tác giả: <strong>{{ book.authorName || 'Chưa rõ' }}</strong></p>
-          <p class="small text-muted mb-1">NXB: <strong class="text-primary">🏢 {{ book.publisherName || 'Chưa rõ'
+          <p class="small text-muted mb-0">{{ '::Books:Author' | abpLocalization }}: <strong>{{ book.authorName || ('::Home:Unknown' | abpLocalization) }}</strong></p>
+          <p class="small text-muted mb-1">{{ '::Books:Publisher' | abpLocalization }}: <strong class="text-primary">🏢 {{ book.publisherName || ('::Home:Unknown' | abpLocalization)
               }}</strong></p>
           <!-- 🌟 CHUỖI 5 NGÔI SAO VÀ SỐ LƯỢT ĐÁNH GIÁ (ĐỘNG THEO ĐIỂM SỐ CHUẨN 100%) -->
           <div class="mb-2">
@@ -102,11 +100,11 @@
               }
               <span class="text-dark fw-bold ms-1 fs-8">{{ book.averageRating | number:'1.1-1' }}</span>
             </div>
-            <small class="text-muted fs-8 d-block">{{ book.totalReviews || 0 }} reviews</small>
+            <small class="text-muted fs-8 d-block">{{ book.totalReviews || 0 }} {{ '::Home:ReviewsCount' | abpLocalization }}</small>
           </div>
           <div class="mt-auto pt-2 border-top">
             <div class="mb-2">
-              <small class="text-muted d-block fs-8">Giá bán</small>
+              <small class="text-muted d-block fs-8">{{ '::Books:Price' | abpLocalization }}</small>
               <div class="d-flex align-items-baseline gap-1.5 flex-wrap">
                 <span class="fw-bold text-danger fs-6">{{ book.price | currency:'VND':'symbol':'1.0-0' }}</span>
                 @if (book.originalPrice && book.originalPrice > book.price) {
@@ -123,9 +121,9 @@
               [disabled]="(book.stockCount ?? 0) <= 0 || addingBookId() === book.id"
               (click)="addToCart($event, book.id)">
               @if (addingBookId() === book.id) {
-              ✓ Đã thêm vào giỏ!
+              ✓ {{ '::Books:AddedToCart' | abpLocalization }}
               } @else {
-              🛒 Thêm vào giỏ
+              🛒 {{ '::Books:AddToCart' | abpLocalization }}
               }
             </button>
             }
@@ -145,7 +143,7 @@
       <!-- HEADER POPUP -->
       <div class="modal-header bg-primary text-white border-0 py-3"
         style="background: linear-gradient(135deg, #4318ff 0%, #868ebd 100%) !important;">
-        <h5 class="modal-title fw-bold">📖 Chi Tiết Sách & Đánh Giá</h5>
+        <h5 class="modal-title fw-bold">📖 {{ '::Books:DetailModalTitle' | abpLocalization }}</h5>
         <button type="button" class="btn-close btn-close-white" (click)="closeModal()"></button>
       </div>
       <!-- NỘI DUNG POPUP -->
@@ -165,22 +163,21 @@
                   {{ getBookTypeName(selectedBook().type) }}
                 </span>
                 <span class="badge" [ngClass]="(selectedBook().stockCount ?? 0) > 0 ? 'bg-success' : 'bg-danger'">
-                  {{ (selectedBook().stockCount ?? 0) > 0 ? '🟢 Còn hàng (' + selectedBook().stockCount + ')' : '🔴 Hết
-                  hàng' }}
+                  {{ (selectedBook().stockCount ?? 0) > 0 ? ('🟢 ' + ('::Home:InStockWithCount' | abpLocalization) + ' (' + selectedBook().stockCount + ')') : ('🔴 ' + ('::Home:OutOfStock' | abpLocalization)) }}
                 </span>
               </div>
               <h4 class="fw-bold text-dark mb-2">{{ selectedBook().name }}</h4>
-              <p class="text-muted mb-1">✍️ Tác giả: <strong class="text-dark">{{ selectedBook().authorName || 'Chưa rõ'
+              <p class="text-muted mb-1">✍️ {{ '::Books:Author' | abpLocalization }}: <strong class="text-dark">{{ selectedBook().authorName || ('::Home:Unknown' | abpLocalization)
                   }}</strong></p>
-              <p class="text-muted mb-1">🏢 Nhà xuất bản: <strong class="text-primary">{{ selectedBook().publisherName
-                  || 'Chưa rõ' }}</strong></p>
-              <p class="text-muted mb-2">📅 Ngày xuất bản: <strong>{{ selectedBook().publishDate | date:'dd/MM/yyyy'
+              <p class="text-muted mb-1">🏢 {{ '::Books:Publisher' | abpLocalization }}: <strong class="text-primary">{{ selectedBook().publisherName
+                  || ('::Home:Unknown' | abpLocalization) }}</strong></p>
+              <p class="text-muted mb-2">📅 {{ '::Books:PublishedDate' | abpLocalization }}: <strong>{{ selectedBook().publishDate | date:'dd/MM/yyyy'
                   }}</strong></p>
             </div>
             <!-- Giá tiền & Nút Mua -->
             <div class="d-flex justify-content-between align-items-center pt-3 border-top flex-wrap gap-2">
               <div>
-                <small class="text-muted d-block">Giá bán:</small>
+                <small class="text-muted d-block">{{ '::Books:Price' | abpLocalization }}:</small>
                 <div class="d-flex align-items-baseline gap-2">
                   <h4 class="fw-bold text-danger mb-0">{{ selectedBook().price | currency:'VND':'symbol':'1.0-0' }}</h4>
                   @if (selectedBook().originalPrice && selectedBook().originalPrice > selectedBook().price) {
@@ -199,9 +196,9 @@
                 [disabled]="(selectedBook().stockCount ?? 0) <= 0 || addingBookId() === selectedBook().id"
                 (click)="selectedBook().id && addToCart($event, selectedBook().id)">
                 @if (addingBookId() === selectedBook().id) {
-                <span>✓ Đã Thêm Vào Giỏ!</span>
+                <span>✓ {{ '::Books:AddedToCart' | abpLocalization }}</span>
                 } @else {
-                <span>🛒 Thêm Vào Giỏ Hàng</span>
+                <span>🛒 {{ '::Books:AddToCart' | abpLocalization }}</span>
                 }
               </button>
               }
@@ -211,7 +208,7 @@
         <!-- PHẦN 2: GỢI Ý SÁCH CÙNG THỂ LOẠI (RECOMMENDATIONS) -->
         @if (reviewSummary()?.recommendedBooks && reviewSummary()!.recommendedBooks!.length > 0) {
         <div class="mb-4 pb-4 border-bottom">
-          <h5 class="fw-bold text-dark mb-3">💡 Có thể bạn cũng thích (Cùng thể loại)</h5>
+          <h5 class="fw-bold text-dark mb-3">💡 {{ '::Books:YouMayAlsoLike' | abpLocalization }}</h5>
           <div class="row row-cols-2 row-cols-md-4 g-3">
             @for (rec of reviewSummary()!.recommendedBooks; track rec.id) {
             <div class="col">
@@ -231,33 +228,33 @@
         }
         <!-- PHẦN 3: FORM ĐÁNH GIÁ & CHẤM SAO -->
         <div class="mb-4 soft-pastel-card p-3.5">
-          <h6 class="fw-bold text-dark mb-2">⭐ Gửi đánh giá của bạn</h6>
+          <h6 class="fw-bold text-dark mb-2">⭐ {{ '::Books:SendReview' | abpLocalization }}</h6>
           <!-- Chọn số sao 1 - 5 -->
           <div class="d-flex align-items-center gap-1 mb-2">
-            <span class="text-muted me-2 small">Chọn số sao:</span>
+            <span class="text-muted me-2 small">{{ '::Books:SelectStars' | abpLocalization }}:</span>
             @for (star of [1, 2, 3, 4, 5]; track star) {
             <button type="button" class="btn btn-sm p-0 border-0 fs-4"
               [ngClass]="star <= userRating() ? 'text-warning' : 'text-secondary opacity-50'" (click)="setRating(star)">
               ★
             </button>
             }
-            <span class="ms-2 fw-bold text-warning small">({{ userRating() }} sao)</span>
+            <span class="ms-2 fw-bold text-warning small">({{ userRating() }} {{ '::Books:StarsSuffix' | abpLocalization }})</span>
           </div>
           <!-- Nhập bình luận -->
           <div class="input-group">
-            <input type="text" class="form-control" placeholder="Viết cảm nghĩ của bạn về cuốn sách này..."
+            <input type="text" class="form-control" [placeholder]="'::Books:ReviewPlaceholder' | abpLocalization"
               [value]="userComment()" (input)="userComment.set($any($event.target).value)">
             <button class="btn btn-primary fw-semibold px-3" [disabled]="isSubmittingReview()" (click)="submitReview()">
-              {{ isSubmittingReview() ? 'Đang gửi...' : '🚀 Gửi Đánh Giá' }}
+              {{ isSubmittingReview() ? ('::Books:SubmittingReview' | abpLocalization) : ('🚀 ' + ('::Books:SubmitReviewBtn' | abpLocalization)) }}
             </button>
           </div>
         </div>
         <!-- PHẦN 4: DANH SÁCH BÌNH LUẬN ĐÃ CÓ -->
         <div>
-          <h6 class="fw-bold text-dark mb-3">💬 Đánh giá từ khách hàng ({{ reviewSummary()?.totalReviews || 0 }})</h6>
+          <h6 class="fw-bold text-dark mb-3">💬 {{ '::Books:CustomerReviews' | abpLocalization }} ({{ reviewSummary()?.totalReviews || 0 }})</h6>
           @if (!reviewSummary()?.reviews || reviewSummary()!.reviews!.length === 0) {
           <div class="text-center py-4 text-muted small bg-white border rounded-3">
-            ✨ Chưa có đánh giá nào. Hãy là người đầu tiên nhận xét về cuốn sách này!
+            ✨ {{ '::Books:NoReviewsYet' | abpLocalization }}
           </div>
           } @else {
           <div class="d-flex flex-column gap-3">
@@ -277,7 +274,7 @@
                   <small class="text-muted fs-8">{{ rev.creationTime | date:'dd/MM/yyyy HH:mm' }}</small>
                   @if (permission.getGrantedPolicy('BookStore.Books.Edit') && rev.id) {
                   <button class="btn btn-outline-danger btn-sm py-0 px-2 fs-8" (click)="deleteReview(rev.id)">
-                    🗑️ Xóa
+                    🗑️ {{ '::Delete' | abpLocalization }}
                   </button>
                   }
                 </div>
@@ -291,7 +288,7 @@
       </div>
       <!-- FOOTER POPUP -->
       <div class="modal-footer border-top bg-white py-3">
-        <button type="button" class="btn btn-primary rounded-pill px-4 shadow-sm" (click)="closeModal()">Đóng</button>
+        <button type="button" class="btn btn-primary rounded-pill px-4 shadow-sm" (click)="closeModal()">{{ '::Close' | abpLocalization }}</button>
       </div>
     </div>
   </div>

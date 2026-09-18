@@ -11,10 +11,12 @@ import { CartSignalStore } from '../Carts/cart-signal.store';
 import { BookReviewService } from '../../../proxy/book-reviews/book-review.service';
 import { BookService } from '../../../proxy/books/book.service';
 
+import { CoreModule, LocalizationService } from '@abp/ng.core';
+
 @Component({
     selector: 'app-order',
     standalone: true,
-    imports: [CommonModule, FormsModule, RouterModule],
+    imports: [CommonModule, FormsModule, RouterModule, CoreModule],
     templateUrl: './order.component.html',
     styleUrls: ['./order.component.scss'],
     animations: [
@@ -33,6 +35,7 @@ export class OrderComponent implements OnInit {
     private route = inject(ActivatedRoute);
     private cartStore = inject(CartSignalStore);
     private router = inject(Router);
+    private localization = inject(LocalizationService);
 
     public orders = signal<OrderDto[]>([]);
     public isLoading = signal<boolean>(false);
@@ -102,13 +105,13 @@ export class OrderComponent implements OnInit {
     }
 
     getStatusLabel(status?: OrderStatus): string {
-        if (status === undefined || status === null) return 'Chưa rõ';
+        if (status === undefined || status === null) return this.localization.instant('::Home:Unknown') || 'Chưa rõ';
         const labels: Record<number, string> = {
-            0: 'Chờ xác nhận',
-            1: 'Đang đóng gói',
-            2: 'Đang vận chuyển',
-            3: 'Giao thành công',
-            4: 'Đã hủy đơn',
+            0: this.localization.instant('::Orders:TabPending') || 'Chờ xác nhận',
+            1: this.localization.instant('::Orders:TabPackaging') || 'Đang đóng gói',
+            2: this.localization.instant('::Orders:TabShipping') || 'Đang vận chuyển',
+            3: this.localization.instant('::Orders:TabCompleted') || 'Hoàn thành',
+            4: this.localization.instant('::Orders:TabCancelled') || 'Đã hủy',
         };
         return labels[status] || 'Chưa rõ';
     }
@@ -130,7 +133,8 @@ export class OrderComponent implements OnInit {
 
         // Nếu danh sách sản phẩm trong đơn rỗng hoặc bằng 0 (do sản phẩm đã bị xóa khỏi hệ thống)
         if (!order.items || order.items.length === 0) {
-            alert('❌ Sản phẩm trong đơn hàng này không còn tồn tại hoặc đã bị Admin xóa khỏi hệ thống!\nKhông thể đặt lại đơn hàng này.');
+            const msg = this.localization.instant('::Orders:ItemsMissingAlert') || 'Sản phẩm trong đơn hàng này không còn tồn tại hoặc đã bị Admin xóa khỏi hệ thống!';
+            alert('❌ ' + msg);
             return;
         }
 

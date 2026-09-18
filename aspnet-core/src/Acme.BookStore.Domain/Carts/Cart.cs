@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
 using Volo.Abp.Domain.Entities.Auditing;
+using Volo.Abp.MultiTenancy;
 
 namespace Acme.BookStore.Carts;
 
-public class Cart : FullAuditedAggregateRoot<Guid>
-{
+public class Cart : FullAuditedAggregateRoot<Guid>, IMultiTenant
+{   
+    public Guid? TenantId { get; set; }
     public Guid UserId { get; set; }
     public ICollection<CartItem> Items { get; set; }
 

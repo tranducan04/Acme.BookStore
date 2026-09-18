@@ -2,10 +2,10 @@
   <div class="container">
     <!-- Header Section -->
     <div class="text-center mb-5">
-      <span class="badge badge-pill support-badge mb-2">⚡ HỖ TRỢ 24/7</span>
-      <h1 class="fw-bold display-5 text-dark mt-2 mb-3">Liên Hệ Với Chúng Tôi</h1>
+      <span class="badge badge-pill support-badge mb-2">⚡ {{ '::Contact:Badge' | abpLocalization }}</span>
+      <h1 class="fw-bold display-5 text-dark mt-2 mb-3">{{ '::Contact:Title' | abpLocalization }}</h1>
       <p class="text-secondary fs-6 mx-auto" style="max-width: 600px;">
-        Đội ngũ BookStore luôn sẵn sàng đồng hành, giải đáp thắc mắc và lắng nghe những đóng góp quý báu từ bạn.
+        {{ '::Contact:Subtitle' | abpLocalization }}
       </p>
     </div>
 
@@ -14,31 +14,31 @@
       <div class="col-lg-5">
         <div class="contact-info-card h-100 p-4 p-md-5 d-flex flex-column justify-content-between">
           <div>
-            <h3 class="fw-bold text-white mb-2">Thông Tin Liên Hệ</h3>
-            <p class="text-white-50 mb-4 small">Bạn có thể liên hệ trực tiếp với chúng tôi qua các kênh dưới đây:</p>
+            <h3 class="fw-bold text-white mb-2">{{ '::Contact:InfoTitle' | abpLocalization }}</h3>
+            <p class="text-white-50 mb-4 small">{{ '::Contact:InfoDesc' | abpLocalization }}</p>
 
             <div class="info-list d-flex flex-column gap-4">
               <div class="info-item d-flex align-items-start gap-3">
                 <div class="info-icon">📍</div>
                 <div>
-                  <h6 class="text-white fw-bold mb-1">Địa chỉ trụ sở:</h6>
-                  <p class="text-white-50 mb-0 small">Tòa nhà BookStore, Q. Cầu Giấy, Hà Nội, Việt Nam</p>
+                  <h6 class="text-white fw-bold mb-1">{{ '::Contact:AddressLabel' | abpLocalization }}</h6>
+                  <p class="text-white-50 mb-0 small">{{ '::Contact:AddressValue' | abpLocalization }}</p>
                 </div>
               </div>
 
               <div class="info-item d-flex align-items-start gap-3">
                 <div class="info-icon">📞</div>
                 <div>
-                  <h6 class="text-white fw-bold mb-1">Hotline tư vấn:</h6>
+                  <h6 class="text-white fw-bold mb-1">{{ '::Contact:HotlineLabel' | abpLocalization }}</h6>
                   <p class="text-white fw-semibold mb-0">0394333730<span
-                      class="badge bg-white text-primary ms-1 fs-8">Miễn phí</span></p>
+                      class="badge bg-white text-primary ms-1 fs-8">{{ '::Contact:HotlineFree' | abpLocalization }}</span></p>
                 </div>
               </div>
 
               <div class="info-item d-flex align-items-start gap-3">
                 <div class="info-icon">✉️</div>
                 <div>
-                  <h6 class="text-white fw-bold mb-1">Email hỗ trợ:</h6>
+                  <h6 class="text-white fw-bold mb-1">{{ '::Contact:EmailLabel' | abpLocalization }}</h6>
                   <p class="text-white-50 mb-0 small">support&#64;bookstore.com.vn</p>
                 </div>
               </div>
@@ -46,15 +46,15 @@
               <div class="info-item d-flex align-items-start gap-3">
                 <div class="info-icon">⏰</div>
                 <div>
-                  <h6 class="text-white fw-bold mb-1">Thời gian làm việc:</h6>
-                  <p class="text-white-50 mb-0 small">08:00 - 21:30 (Thứ 2 - Chủ Nhật)</p>
+                  <h6 class="text-white fw-bold mb-1">{{ '::Contact:HoursLabel' | abpLocalization }}</h6>
+                  <p class="text-white-50 mb-0 small">{{ '::Contact:HoursValue' | abpLocalization }}</p>
                 </div>
               </div>
             </div>
           </div>
 
           <div class="social-links mt-4 pt-4 border-top border-white-10 d-flex gap-3">
-            <span class="text-white-50 small">Kết nối:</span>
+            <span class="text-white-50 small">{{ '::Contact:Connect' | abpLocalization }}</span>
             <a href="#" class="social-badge">Facebook</a>
             <a href="#" class="social-badge">Zalo</a>
             <a href="#" class="social-badge">Instagram</a>
@@ -65,40 +65,40 @@
       <!-- Cột Phải: Form Gửi Phản Hồi Hiện Đại -->
       <div class="col-lg-7">
         <div class="contact-form-card h-100 p-4 p-md-5">
-          <h4 class="fw-bold text-dark mb-1">Gửi Tin Nhắn Cho BookStore</h4>
-          <p class="text-muted small mb-4">Điền thông tin và phản hồi của bạn, chúng tôi sẽ phản hồi trong 24h.</p>
+          <h4 class="fw-bold text-dark mb-1">{{ '::Contact:FormTitle' | abpLocalization }}</h4>
+          <p class="text-muted small mb-4">{{ '::Contact:FormDesc' | abpLocalization }}</p>
 
           <form (ngSubmit)="sendContact()">
             <div class="row g-3">
               <div class="col-md-6">
-                <label class="form-label fw-bold text-dark fs-7">Họ và tên <span class="text-danger">*</span></label>
+                <label class="form-label fw-bold text-dark fs-7">{{ '::Contact:FullName' | abpLocalization }} <span class="text-danger">*</span></label>
                 <input type="text" class="form-control form-control-custom" [(ngModel)]="contactForm.name" name="name"
                   placeholder="Nguyễn Văn A" required>
               </div>
 
               <div class="col-md-6">
-                <label class="form-label fw-bold text-dark fs-7">Địa chỉ Email <span
+                <label class="form-label fw-bold text-dark fs-7">{{ '::Contact:Email' | abpLocalization }} <span
                     class="text-danger">*</span></label>
                 <input type="email" class="form-control form-control-custom" [(ngModel)]="contactForm.email"
                   name="email" placeholder="example@gmail.com" required>
               </div>
 
               <div class="col-12">
-                <label class="form-label fw-bold text-dark fs-7">Tiêu đề <span class="text-danger">*</span></label>
+                <label class="form-label fw-bold text-dark fs-7">{{ '::Contact:Subject' | abpLocalization }} <span class="text-danger">*</span></label>
                 <input type="text" class="form-control form-control-custom" [(ngModel)]="contactForm.subject"
-                  name="subject" placeholder="Cần tư vấn mua sách / Góp ý dịch vụ..." required>
+                  name="subject" [placeholder]="'::Contact:SubjectPlaceholder' | abpLocalization" required>
               </div>
 
               <div class="col-12">
-                <label class="form-label fw-bold text-dark fs-7">Nội dung tin nhắn <span
+                <label class="form-label fw-bold text-dark fs-7">{{ '::Contact:Message' | abpLocalization }} <span
                     class="text-danger">*</span></label>
                 <textarea class="form-control form-control-custom" rows="4" [(ngModel)]="contactForm.message"
-                  name="message" placeholder="Nhập chi tiết nội dung bạn muốn gửi..." required></textarea>
+                  name="message" [placeholder]="'::Contact:MessagePlaceholder' | abpLocalization" required></textarea>
               </div>
 
               <div class="col-12 mt-4">
                 <button type="submit" class="btn btn-send-message fw-bold px-4 py-3 w-100 shadow-sm">
-                  🚀 Gửi Tin Nhắn Ngay
+                  🚀 {{ '::Contact:SendBtn' | abpLocalization }}
                 </button>
               </div>
             </div>

@@ -2,11 +2,11 @@
     <!-- 1. Header Tiêu đề -->
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
         <div>
-            <h3 class="fw-bold text-dark mb-1">⭐ Quản Lý Đánh Giá Và Nhận Xét</h3>
-            <p class="text-muted small mb-0">Theo dõi, phân tích chất lượng sản phẩm và phản hồi từ khách hàng.</p>
+            <h3 class="fw-bold text-dark mb-1">⭐ {{ '::Reviews:AdminTitle' | abpLocalization }}</h3>
+            <p class="text-muted small mb-0">{{ '::Reviews:AdminSubtitle' | abpLocalization }}</p>
         </div>
         <div class="badge bg-primary px-3.5 py-2 fs-6 rounded-pill shadow-sm">
-            Tổng cộng: <strong>{{ totalCount() }}</strong> đánh giá
+            {{ totalCount() }} {{ '::Menu:Reviews' | abpLocalization }}
         </div>
     </div>
 
@@ -16,22 +16,9 @@
         <div class="col-12 col-lg-4">
             <div
                 class="card border-0 shadow-sm rounded-4 p-4 h-100 bg-white d-flex flex-column justify-content-center text-center">
-                <span class="text-muted small fw-bold text-uppercase mb-2">ĐIỂM ĐÁNH GIÁ TRUNG BÌNH</span>
+                <span class="text-muted small fw-bold text-uppercase mb-2">{{ '::Reviews:Rating' | abpLocalization }}</span>
                 <div class="display-3 fw-bold text-warning mb-2">★ {{ averageRating() }}</div>
-                <div class="text-muted small">Dựa trên <strong>{{ reviews().length }}</strong> nhận xét từ khách hàng
-                </div>
-
-                <div class="mt-3 pt-3 border-top d-flex justify-content-around">
-                    <div>
-                        <strong class="text-success fs-5">{{ (reviews().filter(r => (r.rating || 0) >= 4).length)
-                            }}</strong>
-                        <small class="d-block text-muted">Hài lòng (4-5★)</small>
-                    </div>
-                    <div>
-                        <strong class="text-danger fs-5">{{ (reviews().filter(r => (r.rating || 0) <= 2).length)
-                                }}</strong>
-                                <small class="d-block text-muted">Chưa hài lòng (1-2★)</small>
-                    </div>
+                <div class="text-muted small"><strong>{{ reviews().length }}</strong> {{ '::Reviews:Rating' | abpLocalization }}
                 </div>
             </div>
         </div>
@@ -40,7 +27,7 @@
         <div class="col-12 col-lg-8">
             <div class="card border-0 shadow-sm rounded-4 p-4 h-100 bg-white">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="fw-bold text-dark mb-0">📊 Biểu Đồ Phân Bố Số Sao</h5>
+                    <h5 class="fw-bold text-dark mb-0">📊 {{ '::Reviews:Rating' | abpLocalization }}</h5>
                     <span class="badge px-3 py-1 fw-bold rounded-pill"
                         style="background-color: #e0e7ff; color: #4338ca;">1★ ➔ 5★</span>
                 </div>
@@ -59,7 +46,7 @@
                 <div class="input-group">
                     <span class="input-group-text bg-white border-end-0 text-muted fs-5">🔍</span>
                     <input type="text" class="form-control bg-white border-start-0 ps-0 fs-6"
-                        placeholder="Tìm kiếm theo tên sách..." [value]="searchTerm()"
+                        [placeholder]="'::Reviews:SearchPlaceholder' | abpLocalization" [value]="searchTerm()"
                         (input)="searchTerm.set($any($event.target).value); onFilterChange()">
                 </div>
             </div>
@@ -68,19 +55,19 @@
             <div class="col-12 col-sm-6 col-md-4 col-lg-3">
                 <select class="form-select bg-white fs-6 fw-semibold" [value]="selectedRating().toString()"
                     (change)="selectedRating.set(+$any($event.target).value); onFilterChange()">
-                    <option value="0">🌟 Tất cả số sao (1★ - 5★)</option>
-                    <option value="5">⭐⭐⭐⭐⭐ (5 sao)</option>
-                    <option value="4">⭐⭐⭐⭐ (4 sao)</option>
-                    <option value="3">⭐⭐⭐ (3 sao)</option>
-                    <option value="2">⭐⭐ (2 sao)</option>
-                    <option value="1">⭐ (1 sao)</option>
+                    <option value="0">🌟 {{ '::Reviews:AllRatings' | abpLocalization }}</option>
+                    <option value="5">⭐⭐⭐⭐⭐ (5★)</option>
+                    <option value="4">⭐⭐⭐⭐ (4★)</option>
+                    <option value="3">⭐⭐⭐ (3★)</option>
+                    <option value="2">⭐⭐ (2★)</option>
+                    <option value="1">⭐ (1★)</option>
                 </select>
             </div>
 
             <!-- Nút Làm Mới -->
             <div class="col-12 col-sm-6 col-md-2 col-lg-2">
                 <button class="btn btn-primary rounded-pill px-3 w-100 fw-semibold" (click)="loadReviews()">
-                    🔄 Làm mới
+                    🔄 {{ '::Refresh' | abpLocalization }}
                 </button>
             </div>
         </div>
@@ -92,12 +79,12 @@
             <table class="table table-hover align-middle mb-0 w-100">
                 <thead class="bg-white border-bottom">
                     <tr class="text-dark fw-bold" style="font-size: 0.92rem;">
-                        <th class="py-3 ps-4" style="width: 25%;">SÁCH ĐƯỢC ĐÁNH GIÁ</th>
-                        <th class="py-3" style="width: 18%;">KHÁCH HÀNG</th>
-                        <th class="py-3 text-center" style="width: 12%;">ĐÁNH GIÁ</th>
-                        <th class="py-3" style="width: 27%;">NỘI DUNG NHẬN XÉT</th>
-                        <th class="py-3" style="width: 12%;">THỜI GIAN</th>
-                        <th class="py-3 text-center pe-4" style="width: 6%;">THAO TÁC</th>
+                        <th class="py-3 ps-4" style="width: 25%;">{{ '::Reviews:Book' | abpLocalization }}</th>
+                        <th class="py-3" style="width: 18%;">{{ '::Reviews:Reviewer' | abpLocalization }}</th>
+                        <th class="py-3 text-center" style="width: 12%;">{{ '::Reviews:Rating' | abpLocalization }}</th>
+                        <th class="py-3" style="width: 27%;">{{ '::Reviews:Comment' | abpLocalization }}</th>
+                        <th class="py-3" style="width: 12%;">{{ '::Reviews:Date' | abpLocalization }}</th>
+                        <th class="py-3 text-center pe-4" style="width: 6%;">{{ '::Reviews:Actions' | abpLocalization }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -105,7 +92,7 @@
                     <tr>
                         <td colspan="6" class="text-center py-5">
                             <div class="spinner-border text-primary"></div>
-                            <p class="text-muted small mt-2 mb-0">Đang tải danh sách đánh giá...</p>
+                            <p class="text-muted small mt-2 mb-0">{{ '::Loading' | abpLocalization }}</p>
                         </td>
                     </tr>
                     } @else if (filteredReviews().length === 0) {
@@ -156,13 +143,12 @@
         <!-- Phân Trang (Pagination) -->
         @if (totalPages() > 1) {
         <div class="p-3 border-top bg-white d-flex justify-content-between align-items-center">
-            <small class="text-muted fs-6">Trang {{ currentPage() }} / {{ totalPages() }} (Tổng {{ totalCount() }} đánh
-                giá)</small>
+            <small class="text-muted fs-6">{{ '::Pagination:Page' | abpLocalization }} {{ currentPage() }} / {{ totalPages() }} ({{ '::Pagination:Total' | abpLocalization }} {{ totalCount() }} {{ '::Pagination:ReviewsSuffix' | abpLocalization }})</small>
             <div class="btn-group">
                 <button class="btn btn-sm btn-light border rounded-start px-3" [disabled]="currentPage() === 1"
-                    (click)="changePage(currentPage() - 1)">❮ Trước</button>
+                    (click)="changePage(currentPage() - 1)">❮ {{ '::Pagination:Prev' | abpLocalization }}</button>
                 <button class="btn btn-sm btn-light border rounded-end px-3" [disabled]="currentPage() === totalPages()"
-                    (click)="changePage(currentPage() + 1)">Sau ❯</button>
+                    (click)="changePage(currentPage() + 1)">{{ '::Pagination:Next' | abpLocalization }} ❯</button>
             </div>
         </div>
         }

@@ -34,4 +34,11 @@ export class ChatService {
       url: `/api/app/chat/mark-as-read/${senderId}`,
     },
     { apiName: this.apiName,...config });
+
+  getAdminId = (config?: Partial<Rest.Config>) =>
+    this.restService.request<any, string>({
+      method: 'GET',
+      url: '/api/app/chat/admin-id',
+    },
+    { apiName: this.apiName,...config });
 }

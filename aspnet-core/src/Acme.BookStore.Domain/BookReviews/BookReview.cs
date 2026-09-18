@@ -1,13 +1,15 @@
 using System;
 using Volo.Abp.Domain.Entities.Auditing;
+using Volo.Abp.MultiTenancy;
 
 namespace Acme.BookStore.BookReviews;
 
 /// <summary>
 /// Entity lưu thông tin Đánh giá & Nhận xét của Khách hàng cho từng Cuốn sách
 /// </summary>
-public class BookReview : FullAuditedAggregateRoot<Guid>
+public class BookReview : FullAuditedAggregateRoot<Guid>, IMultiTenant
 {
+    public Guid? TenantId { get; set; }
     // Mã sách được đánh giá
     public Guid BookId { get; set; }
 

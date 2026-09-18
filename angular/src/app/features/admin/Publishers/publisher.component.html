@@ -2,22 +2,21 @@
     <!-- HEADER & NÚT THAO TÁC -->
     <div class="card-header bg-white py-3 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
         <div>
-            <h4 class="fw-bold text-dark mb-1">🏢 Quản Lý Nhà Xuất Bản</h4>
-            <p class="text-muted small mb-0">Quản lý danh sách các nhà xuất bản phát hành sách</p>
+            <h4 class="fw-bold text-dark mb-1">🏢 {{ '::Publishers:Title' | abpLocalization }}</h4>
         </div>
         <div class="d-flex align-items-center gap-2">
             <!-- Ô tìm kiếm -->
             <div class="search-input-wrapper" style="width: 220px;">
                 <span class="search-icon text-muted">🔍</span>
-                <input type="text" class="form-control form-control-sm shadow-sm" placeholder="Tìm NXB, địa chỉ, SĐT..."
+                <input type="text" class="form-control form-control-sm shadow-sm" [placeholder]="'::Publishers:SearchPlaceholder' | abpLocalization"
                     [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" />
             </div>
             <button class="btn btn-sm btn-light border text-dark fw-bold rounded-pill px-3 shadow-sm"
                 (click)="loadPublishers()">
-                🔄 Cập Nhật
+                🔄 {{ '::Update' | abpLocalization }}
             </button>
             <button class="btn btn-sm btn-primary fw-bold rounded-pill px-3 shadow-sm" (click)="openCreateModal()">
-                ➕ Thêm NXB Mới
+                ➕ {{ '::Publishers:AddNew' | abpLocalization }}
             </button>
         </div>
     </div>
@@ -26,39 +25,41 @@
         @if (isLoading()) {
         <div class="text-center py-5">
             <div class="spinner-border text-primary" role="status"></div>
-            <p class="mt-2 text-muted">Đang tải danh sách Nhà xuất bản...</p>
+            <p class="mt-2 text-muted">{{ '::Publishers:Loading' | abpLocalization }}</p>
         </div>
         } @else {
-        <table class="table table-hover align-middle mb-0 w-100" style="table-layout: fixed;">
+        <table class="table table-hover align-middle mb-0 w-100">
             <thead class="table-dark">
                 <tr>
-                    <th class="ps-3" style="width: 30%;">TÊN NHÀ XUẤT BẢN</th>
-                    <th style="width: 35%;">ĐỊA CHỈ</th>
-                    <th style="width: 20%;">SỐ ĐIỆN THOẠI</th>
-                    <th class="text-end pe-3" style="width: 15%;">HÀNH ĐỘNG</th>
+                    <th class="ps-3" style="width: 28%;">{{ '::Publishers:Name' | abpLocalization }}</th>
+                    <th style="width: 32%;">{{ '::Publishers:Address' | abpLocalization }}</th>
+                    <th style="width: 18%;">{{ '::Publishers:Phone' | abpLocalization }}</th>
+                    <th class="text-end pe-4 text-nowrap" style="width: 220px; min-width: 220px;">{{ '::Actions' | abpLocalization }}</th>
                 </tr>
             </thead>
             <tbody>
                 @for (pub of filteredPublishers(); track pub.id) {
                 <tr>
                     <td class="ps-3 fw-bold text-dark fs-6">🏢 {{ pub.name }}</td>
-                    <td class="text-muted">{{ pub.address || 'Chưa cập nhật' }}</td>
+                    <td class="text-muted">{{ pub.address || ('::NoData' | abpLocalization) }}</td>
                     <td>
                         <span class="fw-semibold text-primary">📞 {{ pub.phoneNumber || '---' }}</span>
                     </td>
-                    <td class="text-end pe-3">
-                        <button class="btn btn-sm btn-primary me-1 shadow-sm" (click)="openEditModal(pub)">
-                            ✏️ Sửa
-                        </button>
-                        <button class="btn btn-sm btn-danger shadow-sm" (click)="pub.id && deletePublisher(pub.id)">
-                            🗑️ Xóa
-                        </button>
+                    <td class="text-end pe-4 text-nowrap" style="width: 220px; min-width: 220px;">
+                        <div class="d-inline-flex align-items-center justify-content-end gap-2 flex-nowrap" style="white-space: nowrap;">
+                            <button class="btn btn-sm btn-primary shadow-sm text-nowrap" (click)="openEditModal(pub)">
+                                ✏️ {{ '::Edit' | abpLocalization }}
+                            </button>
+                            <button class="btn btn-sm btn-danger shadow-sm text-nowrap" (click)="pub.id && deletePublisher(pub.id)">
+                                🗑️ {{ '::Delete' | abpLocalization }}
+                            </button>
+                        </div>
                     </td>
                 </tr>
                 } @empty {
                 <tr>
                     <td colspan="4" class="text-center py-5 text-muted">
-                        Chưa có Nhà xuất bản nào. Hãy bấm <strong>"➕ Thêm NXB Mới"</strong> để tạo!
+                        {{ '::Publishers:NotFound' | abpLocalization }}
                     </td>
                 </tr>
                 }
@@ -73,34 +74,34 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content shadow-lg border-0 rounded-4 overflow-hidden">
             <div class="modal-header bg-primary text-white p-3">
-                <h5 class="modal-title fw-bold">{{ isEditMode() ? '✏️ Chỉnh Sửa NXB' : '➕ Thêm Nhà Xuất Bản Mới' }}</h5>
+                <h5 class="modal-title fw-bold">{{ isEditMode() ? ('✏️ ' + ('::Edit' | abpLocalization) + ' ' + ('::Publishers:Name' | abpLocalization)) : ('➕ ' + ('::Publishers:AddNew' | abpLocalization)) }}</h5>
                 <button type="button" class="btn-close btn-close-white" (click)="closeModal()"></button>
             </div>
             <div class="modal-body p-4">
                 <form (submit)="$event.preventDefault(); savePublisher()">
                     <!-- Tên NXB -->
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Tên Nhà Xuất Bản <span class="text-danger">*</span></label>
+                        <label class="form-label fw-bold">{{ '::Publishers:Name' | abpLocalization }} <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" [value]="formName()" (input)="onInput('name', $event)"
-                            placeholder="Ví dụ: NXB Kim Đồng, NXB Trẻ..." required>
+                            [placeholder]="'::Publishers:Name' | abpLocalization" required>
                     </div>
                     <!-- Địa chỉ -->
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Địa Chỉ Trụ Sở</label>
+                        <label class="form-label fw-bold">{{ '::Publishers:Address' | abpLocalization }}</label>
                         <input type="text" class="form-control" [value]="formAddress()"
-                            (input)="onInput('address', $event)" placeholder="Ví dụ: 55 Quang Trung, Hà Nội">
+                            (input)="onInput('address', $event)" [placeholder]="'::Publishers:Address' | abpLocalization">
                     </div>
                     <!-- Số điện thoại -->
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Số Điện Thoại Liên Hệ</label>
+                        <label class="form-label fw-bold">{{ '::Publishers:Phone' | abpLocalization }}</label>
                         <input type="text" class="form-control" [value]="formPhoneNumber()"
-                            (input)="onInput('phone', $event)" placeholder="Ví dụ: 024 3943 4730">
+                            (input)="onInput('phone', $event)" [placeholder]="'::Publishers:Phone' | abpLocalization">
                     </div>
                     <div class="modal-footer px-0 pb-0 pt-3 border-top">
                         <button type="button" class="btn btn-secondary rounded-pill px-3"
-                            (click)="closeModal()">Hủy</button>
+                            (click)="closeModal()">{{ '::Cancel' | abpLocalization }}</button>
                         <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">
-                            💾 {{ isEditMode() ? 'Lưu Thay Đổi' : 'Tạo Mới' }}
+                            💾 {{ isEditMode() ? ('::Save' | abpLocalization) : ('::Publishers:AddNew' | abpLocalization) }}
                         </button>
                     </div>
                 </form>

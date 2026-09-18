@@ -1,10 +1,12 @@
 using System;
 using Volo.Abp.Domain.Entities.Auditing;
+using Volo.Abp.MultiTenancy;
 
 namespace Acme.BookStore.Chats;
 
-public class ChatMessage : CreationAuditedEntity<Guid>
+public class ChatMessage : CreationAuditedEntity<Guid>, IMultiTenant
 {
+    public Guid? TenantId { get; set; }
     public Guid SenderId { get; set; }       // ID người gửi (Khách hoặc Admin)
     public Guid ReceiverId { get; set; }     // ID người nhận
     public string SenderName { get; set; }   // Tên hiển thị người gửi

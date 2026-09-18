@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
 using Volo.Abp.Domain.Entities.Auditing;
+using Volo.Abp.MultiTenancy;
 
 namespace Acme.BookStore.Orders;
 
-public class Order : FullAuditedAggregateRoot<Guid>
+public class Order : FullAuditedAggregateRoot<Guid>, IMultiTenant
 {
+    public Guid? TenantId { get; set; } 
     public Guid UserId { get; set; }
     public string OrderNo { get; set; }
     public OrderStatus Status { get; set; }

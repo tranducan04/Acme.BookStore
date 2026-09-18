@@ -3,49 +3,48 @@
         <!-- Header -->
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
             <div>
-                <h2 class="fw-bold text-dark mb-1">🔔 Trung Tâm Thông Báo</h2>
-                <p class="text-muted small mb-0">Theo dõi thông tin đơn hàng, cập nhật vận chuyển và tin tức mới nhất.</p>
+                <h2 class="fw-bold text-dark mb-1">🔔 {{ '::Notifications:Title' | abpLocalization }}</h2>
+                <p class="text-muted small mb-0">{{ '::Notifications:Subtitle' | abpLocalization }}</p>
             </div>
             <div class="d-flex align-items-center gap-2">
                 @if (unreadCount() > 0) {
                 <button class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-semibold shadow-sm"
                     (click)="markAllAsRead()">
-                    ✓ Đã đọc tất cả ({{ unreadCount() }})
+                    ✓ {{ '::Notifications:Read' | abpLocalization }} ({{ unreadCount() }})
                 </button>
                 }
                 <button class="btn btn-light btn-sm rounded-pill px-3 shadow-sm border" (click)="loadNotifications()">
-                    🔄 Làm mới
+                    🔄 {{ '::Notifications:Refresh' | abpLocalization }}
                 </button>
             </div>
         </div>
         <!-- Filter Tabs -->
         <div class="filter-tabs d-flex gap-2 overflow-auto pb-2 mb-4">
             <button class="tab-btn" [class.active]="selectedFilter() === 'all'" (click)="selectedFilter.set('all')">
-                Tất cả ({{ notifications().length }})
+                {{ '::Notifications:All' | abpLocalization }} ({{ notifications().length }})
             </button>
             <button class="tab-btn" [class.active]="selectedFilter() === 'unread'"
                 (click)="selectedFilter.set('unread')">
-                🔴 Chưa đọc ({{ unreadCount() }})
+                🔴 {{ '::Notifications:Unread' | abpLocalization }} ({{ unreadCount() }})
             </button>
             <button class="tab-btn" [class.active]="selectedFilter() === 'order'" (click)="selectedFilter.set('order')">
-                📦 Đơn hàng
+                📦 {{ '::Notifications:Orders' | abpLocalization }}
             </button>
             <button class="tab-btn" [class.active]="selectedFilter() === 'shipping'"
                 (click)="selectedFilter.set('shipping')">
-                🚚 Vận chuyển
+                🚚 {{ '::Notifications:Shipping' | abpLocalization }}
             </button>
         </div>
         <!-- Notification Cards List -->
         @if (isLoading()) {
         <div class="card border-0 shadow-sm rounded-4 text-center py-5">
             <div class="spinner-border text-primary mx-auto mb-3"></div>
-            <p class="text-muted">Đang tải thông báo...</p>
+            <p class="text-muted">{{ '::Loading' | abpLocalization }}</p>
         </div>
         } @else if (filteredNotifications().length === 0) {
         <div class="card border-0 shadow-sm rounded-4 text-center py-5 px-3">
             <div class="fs-1 mb-2">🔕</div>
-            <h5 class="fw-bold text-dark mb-2">Không có thông báo nào!</h5>
-            <p class="text-muted small mb-0">Khi có cập nhật đơn hàng hoặc tin mới, thông báo sẽ xuất hiện tại đây.</p>
+            <h5 class="fw-bold text-dark mb-2">{{ '::Notifications:NoData' | abpLocalization }}</h5>
         </div>
         } @else {
         <div class="d-flex flex-column gap-3">
@@ -66,17 +65,17 @@
                     <!-- Nội dung thông báo -->
                     <div class="flex-grow-1">
                         <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-1">
-                            <h6 class="mb-0 fw-bold text-dark notif-title">{{ notif.title }}</h6>
+                            <h6 class="mb-0 fw-bold text-dark notif-title">{{ notif.title | notifTranslate:'title' }}</h6>
                             <small class="text-muted">📅 {{ notif.creationTime | date:'HH:mm - dd/MM/yyyy' }}</small>
                         </div>
-                        <p class="text-muted mb-0 small">{{ notif.message }}</p>
+                        <p class="text-muted mb-0 small">{{ notif.message | notifTranslate:'message' }}</p>
                     </div>
                     <!-- Status Dot -->
                     <div class="flex-shrink-0">
                         @if (!notif.isRead) {
-                        <span class="badge bg-danger rounded-pill px-2.5 py-1">Mới</span>
+                        <span class="badge bg-danger rounded-pill px-2.5 py-1">{{ '::New' | abpLocalization }}</span>
                         } @else {
-                        <span class="text-muted small">✓ Đã đọc</span>
+                        <span class="text-muted small">✓ {{ '::Notifications:Read' | abpLocalization }}</span>
                         }
                     </div>
                 </div>

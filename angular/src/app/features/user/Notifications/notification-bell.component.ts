@@ -5,14 +5,17 @@ import { firstValueFrom } from 'rxjs';
 import { NotificationService } from '../../../proxy/notifications/notification.service';
 import { NotificationDto } from '../../../proxy/notifications/models';
 
+import { LocalizationPipe } from '@abp/ng.core';
+import { NotificationTranslatePipe } from './notification-translate.pipe';
+
 @Component({
-    selector: 'app-notification-bell',
-    standalone: true,
-    imports: [CommonModule, RouterModule],
-    template: `
+  selector: 'app-notification-bell',
+  standalone: true,
+  imports: [CommonModule, RouterModule, LocalizationPipe, NotificationTranslatePipe],
+  template: `
     <div class="notification-bell-container position-relative d-flex align-items-center">
       <!-- 🔔 NÚT CHUÔNG -->
-      <button type="button" class="btn-bell" (click)="toggleDropdown()" title="Thông báo">
+      <button type="button" class="btn-bell" (click)="toggleDropdown()" [title]="'::Notifications:Title' | abpLocalization">
         <span class="bell-icon">🔔</span>
         @if (unreadCount() > 0) {
           <span class="unread-badge animate-pulse">
@@ -30,14 +33,14 @@ import { NotificationDto } from '../../../proxy/notifications/models';
           <!-- Header -->
           <div class="dropdown-header p-3 bg-white border-bottom d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center gap-2">
-              <h6 class="mb-0 fw-bold text-dark">Thông Báo</h6>
+              <h6 class="mb-0 fw-bold text-dark">{{ '::Notifications:Title' | abpLocalization }}</h6>
               @if (unreadCount() > 0) {
-                <span class="badge bg-danger rounded-pill">{{ unreadCount() }} mới</span>
+                <span class="badge bg-danger rounded-pill">{{ unreadCount() }} {{ '::Notifications:NewCount' | abpLocalization }}</span>
               }
             </div>
             @if (unreadCount() > 0) {
               <button class="btn btn-link btn-sm text-decoration-none p-0 text-primary small fw-semibold" (click)="markAllAsRead()">
-                Đã đọc tất cả
+                {{ '::Notifications:MarkAllRead' | abpLocalization }}
               </button>
             }
           </div>
@@ -51,7 +54,7 @@ import { NotificationDto } from '../../../proxy/notifications/models';
             } @else if (notifications().length === 0) {
               <div class="text-center py-4 px-3 text-muted">
                 <div class="fs-2 mb-1">🔕</div>
-                <p class="small mb-0">Không có thông báo nào!</p>
+                <p class="small mb-0">{{ '::Notifications:NoData' | abpLocalization }}</p>
               </div>
             } @else {
               @for (notif of notifications(); track notif.id) {
@@ -71,10 +74,10 @@ import { NotificationDto } from '../../../proxy/notifications/models';
 
                   <div class="flex-grow-1 overflow-hidden">
                     <div class="d-flex justify-content-between align-items-baseline mb-1">
-                      <strong class="text-dark small text-truncate notif-title" [class.fw-bold]="!notif.isRead">{{ notif.title }}</strong>
+                      <strong class="text-dark small text-truncate notif-title" [class.fw-bold]="!notif.isRead">{{ notif.title | notifTranslate:'title' }}</strong>
                       <small class="text-muted notif-time ms-1 flex-shrink-0">{{ notif.creationTime | date:'HH:mm dd/MM' }}</small>
                     </div>
-                    <p class="mb-0 text-muted small text-truncate notif-msg">{{ notif.message }}</p>
+                    <p class="mb-0 text-muted small text-truncate notif-msg">{{ notif.message | notifTranslate:'message' }}</p>
                   </div>
 
                   @if (!notif.isRead) {
@@ -88,14 +91,14 @@ import { NotificationDto } from '../../../proxy/notifications/models';
           <!-- Footer xem tất cả -->
           <div class="p-2 bg-light text-center border-top">
             <a routerLink="/notifications" (click)="isOpen.set(false)" class="small text-primary fw-bold text-decoration-none">
-              Xem tất cả thông báo ➔
+              {{ '::Notifications:ViewAll' | abpLocalization }} ➔
             </a>
           </div>
         </div>
       }
     </div>
   `,
-    styles: [`
+  styles: [`
     .notification-bell-container {
       margin-right: 0.75rem;
     }
@@ -198,69 +201,69 @@ import { NotificationDto } from '../../../proxy/notifications/models';
   `]
 })
 export class NotificationBellComponent implements OnInit {
-    private notificationService = inject(NotificationService);
-    private router = inject(Router);
+  private notificationService = inject(NotificationService);
+  private router = inject(Router);
 
-    public isOpen = signal<boolean>(false);
-    public notifications = signal<NotificationDto[]>([]);
-    public unreadCount = signal<number>(0);
-    public isLoading = signal<boolean>(false);
+  public isOpen = signal<boolean>(false);
+  public notifications = signal<NotificationDto[]>([]);
+  public unreadCount = signal<number>(0);
+  public isLoading = signal<boolean>(false);
 
-    ngOnInit() {
-        this.loadUnreadCount();
-        // Tự động quét thông báo mới mỗi 15 giây
-        setInterval(() => this.loadUnreadCount(), 15000);
+  ngOnInit() {
+    this.loadUnreadCount();
+    // Tự động quét thông báo mới mỗi 15 giây
+    setInterval(() => this.loadUnreadCount(), 15000);
+  }
+
+  async loadNotifications() {
+    this.isLoading.set(true);
+    try {
+      const items = await firstValueFrom(this.notificationService.getMyNotifications());
+      this.notifications.set(items || []);
+      this.unreadCount.set(this.notifications().filter(n => !n.isRead).length);
+    } catch (err) {
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
+
+  async loadUnreadCount() {
+    try {
+      const count = await firstValueFrom(this.notificationService.getUnreadCount());
+      this.unreadCount.set(count || 0);
+    } catch (err) { }
+  }
+
+  toggleDropdown() {
+    this.isOpen.set(!this.isOpen());
+    if (this.isOpen()) {
+      this.loadNotifications();
+    }
+  }
+
+  async onNotificationClick(notif: NotificationDto) {
+    if (!notif.id) return;
+
+    if (!notif.isRead) {
+      await firstValueFrom(this.notificationService.markAsRead(notif.id));
+      notif.isRead = true;
+      this.unreadCount.update(c => Math.max(0, c - 1));
     }
 
-    async loadNotifications() {
-        this.isLoading.set(true);
-        try {
-            const items = await firstValueFrom(this.notificationService.getMyNotifications());
-            this.notifications.set(items || []);
-            this.unreadCount.set(this.notifications().filter(n => !n.isRead).length);
-        } catch (err) {
-        } finally {
-            this.isLoading.set(false);
-        }
+    this.isOpen.set(false);
+
+    if (notif.targetUrl) {
+      this.router.navigateByUrl(notif.targetUrl);
     }
+  }
 
-    async loadUnreadCount() {
-        try {
-            const count = await firstValueFrom(this.notificationService.getUnreadCount());
-            this.unreadCount.set(count || 0);
-        } catch (err) { }
+  async markAllAsRead() {
+    try {
+      await firstValueFrom(this.notificationService.markAllAsRead());
+      this.notifications.update(list => list.map(n => ({ ...n, isRead: true })));
+      this.unreadCount.set(0);
+    } catch (err) {
+      console.error('Lỗi đánh dấu đã đọc:', err);
     }
-
-    toggleDropdown() {
-        this.isOpen.set(!this.isOpen());
-        if (this.isOpen()) {
-            this.loadNotifications();
-        }
-    }
-
-    async onNotificationClick(notif: NotificationDto) {
-        if (!notif.id) return;
-
-        if (!notif.isRead) {
-            await firstValueFrom(this.notificationService.markAsRead(notif.id));
-            notif.isRead = true;
-            this.unreadCount.update(c => Math.max(0, c - 1));
-        }
-
-        this.isOpen.set(false);
-
-        if (notif.targetUrl) {
-            this.router.navigateByUrl(notif.targetUrl);
-        }
-    }
-
-    async markAllAsRead() {
-        try {
-            await firstValueFrom(this.notificationService.markAllAsRead());
-            this.notifications.update(list => list.map(n => ({ ...n, isRead: true })));
-            this.unreadCount.set(0);
-        } catch (err) {
-            console.error('Lỗi đánh dấu đã đọc:', err);
-        }
-    }
+  }
 }

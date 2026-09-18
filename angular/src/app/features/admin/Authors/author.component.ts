@@ -5,13 +5,13 @@ import { trigger, transition, style, animate } from '@angular/animations';
 import { AuthorService } from '@proxy/authors';
 import { firstValueFrom } from 'rxjs';
 
-import { PermissionService } from '@abp/ng.core';
+import { PermissionService, LocalizationPipe } from '@abp/ng.core';
 
 @Component({
   selector: 'app-author',
   templateUrl: './author.component.html',
   styleUrl: './author.component.scss',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LocalizationPipe],
   animations: [
     trigger('pageEnter', [
       transition(':enter', [

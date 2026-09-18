@@ -15,4 +15,7 @@ public interface IChatAppService : IApplicationService
 
     // 3. Đánh dấu đã đọc tất cả tin nhắn từ 1 người gửi
     Task MarkAsReadAsync(Guid senderId);
+
+    // 4. Lấy ID của Admin (user có role "admin") để client gửi tin nhắn đúng người
+    Task<Guid> GetAdminIdAsync();
 }

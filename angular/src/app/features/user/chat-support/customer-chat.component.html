@@ -3,8 +3,8 @@
     <div class="header-info">
       <div class="avatar"><i class="fas fa-headset"></i></div>
       <div>
-        <h3>Hỗ trợ Trực tuyến 💬</h3>
-        <span class="status"><i class="fas fa-circle online-dot"></i> Đang hoạt động</span>
+        <h3>{{ '::ChatSupport:Title' | abpLocalization }}</h3>
+        <span class="status"><i class="fas fa-circle online-dot"></i> {{ '::ChatSupport:Active' | abpLocalization }}</span>
       </div>
     </div>
   </div>
@@ -12,7 +12,7 @@
   <div class="chat-messages" id="chat-messages-box">
     <div *ngIf="messages.length === 0" class="empty-state">
       <i class="fas fa-comments"></i>
-      <p>Xin chào! Bạn cần hỗ trợ gì từ chúng tôi hôm nay?</p>
+      <p>{{ '::ChatSupport:Welcome' | abpLocalization }}</p>
     </div>
 
     <div
@@ -31,10 +31,10 @@
       type="text"
       [(ngModel)]="newMessage"
       (keyup.enter)="send()"
-      placeholder="Nhập tin nhắn..."
+      [placeholder]="'::ChatSupport:InputPlaceholder' | abpLocalization"
     />
     <button (click)="send()" [disabled]="!newMessage.trim()">
-      <i class="fas fa-paper-plane"></i> Gửi
+      <i class="fas fa-paper-plane"></i> {{ '::ChatSupport:SendBtn' | abpLocalization }}
     </button>
   </div>
 </div>

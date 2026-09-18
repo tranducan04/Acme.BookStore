@@ -20,9 +20,9 @@
                 🤖
             </div>
             <div>
-                <h6 class="mb-0 fw-bold">BookStore </h6>
+                <h6 class="mb-0 fw-bold">BookStore</h6>
                 <small class="text-white-50 fs-8 d-flex align-items-center gap-1">
-                    <span class="online-dot"></span> Sẵn sàng tư vấn
+                    <span class="online-dot"></span> {{ '::ChatBot:ReadyToConsult' | abpLocalization }}
                 </small>
             </div>
         </div>
@@ -44,7 +44,7 @@
                 @if (msg.books && msg.books.length > 0) {
                 <div class="recommended-books-container mt-2 pt-2 border-top">
                     <div class="small fw-bold text-primary mb-1.5 d-flex align-items-center gap-1">
-                        <span>✨ Sách gợi ý mua ngay:</span>
+                        <span>✨ {{ '::ChatBot:RecommendedBooks' | abpLocalization }}</span>
                     </div>
                     <div class="d-flex flex-column gap-2">
                         @for (book of msg.books; track book.id) {
@@ -63,9 +63,9 @@
                                 class="btn btn-sm btn-primary rounded-pill px-2.5 py-1 fs-8 d-flex align-items-center gap-1 flex-shrink-0"
                                 (click)="addToCart(book)" [disabled]="addingBookId() === book.id">
                                 @if (addingBookId() === book.id) {
-                                <span>✓ Đã thêm</span>
+                                <span>✓ {{ '::ChatBot:AddedBtn' | abpLocalization }}</span>
                                 } @else {
-                                <span>🛒 Mua</span>
+                                <span>🛒 {{ '::ChatBot:BuyBtn' | abpLocalization }}</span>
                                 }
                             </button>
                         </div>
@@ -83,7 +83,7 @@
         @if (isTyping()) {
         <div class="d-flex align-items-center gap-2 text-muted small p-2">
             <div class="spinner-grow spinner-grow-sm text-primary" role="status"></div>
-            <span class="fst-italic">Gemini đang tìm sách phù hợp...</span>
+            <span class="fst-italic">{{ '::ChatBot:Thinking' | abpLocalization }}</span>
         </div>
         }
     </div>
@@ -92,15 +92,15 @@
     <div class="chatbox-chips px-3 py-1.5 bg-light border-top d-flex flex-wrap gap-1">
         <button class="btn btn-sm btn-white border rounded-pill py-0.5 px-2 fs-8"
             (click)="sendMessage('Gợi ý những cuốn sách bán chạy nhất')">
-            🔥 Sách hot
+            {{ '::ChatBot:ChipHot' | abpLocalization }}
         </button>
         <button class="btn btn-sm btn-white border rounded-pill py-0.5 px-2 fs-8"
             (click)="sendMessage('Có sách nào giá dưới 100k không?')">
-            💰 Dưới 100k
+            {{ '::ChatBot:ChipUnder100k' | abpLocalization }}
         </button>
         <button class="btn btn-sm btn-white border rounded-pill py-0.5 px-2 fs-8"
             (click)="sendMessage('Tư vấn sách hay đọc cuối tuần')">
-            📖 Đọc cuối tuần
+            {{ '::ChatBot:ChipWeekend' | abpLocalization }}
         </button>
     </div>
 
@@ -108,7 +108,7 @@
     <div class="chatbox-footer p-2 bg-white border-top">
         <form class="d-flex gap-2" (submit)="$event.preventDefault(); sendMessage()">
             <input type="text" class="form-control rounded-pill px-3 fs-7"
-                placeholder="Hỏi AI bất cứ điều gì về sách..." [value]="inputMessage()"
+                [placeholder]="'::ChatBot:Placeholder' | abpLocalization" [value]="inputMessage()"
                 (input)="inputMessage.set($any($event.target).value)" [disabled]="isTyping()">
             <button type="submit" class="btn btn-primary rounded-circle shadow-sm"
                 [disabled]="!inputMessage().trim() || isTyping()" style="width: 40px; height: 40px;">

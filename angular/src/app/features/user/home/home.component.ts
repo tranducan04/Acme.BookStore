@@ -2,20 +2,29 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { AuthService, PermissionService } from '@abp/ng.core';
+import { AuthService, PermissionService, LocalizationPipe } from '@abp/ng.core';
 import { BookService, bookTypeOptions } from '@proxy/books';
 import { BookReviewService } from '../../../proxy/book-reviews/book-review.service';
 import { BookReviewSummaryDto } from '../../../proxy/book-reviews/models';
 import { CartSignalStore } from '../Carts/cart-signal.store';
 import { firstValueFrom } from 'rxjs';
 import { WishlistService } from '../../../proxy/wishlists/wishlist.service';
+import { trigger, transition, style, animate } from '@angular/animations';
 
 @Component({
   selector: 'app-home',
   standalone: true,
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
-  imports: [CommonModule, FormsModule, RouterLink]
+  imports: [CommonModule, FormsModule, RouterLink, LocalizationPipe],
+  animations: [
+    trigger('pageEnter', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(25px)' }),
+        animate('600ms cubic-bezier(0.16, 1, 0.3, 1)', style({ opacity: 1, transform: 'translateY(0)' }))
+      ])
+    ])
+  ]
 })
 export class HomeComponent implements OnInit {
   private authService = inject(AuthService);

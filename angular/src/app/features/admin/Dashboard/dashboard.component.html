@@ -1,13 +1,13 @@
 <div class="dashboard-container p-4" @pageEnter>
   <div class="mb-4 d-flex justify-content-between align-items-center">
     <div>
-      <h2 class="fw-bold text-dark mb-1">📊 Báo Cáo Thống Kê & Phân Tích</h2>
-      <p class="text-muted mb-0">Theo dõi doanh thu, cơ cấu sản phẩm và hiệu suất kinh doanh</p>
+      <h2 class="fw-bold text-dark mb-1">📊 {{ '::Dashboard:Title' | abpLocalization }}</h2>
+      <p class="text-muted mb-0">{{ '::Dashboard:Subtitle' | abpLocalization }}</p>
     </div>
     <button class="btn btn-primary btn-sm rounded-pill px-4 fw-bold shadow-sm" [disabled]="isRefreshing()"
       (click)="refreshData()">
       <span *ngIf="isRefreshing()" class="spinner-border spinner-border-sm me-1"></span>
-      🔄 {{ isRefreshing() ? 'Đang cập nhật...' : 'Cập Nhật Dữ Liệu' }}
+      🔄 {{ isRefreshing() ? ('::Loading' | abpLocalization) : ('::Dashboard:Refresh' | abpLocalization) }}
     </button>
   </div>
   <!-- 4 THẺ CHỈ SỐ KPI BẤM VÀO XEM DANH SÁCH CHI TIẾT -->
@@ -19,9 +19,9 @@
         title="Bấm để xem danh sách đơn hàng đã bán / hoàn thành">
         <div class="d-flex align-items-center justify-content-between">
           <div>
-            <span class="text-uppercase text-muted fw-bold small d-block mb-1">Tổng Doanh Thu</span>
+            <span class="text-uppercase text-muted fw-bold small d-block mb-1">{{ '::Dashboard:TotalRevenue' | abpLocalization }}</span>
             <h3 class="fw-bold text-dark mb-0">{{ totalRevenue() | currency:'VND':'symbol':'1.0-0' }}</h3>
-            <small class="text-success fw-semibold">🔍 Xem đơn đã bán ❯</small>
+            <small class="text-success fw-semibold">🔍 {{ '::Detail' | abpLocalization }} ❯</small>
           </div>
           <div
             class="p-3 rounded-circle bg-success-subtle text-success fs-3 d-flex align-items-center justify-content-center"
@@ -38,9 +38,9 @@
         title="Bấm để xem danh sách tất cả đơn hàng">
         <div class="d-flex align-items-center justify-content-between">
           <div>
-            <span class="text-uppercase text-muted fw-bold small d-block mb-1">Tổng Số Đơn Hàng</span>
+            <span class="text-uppercase text-muted fw-bold small d-block mb-1">{{ '::Dashboard:TotalOrders' | abpLocalization }}</span>
             <h3 class="fw-bold text-dark mb-0">{{ totalOrdersCount() }}</h3>
-            <small class="text-primary fw-semibold">🔍 Xem tất cả đơn ❯</small>
+            <small class="text-primary fw-semibold">🔍 {{ '::Detail' | abpLocalization }} ❯</small>
           </div>
           <div
             class="p-3 rounded-circle bg-primary-subtle text-primary fs-3 d-flex align-items-center justify-content-center"
@@ -57,9 +57,9 @@
         title="Bấm để xem danh sách đơn hàng cần xử lý">
         <div class="d-flex align-items-center justify-content-between">
           <div>
-            <span class="text-uppercase text-muted fw-bold small d-block mb-1">Đơn Cần Xử Lý</span>
+            <span class="text-uppercase text-muted fw-bold small d-block mb-1">{{ '::Dashboard:CompletedOrders' | abpLocalization }}</span>
             <h3 class="fw-bold text-dark mb-0">{{ pendingOrdersCount() }}</h3>
-            <small class="text-warning fw-semibold">🔍 Xem đơn cần xử lý ❯</small>
+            <small class="text-warning fw-semibold">🔍 {{ '::Detail' | abpLocalization }} ❯</small>
           </div>
           <div
             class="p-3 rounded-circle bg-warning-subtle text-warning fs-3 d-flex align-items-center justify-content-center"
@@ -76,9 +76,9 @@
         title="Bấm để chuyển sang Quản lý Sách">
         <div class="d-flex align-items-center justify-content-between">
           <div>
-            <span class="text-uppercase text-muted fw-bold small d-block mb-1">Sách Đang Bán</span>
+            <span class="text-uppercase text-muted fw-bold small d-block mb-1">{{ '::Dashboard:TotalBooks' | abpLocalization }}</span>
             <h3 class="fw-bold text-dark mb-0">{{ totalBooksCount() }}</h3>
-            <small class="text-info fw-semibold">📚 Quản lý Sách ❯</small>
+            <small class="text-info fw-semibold">📚 {{ '::Detail' | abpLocalization }} ❯</small>
           </div>
           <div class="p-3 rounded-circle bg-info-subtle text-info fs-3 d-flex align-items-center justify-content-center"
             style="width: 54px; height: 54px;">
@@ -94,8 +94,7 @@
     <div class="col-12 col-xl-6">
       <div class="card shadow-sm border-0 rounded-3 p-4 bg-white h-100">
         <div class="d-flex justify-content-between align-items-center mb-3">
-          <h5 class="fw-bold text-dark mb-0">📊 Doanh Thu Theo Tháng (VNĐ)</h5>
-          <span class="badge bg-light text-secondary border">Năm 2026</span>
+          <h5 class="fw-bold text-dark mb-0">📊 {{ '::Dashboard:RevenueChart' | abpLocalization }}</h5>
         </div>
         <div style="height: 280px; position: relative;">
           <canvas #revenueBarChart></canvas>
@@ -105,7 +104,7 @@
     <!-- 🍩 Biểu đồ tròn 1: Cơ cấu Doanh số theo Thể loại Sách -->
     <div class="col-12 col-md-6 col-xl-3">
       <div class="card shadow-sm border-0 rounded-3 p-4 bg-white h-100">
-        <h5 class="fw-bold text-dark mb-3">🍩 Doanh Số Thể Loại</h5>
+        <h5 class="fw-bold text-dark mb-3">🍩 {{ '::Books:Category' | abpLocalization }}</h5>
         <div class="d-flex align-items-center justify-content-center" style="height: 280px; position: relative;">
           <canvas #categoryPieChart></canvas>
         </div>
@@ -114,7 +113,7 @@
     <!-- 🥧 Biểu đồ tròn 2: Tỷ lệ Trạng thái Đơn hàng -->
     <div class="col-12 col-md-6 col-xl-3">
       <div class="card shadow-sm border-0 rounded-3 p-4 bg-white h-100">
-        <h5 class="fw-bold text-dark mb-3">🥧 Trạng Thái Đơn Hàng</h5>
+        <h5 class="fw-bold text-dark mb-3">🥧 {{ '::Orders:Status' | abpLocalization }}</h5>
         <div class="d-flex align-items-center justify-content-center" style="height: 280px; position: relative;">
           <canvas #orderStatusChart></canvas>
         </div>
@@ -124,19 +123,18 @@
   <!-- BẢNG TÓM TẮT ĐƠN HÀNG GẦN ĐÂY -->
   <div class="card shadow-sm border-0 rounded-3">
     <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
-      <h5 class="mb-0 fw-bold text-dark">📋 Đơn Hàng Mới Nhất</h5>
-      <small class="text-muted">Cập nhật theo thời gian thực</small>
+      <h5 class="mb-0 fw-bold text-dark">📋 {{ '::Dashboard:RecentOrders' | abpLocalization }}</h5>
     </div>
     <div class="card-body p-0" style="overflow-x: hidden;">
       <table class="table table-hover align-middle mb-0 w-100" style="table-layout: fixed;">
         <thead class="table-light text-muted">
           <tr>
-            <th class="ps-3">Mã đơn</th>
-            <th>Ngày đặt</th>
-            <th>Khách hàng</th>
-            <th>Tổng tiền</th>
-            <th>Phương thức</th>
-            <th class="text-center">Trạng thái</th>
+            <th class="ps-3">{{ '::Orders:OrderCode' | abpLocalization }}</th>
+            <th>{{ '::Orders:OrderDate' | abpLocalization }}</th>
+            <th>{{ '::Orders:Customer' | abpLocalization }}</th>
+            <th>{{ '::Orders:TotalAmount' | abpLocalization }}</th>
+            <th>{{ '::Orders:Payment' | abpLocalization }}</th>
+            <th class="text-center">{{ '::Orders:Status' | abpLocalization }}</th>
           </tr>
         </thead>
         <tbody>
@@ -148,7 +146,7 @@
             <td class="fw-bold text-danger">{{ order.totalAmount | currency:'VND':'symbol':'1.0-0' }}</td>
             <td>
               <span class="fw-semibold text-dark">
-                {{ order.paymentMethod === 1 ? '📱 Chuyển khoản QR' : '💵 COD' }}
+                {{ order.paymentMethod === 1 ? '📱 QR Code' : '💵 COD' }}
               </span>
             </td>
             <td class="text-center">
@@ -159,7 +157,7 @@
           </tr>
           } @empty {
           <tr>
-            <td colspan="6" class="text-center py-4 text-muted">Chưa có đơn hàng nào!</td>
+            <td colspan="6" class="text-center py-4 text-muted">{{ '::NoData' | abpLocalization }}</td>
           </tr>
           }
         </tbody>

@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
-import { EnvironmentService, ConfigStateService } from '@abp/ng.core';
+import { EnvironmentService } from '@abp/ng.core';
+import { OAuthService } from 'angular-oauth2-oidc';
 import * as signalR from '@microsoft/signalr';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ChatMessageDto } from '../../proxy/chats/models';
@@ -9,7 +10,7 @@ import { ChatMessageDto } from '../../proxy/chats/models';
 })
 export class ChatSignalRService {
   private environmentService = inject(EnvironmentService);
-  private configState = inject(ConfigStateService);
+  private oAuthService = inject(OAuthService);
 
   private hubConnection: signalR.HubConnection | null = null;
   private messageReceivedSource = new BehaviorSubject<ChatMessageDto | null>(null);
@@ -22,16 +23,16 @@ export class ChatSignalRService {
     }
 
     const baseUrl = this.environmentService.getEnvironment().apis.default.url;
-    const token = this.configState.getDeep('auth.accessToken');
 
     this.hubConnection = new signalR.HubConnectionBuilder()
       .withUrl(`${baseUrl}/signalr-hubs/chat`, {
-        accessTokenFactory: () => token || '',
+        accessTokenFactory: () => this.oAuthService.getAccessToken() || '',
       })
       .withAutomaticReconnect()
       .build();
 
     this.hubConnection.on('ReceiveMessage', (message: ChatMessageDto) => {
+      console.log('SignalR ReceiveMessage event:', message);
       this.messageReceivedSource.next(message);
     });
 
@@ -44,10 +45,18 @@ export class ChatSignalRService {
   }
 
   public async sendMessage(receiverId: string, message: string): Promise<void> {
+    if (!this.hubConnection || this.hubConnection.state !== signalR.HubConnectionState.Connected) {
+      console.warn('SignalR is not connected, attempting to connect before sending...');
+      await this.startConnection();
+    }
+
     if (this.hubConnection && this.hubConnection.state === signalR.HubConnectionState.Connected) {
+      console.log('Invoking SendMessageAsync with receiverId:', receiverId, 'message:', message);
       await this.hubConnection.invoke('SendMessageAsync', receiverId, message);
+      console.log('SendMessageAsync invoked successfully.');
     } else {
-      console.error('SignalR is not connected.');
+      console.error('SignalR is still not connected.');
+      throw new Error('SignalR chưa được kết nối.');
     }
   }
 

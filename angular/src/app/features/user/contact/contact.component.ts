@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { CoreModule } from '@abp/ng.core';
 import { trigger, transition, style, animate } from '@angular/animations';
 
 @Component({
   selector: 'app-contact',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, CoreModule],
   templateUrl: './contact.component.html',
   styleUrl: './contact.component.scss',
   animations: [

@@ -5,12 +5,12 @@ import { trigger, transition, style, animate } from '@angular/animations';
 import { firstValueFrom } from 'rxjs';
 import { CategoryService } from '../../../proxy/categories/category.service';
 import { CategoryDto, CreateUpdateCategoryDto } from '../../../proxy/categories/models';
-import { PermissionService } from '@abp/ng.core';
+import { PermissionService, LocalizationPipe } from '@abp/ng.core';
 
 @Component({
     selector: 'app-category',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, LocalizationPipe],
     templateUrl: './category.component.html',
     styleUrls: ['./category.component.scss'],
     animations: [

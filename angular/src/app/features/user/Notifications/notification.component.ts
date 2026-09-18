@@ -4,11 +4,13 @@ import { Router, RouterModule } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { NotificationService } from '../../../proxy/notifications/notification.service';
 import { NotificationDto } from '../../../proxy/notifications/models';
+import { LocalizationPipe } from '@abp/ng.core';
+import { NotificationTranslatePipe } from './notification-translate.pipe';
 
 @Component({
     selector: 'app-notification',
     standalone: true,
-    imports: [CommonModule, RouterModule],
+    imports: [CommonModule, RouterModule, LocalizationPipe, NotificationTranslatePipe],
     templateUrl: './notification.component.html',
     styleUrls: ['./notification.component.scss']
 })

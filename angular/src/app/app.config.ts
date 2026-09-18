@@ -29,7 +29,6 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    { provide: LOCALE_ID, useValue: 'vi' },
     provideAnimationsAsync(),
     provideRouter(appRoutes),
     APP_ROUTE_PROVIDER,

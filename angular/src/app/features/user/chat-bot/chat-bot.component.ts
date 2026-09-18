@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
 import { ChatBotService } from '../../../proxy/chat-bots/chat-bot.service';
 import { ChatBotRecommendedBookDto } from '../../../proxy/chat-bots/models';
-import { PermissionService } from '@abp/ng.core';
+import { PermissionService, CoreModule } from '@abp/ng.core';
 import { CartSignalStore } from '../Carts/cart-signal.store';
 
 interface ChatMessage {
@@ -17,7 +17,7 @@ interface ChatMessage {
 @Component({
     selector: 'app-chat-bot',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, CoreModule],
     templateUrl: './chat-bot.component.html',
     styleUrls: ['./chat-bot.component.scss']
 })

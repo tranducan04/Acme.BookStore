@@ -1,11 +1,13 @@
 using System;
 using Acme.BookStore.Notifications;
 using Volo.Abp.Domain.Entities.Auditing;
+using Volo.Abp.MultiTenancy;
 
 namespace Acme.BookStore.Notifications;
 
-public class AppNotification : CreationAuditedEntity<Guid>
+public class AppNotification : CreationAuditedEntity<Guid>, IMultiTenant
 {
+    public Guid? TenantId { get; set; }
     public Guid UserId { get; set; }           // Người nhận thông báo
     public string Title { get; set; } = string.Empty;   // Tiêu đề ngắn gọn
     public string Message { get; set; } = string.Empty; // Nội dung chi tiết

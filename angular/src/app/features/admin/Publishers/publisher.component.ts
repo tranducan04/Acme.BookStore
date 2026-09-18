@@ -5,11 +5,12 @@ import { trigger, transition, style, animate } from '@angular/animations';
 import { firstValueFrom } from 'rxjs';
 import { PublisherService } from '../../../proxy/publishers/publisher.service';
 import { PublisherDto, CreateUpdatePublisherDto } from '../../../proxy/publishers/models';
+import { LocalizationPipe } from '@abp/ng.core';
 
 @Component({
     selector: 'app-publisher',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, LocalizationPipe],
     templateUrl: './publisher.component.html',
     styleUrl: './publisher.component.scss',
     animations: [

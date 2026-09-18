@@ -1,80 +1,79 @@
-import { RoutesService, eLayoutType } from '@abp/ng.core';
+import { RoutesService, eLayoutType, PermissionService } from '@abp/ng.core';
 import { APP_INITIALIZER } from '@angular/core';
 
 export const APP_ROUTE_PROVIDER = [
-  { provide: APP_INITIALIZER, useFactory: configureRoutes, deps: [RoutesService], multi: true },
+  { provide: APP_INITIALIZER, useFactory: configureRoutes, deps: [RoutesService, PermissionService], multi: true },
 ];
 
-function configureRoutes(routesService: RoutesService) {
+function configureRoutes(routesService: RoutesService, permissionService: PermissionService) {
   return () => {
     routesService.add([
       {
         path: '/',
-        name: 'Trang chủ 🏠',
+        name: '::Menu:Home',
         iconClass: 'fas fa-home',
         order: 1,
         layout: eLayoutType.application,
       },
       {
         path: '/books',
-        name: 'Danh mục Sách 📚',
+        name: '::Menu:Books',
         iconClass: 'fas fa-book',
         order: 2,
         layout: eLayoutType.application,
       },
       {
         path: '/cart',
-        name: 'Giỏ hàng 🛒',
+        name: '::Menu:Cart',
         iconClass: 'fas fa-shopping-cart',
         order: 3,
         layout: eLayoutType.application,
       },
       {
         path: '/wishlist',
-        name: 'Yêu Thích 💖',
+        name: '::Menu:Wishlist',
         iconClass: 'fas fa-heart',
         order: 4,
         layout: eLayoutType.application,
       },
       {
         path: '/orders',
-        name: 'Đơn hàng của tôi 📋',
+        name: '::Menu:Orders',
         iconClass: 'fas fa-clipboard-list',
         order: 5,
         layout: eLayoutType.application,
       },
       {
         path: '/notifications',
-        name: 'Thông báo 🔔',
+        name: '::Menu:Notifications',
         iconClass: 'fas fa-bell',
         order: 6,
         layout: eLayoutType.application,
       },
       {
         path: '/about',
-        name: 'Giới thiệu ℹ️',
+        name: '::Menu:About',
         iconClass: 'fas fa-info-circle',
         order: 7,
         layout: eLayoutType.application,
       },
       {
         path: '/contact',
-        name: 'Liên hệ 📞',
+        name: '::Menu:Contact',
         iconClass: 'fas fa-envelope',
         order: 8,
         layout: eLayoutType.application,
       },
       {
         path: '/chat-support',
-        name: 'Hỗ trợ Trực tuyến 💬',
+        name: '::Menu:ChatSupport',
         iconClass: 'fas fa-comments',
         order: 9,
         layout: eLayoutType.application,
-        requiredPolicy: '!BookStore.Books.Create',
       },
       {
         path: '/admin-orders',
-        name: 'Quản lý Đơn hàng 👑',
+        name: '::Menu:AdminOrders',
         iconClass: 'fas fa-tasks',
         order: 10,
         layout: eLayoutType.application,
@@ -82,7 +81,7 @@ function configureRoutes(routesService: RoutesService) {
       },
       {
         path: '/admin/chat',
-        name: 'Tư vấn Khách hàng 💬',
+        name: '::Menu:AdminChat',
         iconClass: 'fas fa-headset',
         order: 11,
         layout: eLayoutType.application,
@@ -90,7 +89,7 @@ function configureRoutes(routesService: RoutesService) {
       },
       {
         path: '/authors',
-        name: 'Quản lý Tác giả 👤',
+        name: '::Menu:Authors',
         iconClass: 'fas fa-user-edit',
         order: 12,
         layout: eLayoutType.application,
@@ -98,7 +97,7 @@ function configureRoutes(routesService: RoutesService) {
       },
       {
         path: '/categories',
-        name: 'Quản lý Danh mục 🏷️',
+        name: '::Menu:Categories',
         iconClass: 'fas fa-tags',
         order: 13,
         layout: eLayoutType.application,
@@ -106,7 +105,7 @@ function configureRoutes(routesService: RoutesService) {
       },
       {
         path: '/publishers',
-        name: 'Nhà Xuất Bản 🏢',
+        name: '::Menu:Publishers',
         iconClass: 'fas fa-building',
         order: 14,
         layout: eLayoutType.application,
@@ -114,7 +113,7 @@ function configureRoutes(routesService: RoutesService) {
       },
       {
         path: '/dashboard',
-        name: 'Báo cáo Thống kê 📊',
+        name: '::Menu:Dashboard',
         iconClass: 'fas fa-chart-line',
         order: 15,
         layout: eLayoutType.application,
@@ -122,12 +121,22 @@ function configureRoutes(routesService: RoutesService) {
       },
       {
         path: '/admin/reviews',
-        name: 'Quản lý Đánh giá 📝',
+        name: '::Menu:Reviews',
         iconClass: 'fas fa-star',
         order: 16,
         layout: eLayoutType.application,
         requiredPolicy: 'BookStore.Books.Create',
       },
     ]);
+
+    permissionService.getGrantedPolicy$('BookStore.Books.Create').subscribe((isAdmin) => {
+      const hideForAdminPaths = ['/cart', '/orders', '/about', '/contact', '/chat-support'];
+      hideForAdminPaths.forEach(path => {
+        const route = routesService.find(r => r.path === path);
+        if (route) {
+          routesService.patch(route.name, { invisible: isAdmin });
+        }
+      });
+    });
   };
 }

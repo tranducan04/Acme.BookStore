@@ -8,13 +8,14 @@ import { BookService } from '../../../proxy/books/book.service';
 import { OrderService } from '../../../proxy/orders/order.service';
 import { OrderDto } from '../../../proxy/orders/models';
 import { BookDto } from '../../../proxy/books/models';
+import { LocalizationPipe } from '@abp/ng.core';
 
 Chart.register(...registerables);
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LocalizationPipe],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
   animations: [

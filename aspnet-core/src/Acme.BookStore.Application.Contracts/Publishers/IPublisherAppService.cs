@@ -1,14 +1,15 @@
 using System;
+using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 
 namespace Acme.BookStore.Publishers;
 
-public interface IPublisherAppService :
-    ICrudAppService<
-        PublisherDto,               // DTO hiển thị danh sách & chi tiết
-        Guid,                       // Khóa chính Id
-        PagedAndSortedResultRequestDto, // DTO phân trang & sắp xếp
-        CreateUpdatePublisherDto>   // DTO tạo mới & chỉnh sửa
+public interface IPublisherAppService : IApplicationService
 {
+    Task<PublisherDto> GetAsync(Guid id);
+    Task<PagedResultDto<PublisherDto>> GetListAsync(PagedAndSortedResultRequestDto input);
+    Task<PublisherDto> CreateAsync(CreateUpdatePublisherDto input);
+    Task<PublisherDto> UpdateAsync(Guid id, CreateUpdatePublisherDto input);
+    Task DeleteAsync(Guid id);
 }

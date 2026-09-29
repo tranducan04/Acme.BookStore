@@ -21,6 +21,10 @@ public class Order : FullAuditedAggregateRoot<Guid>, IMultiTenant
     public PaymentMethod PaymentMethod { get; set; } = PaymentMethod.COD;
     public PaymentStatus PaymentStatus { get; set; } = PaymentStatus.Unpaid;
 
+    // Thông tin mã giảm giá áp dụng
+    public string? CouponCode { get; set; }
+    public decimal DiscountAmount { get; set; } = 0;
+
     public ICollection<OrderItem> Items { get; set; }
 
     public Order()

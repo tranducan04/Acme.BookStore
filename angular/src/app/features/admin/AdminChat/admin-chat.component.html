@@ -1,71 +1,187 @@
-<div class="admin-chat-layout">
-  <!-- Conversation Sidebar -->
-  <div class="conversation-sidebar">
-    <div class="sidebar-header">
-      <h4><i class="fas fa-comments"></i> Khách hàng cần hỗ trợ</h4>
-    </div>
-    <div class="conversation-list">
-      <div *ngIf="conversations.length === 0" class="empty-list">
-        <p>Chưa có cuộc trò chuyện nào.</p>
+<div class="admin-chat-layout shadow-sm rounded-4 overflow-hidden border">
+  <!-- 📑 CỘT TRÁI: DANH SÁCH CUỘC TRÒ CHUYỆN -->
+  <div class="conversation-sidebar border-end bg-white">
+    <div class="sidebar-header p-3 border-bottom">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex align-items-center gap-2">
+          <div class="header-icon-wrap rounded-circle d-flex align-items-center justify-content-center">
+            <i class="fas fa-comments text-primary"></i>
+          </div>
+          <h5 class="mb-0 fw-bold fs-6">Hỗ trợ khách hàng</h5>
+        </div>
+        @if (totalUnread() > 0) {
+        <span class="badge bg-danger rounded-pill px-2.5 py-1 fs-8 shadow-xs">
+          {{ totalUnread() }} mới
+        </span>
+        }
       </div>
 
-      <div
-        *ngFor="let conv of conversations"
-        class="conversation-item"
-        [class.active]="selectedUser?.userId === conv.userId"
-        (click)="selectConversation(conv)"
-      >
-        <div class="user-avatar">
-          <i class="fas fa-user-circle"></i>
+      <!-- Ô TÌM KIẾM HỘI THOẠI (Dùng Flex wrapper để không bao giờ bị đè chữ lên icon) -->
+      <div class="search-input-wrapper">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" class="search-input" placeholder="Tìm tên khách hoặc tin nhắn..." [value]="searchTerm()"
+          (input)="searchTerm.set($any($event.target).value)" />
+        @if (searchTerm()) {
+        <button type="button" class="clear-btn border-0 bg-transparent text-muted" (click)="searchTerm.set('')"
+          title="Xóa tìm kiếm">
+          <i class="fas fa-times-circle"></i>
+        </button>
+        }
+      </div>
+    </div>
+
+    <!-- DANH SÁCH CUỘC TRÒ CHUYỆN -->
+    <div class="conversation-list py-2">
+      @if (isLoading()) {
+      <div class="p-5 text-center text-muted">
+        <div class="spinner-border spinner-border-sm text-primary mb-2" role="status"></div>
+        <div class="small">Đang tải danh sách...</div>
+      </div>
+      } @else if (filteredConversations().length === 0) {
+      <div class="empty-list p-5 text-center text-muted">
+        <div class="empty-icon-wrap mb-2">
+          <i class="fas fa-comment-slash fa-2x opacity-35"></i>
         </div>
-        <div class="user-info">
-          <div class="user-name">
-            {{ conv.userName || 'Khách hàng' }}
-            <span *ngIf="conv.unreadCount && conv.unreadCount > 0" class="badge bg-danger">
+        <p class="small mb-0 fw-medium">
+          {{ searchTerm() ? 'Không tìm thấy cuộc trò chuyện phù hợp.' : 'Chưa có tin nhắn nào từ khách hàng.' }}
+        </p>
+      </div>
+      } @else {
+      @for (conv of filteredConversations(); track conv.userId) {
+      <div class="conversation-card mx-2.5 my-1.5 p-3 rounded-3 d-flex align-items-center gap-3"
+        [class.active]="selectedUser()?.userId === conv.userId" (click)="selectConversation(conv)">
+        <!-- AVATAR KHÁCH HÀNG -->
+        <div
+          class="user-avatar rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 text-white fw-bold shadow-xs"
+          [style.background]="getAvatarColor(conv.userName)">
+          {{ getInitials(conv.userName) }}
+        </div>
+
+        <!-- THÔNG TIN HỘI THOẠI -->
+        <div class="user-info flex-grow-1 overflow-hidden">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <span class="user-name fw-semibold text-truncate text-dark fs-7">
+              {{ conv.userName || 'Khách hàng' }}
+            </span>
+            @if (conv.lastMessageTime) {
+            <span class="msg-time flex-shrink-0 text-muted fs-8 opacity-75 ms-2">
+              {{ conv.lastMessageTime | date: 'HH:mm' }}
+            </span>
+            }
+          </div>
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="last-msg text-truncate pe-2 text-muted fs-8">
+              {{ conv.lastMessage || '...' }}
+            </span>
+            @if (conv.unreadCount && conv.unreadCount > 0) {
+            <span class="badge unread-badge rounded-pill px-2 py-0.5 fs-8 flex-shrink-0">
               {{ conv.unreadCount }}
             </span>
+            }
           </div>
-          <div class="last-msg">{{ conv.lastMessage }}</div>
         </div>
       </div>
+      }
+      }
     </div>
   </div>
 
-  <!-- Chat Main Panel -->
-  <div class="chat-main">
-    <div *ngIf="!selectedUser" class="no-selection">
-      <i class="fas fa-headset"></i>
-      <p>Vui lòng chọn một cuộc trò chuyện ở cột bên trái để bắt đầu tư vấn.</p>
-    </div>
-
-    <ng-container *ngIf="selectedUser">
-      <div class="chat-header">
-        <h4><i class="fas fa-user"></i> {{ selectedUser.userName || 'Khách hàng' }}</h4>
+  <!-- 💬 CỘT PHẢI: KHUNG CHAT TƯ VẤN -->
+  <div class="chat-main d-flex flex-column">
+    @if (!selectedUser()) {
+    <div class="no-selection text-center m-auto p-5 text-muted">
+      <div class="icon-wrap mb-3 mx-auto rounded-circle d-flex align-items-center justify-content-center shadow-xs">
+        <i class="fas fa-headset fa-2x text-primary"></i>
       </div>
-
-      <div class="chat-messages" id="admin-chat-messages-box">
+      <h5 class="fw-bold text-dark mb-1">Kênh tư vấn & hỗ trợ khách hàng</h5>
+      <p class="small text-muted mb-0 max-w-350 mx-auto">
+        Chọn một cuộc trò chuyện từ danh sách bên trái để phản hồi thắc mắc và tư vấn sản phẩm cho khách hàng.
+      </p>
+    </div>
+    } @else {
+    <!-- CHAT HEADER -->
+    <div class="chat-header p-3 px-4 bg-white border-bottom d-flex justify-content-between align-items-center">
+      <div class="d-flex align-items-center gap-3">
         <div
-          *ngFor="let msg of messages"
-          class="message-bubble"
-          [ngClass]="{ 'my-message': msg.isMyMessage, 'other-message': !msg.isMyMessage }"
-        >
-          <div class="message-sender" *ngIf="!msg.isMyMessage">{{ msg.senderName }}</div>
-          <div class="message-content">{{ msg.message }}</div>
-          <div class="message-time">{{ msg.creationTime | date: 'HH:mm dd/MM' }}</div>
+          class="active-avatar rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-xs"
+          [style.background]="getAvatarColor(selectedUser()?.userName)">
+          {{ getInitials(selectedUser()?.userName) }}
+        </div>
+        <div>
+          <h6 class="mb-0 fw-bold text-dark fs-6">{{ selectedUser()?.userName || 'Khách hàng' }}</h6>
+          <div class="status-indicator">
+            <span class="pulsing-dot" [class.offline]="!isOnline(selectedUser()?.lastMessageTime)"></span>
+            <span class="status-text" [class.text-muted]="!isOnline(selectedUser()?.lastMessageTime)">
+              {{ getTimeAgo(selectedUser()?.lastMessageTime) }}
+            </span>
+          </div>
         </div>
       </div>
+    </div>
 
-      <div class="chat-input-box">
-        <input
-          type="text"
-          [(ngModel)]="newMessage"
-          (keyup.enter)="send()"
-          placeholder="Nhập câu trả lời tư vấn..."
-        />
-        <button (click)="send()" [disabled]="!newMessage.trim()">
-          <i class="fas fa-paper-plane"></i> Gửi
-        </button>
+    <!-- MESSAGES AREA (Padding rộng rãi 28px ngăn hoàn toàn việc bị cắt lề) -->
+    <div class="chat-messages flex-grow-1" id="admin-chat-messages-box">
+      @if (isLoadingMessages()) {
+      <div class="text-center py-5">
+        <div class="spinner-border spinner-border-sm text-primary mb-2" role="status"></div>
+        <p class="text-muted small">Đang tải lịch sử tin nhắn...</p>
       </div>
-    </ng-container>
+      } @else if (messages().length === 0) {
+      <div class="text-center py-5 text-muted">
+        <div class="empty-chat-icon mb-2">
+          <i class="fas fa-hand-wave fa-2x text-warning opacity-75"></i>
+        </div>
+        <p class="small mb-0">Chưa có tin nhắn nào. Hãy gửi lời chào đầu tiên tới khách hàng nhé!</p>
+      </div>
+      } @else {
+      <!-- DATE PILL -->
+      <div class="text-center my-3">
+        <span class="badge bg-white text-muted border shadow-xs px-3 py-1.5 rounded-pill fs-8 fw-normal">
+          Cuộc trò chuyện trực tuyến
+        </span>
+      </div>
+
+      @for (msg of messages(); track msg.id) {
+      <div class="message-row" [class.justify-content-end]="msg.isMyMessage"
+        [class.justify-content-start]="!msg.isMyMessage">
+        @if (!msg.isMyMessage) {
+        <div class="mini-avatar text-white shadow-xs" [style.background]="getAvatarColor(selectedUser()?.userName)">
+          {{ getInitials(selectedUser()?.userName) }}
+        </div>
+        }
+        <div class="message-bubble" [class.my-message]="msg.isMyMessage" [class.other-message]="!msg.isMyMessage">
+          @if (!msg.isMyMessage) {
+          <div class="message-sender fw-bold mb-1">{{ msg.senderName || 'Khách hàng' }}</div>
+          }
+          <div class="message-content">{{ msg.message }}</div>
+          <div class="message-time">
+            <span>{{ msg.creationTime | date: 'HH:mm dd/MM' }}</span>
+            @if (msg.isMyMessage) {
+            <i class="fas fa-check-double text-white-50 ms-1 fs-9"></i>
+            }
+          </div>
+        </div>
+      </div>
+      }
+      }
+    </div>
+
+    <!-- INPUT BOX -->
+    <div class="chat-input-box">
+      <form class="d-flex align-items-center gap-3" (submit)="$event.preventDefault(); send()">
+        <input type="text" class="chat-input-field flex-grow-1"
+          placeholder="Nhập câu trả lời tư vấn cho khách hàng... (Nhấn Enter để gửi)" [value]="inputText()"
+          (input)="inputText.set($any($event.target).value)" [disabled]="isSending()" />
+        <button type="submit" class="btn-send flex-shrink-0" [disabled]="!inputText().trim() || isSending()"
+          title="Gửi tin nhắn">
+          @if (isSending()) {
+          <i class="fas fa-spinner fa-spin"></i>
+          } @else {
+          <i class="fas fa-paper-plane"></i>
+          }
+        </button>
+      </form>
+    </div>
+    }
   </div>
 </div>

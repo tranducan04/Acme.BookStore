@@ -1,0 +1,260 @@
+<div class="coupon-page" @pageEnter>
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="header-left">
+      <div class="header-icon">🎟️</div>
+      <div>
+        <h1 class="page-title">{{ '::Coupons:Title' | abpLocalization }}</h1>
+        <p class="page-subtitle">{{ '::Coupons:Subtitle' | abpLocalization }}</p>
+      </div>
+    </div>
+    <button class="btn btn-primary" (click)="openCreateModal()">
+      <span class="btn-icon">➕</span> {{ '::Coupons:AddNew' | abpLocalization }}
+    </button>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="page-toolbar">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" [placeholder]="'::Coupons:SearchPlaceholder' | abpLocalization" [value]="searchTerm()"
+        (input)="searchTerm.set($any($event.target).value)" />
+      @if (searchTerm()) {
+      <button class="clear-btn" (click)="searchTerm.set('')">✕</button>
+      }
+    </div>
+
+    <div class="filter-group">
+      <label class="filter-label">{{ '::Coupons:Status' | abpLocalization }}</label>
+      <select [value]="filterActive()" (change)="filterActive.set($any($event.target).value)" class="form-select">
+        <option value="all">{{ '::Coupons:AllStatus' | abpLocalization }}</option>
+        <option value="active">{{ '::Coupons:Active' | abpLocalization }}</option>
+        <option value="inactive">{{ '::Coupons:Inactive' | abpLocalization }}</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- TABLE CONTENT -->
+  <div class="table-card">
+    @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>{{ '::Coupons:Loading' | abpLocalization }}</p>
+    </div>
+    } @else if (filteredCoupons().length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon">🏷️</div>
+      <h3>{{ '::Coupons:EmptyTitle' | abpLocalization }}</h3>
+      <p>{{ '::Coupons:EmptyDesc' | abpLocalization }}</p>
+      <button class="btn btn-outline" (click)="openCreateModal()">{{ '::Coupons:CreateFirst' | abpLocalization }}</button>
+    </div>
+    } @else {
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>{{ '::Coupons:Code' | abpLocalization }}</th>
+            <th>{{ '::Coupons:ProgramName' | abpLocalization }}</th>
+            <th>{{ '::Coupons:Discount' | abpLocalization }}</th>
+            <th>{{ '::Coupons:MinOrder' | abpLocalization }}</th>
+            <th>{{ '::Coupons:Usage' | abpLocalization }}</th>
+            <th>{{ '::Coupons:Expiry' | abpLocalization }}</th>
+            <th>{{ '::Coupons:StatusCol' | abpLocalization }}</th>
+            <th class="text-right">{{ '::Coupons:Actions' | abpLocalization }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of filteredCoupons(); track c.id) {
+          <tr>
+            <td>
+              <span class="code-badge">{{ c.code }}</span>
+            </td>
+            <td>
+              <div class="coupon-title">{{ c.title }}</div>
+            </td>
+            <td>
+              @if (c.discountType === DiscountType.Percentage) {
+              <span class="discount-badge discount-percent">{{ '::Coupons:DiscountPercent' | abpLocalization: (c.discountValue + '') }}</span>
+              @if (c.maxDiscountAmount) {
+              <div class="sub-text">{{ '::Coupons:MaxDiscount' | abpLocalization }} {{ c.maxDiscountAmount | number }}₫</div>
+              }
+              } @else {
+              <span class="discount-badge discount-fixed">-{{ c.discountValue | number }}₫</span>
+              }
+            </td>
+            <td>
+              @if (c.minOrderAmount > 0) {
+              <strong>{{ c.minOrderAmount | number }}₫</strong>
+              } @else {
+              <span class="sub-text">{{ '::Coupons:Unlimited' | abpLocalization }}</span>
+              }
+            </td>
+            <td>
+              <div class="usage-progress">
+                <span class="usage-text">{{ c.usedCount }} / {{ c.maxUsageCount }}</span>
+                <div class="progress-bar">
+                  <div class="progress-fill" [style.width.%]="(c.usedCount / c.maxUsageCount) * 100"></div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="date-range">
+                <span>{{ c.startDate | date:'dd/MM/yyyy' }}</span>
+                <span class="date-arrow">➔</span>
+                <span>{{ c.endDate | date:'dd/MM/yyyy' }}</span>
+              </div>
+            </td>
+            <td>
+              <button class="status-toggle" [class.active]="c.isActive" (click)="toggleActive(c)"
+                title="Toggle status">
+                <span class="toggle-dot"></span>
+                {{ c.isActive ? ('::Coupons:StatusActive' | abpLocalization) : ('::Coupons:StatusPaused' | abpLocalization) }}
+              </button>
+            </td>
+            <td class="text-right actions-cell">
+              <button class="action-btn edit-btn" (click)="openEditModal(c)" [title]="'::Coupons:EditTitle' | abpLocalization">
+                ✏️
+              </button>
+              <button class="action-btn delete-btn" (click)="deleteCoupon(c)" [title]="'::Coupons:DeleteTitle' | abpLocalization">
+                🗑️
+              </button>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    }
+  </div>
+
+  <!-- 🌟 MODAL THÊM / SỬA MÃ GIẢM GIÁ (Chuẩn Bootstrap Modal tương thích LeptonX ABP) -->
+  @if (isModalOpen()) {
+  <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.55); z-index: 1060;"
+    (click)="closeModal()">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" (click)="$event.stopPropagation()">
+      <div class="modal-content shadow-lg border-0 rounded-4 overflow-hidden">
+        <div class="modal-header bg-primary text-white p-3">
+          <h5 class="modal-title fw-bold">
+            {{ isEditMode() ? ('::Coupons:ModalEditTitle' | abpLocalization) : ('::Coupons:ModalCreateTitle' | abpLocalization) }}
+          </h5>
+          <button type="button" class="btn-close btn-close-white" (click)="closeModal()"></button>
+        </div>
+
+        <div class="modal-body p-4">
+          @if (formError()) {
+          <div class="alert alert-danger mb-3 py-2 px-3">
+            ⚠️ {{ formError() }}
+          </div>
+          }
+
+          <div class="row g-3">
+            <!-- Mã Code -->
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark">{{ '::Coupons:ModalCodeLabel' | abpLocalization }} <span class="text-danger">*</span></label>
+              <input type="text" class="form-control text-uppercase fw-bold" [placeholder]="'::Coupons:ModalCodePlaceholder' | abpLocalization"
+                [value]="formCode()" (input)="formCode.set($any($event.target).value)" required />
+              <small class="text-muted d-block mt-1">{{ '::Coupons:ModalCodeHelp' | abpLocalization }}</small>
+            </div>
+
+            <!-- Tên chương trình -->
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark">{{ '::Coupons:ModalTitleLabel' | abpLocalization }} <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" [placeholder]="'::Coupons:ModalTitlePlaceholder' | abpLocalization" [value]="formTitle()"
+                (input)="formTitle.set($any($event.target).value)" required />
+            </div>
+
+            <!-- Loại giảm giá -->
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark">{{ '::Coupons:ModalTypeLabel' | abpLocalization }} <span class="text-danger">*</span></label>
+              <select class="form-select fw-semibold" [value]="formDiscountType()"
+                (change)="formDiscountType.set(+$any($event.target).value)">
+                <option [value]="DiscountType.Percentage">{{ '::Coupons:ModalTypePercentage' | abpLocalization }}</option>
+                <option [value]="DiscountType.FixedAmount">{{ '::Coupons:ModalTypeFixed' | abpLocalization }}</option>
+              </select>
+            </div>
+
+            <!-- Giá trị giảm -->
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark">
+                {{ formDiscountType() === DiscountType.Percentage ? ('::Coupons:ModalValuePercentLabel' | abpLocalization) : ('::Coupons:ModalValueFixedLabel' | abpLocalization) }} <span
+                  class="text-danger">*</span>
+              </label>
+              <input type="number" class="form-control"
+                [placeholder]="formDiscountType() === DiscountType.Percentage ? 'VD: 15' : 'VD: 50000'"
+                [value]="formDiscountValue()" (input)="formDiscountValue.set(+$any($event.target).value)" required />
+            </div>
+
+            <!-- Trần giảm tối đa (nếu là %) -->
+            @if (formDiscountType() === DiscountType.Percentage) {
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark">{{ '::Coupons:ModalMaxDiscountLabel' | abpLocalization }}</label>
+              <input type="number" class="form-control" [placeholder]="'::Coupons:ModalMaxDiscountPlaceholder' | abpLocalization"
+                [value]="formMaxDiscountAmount() || ''"
+                (input)="formMaxDiscountAmount.set($any($event.target).value ? +$any($event.target).value : null)" />
+              <small class="text-muted d-block mt-1">{{ '::Coupons:ModalMaxDiscountHelp' | abpLocalization }}</small>
+            </div>
+            }
+
+            <!-- Đơn hàng tối thiểu -->
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark">{{ '::Coupons:ModalMinOrderLabel' | abpLocalization }}</label>
+              <input type="number" class="form-control" placeholder="VD: 200000" [value]="formMinOrderAmount()"
+                (input)="formMinOrderAmount.set(+$any($event.target).value)" />
+            </div>
+
+            <!-- Tổng lượt dùng -->
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark">{{ '::Coupons:ModalMaxUsageLabel' | abpLocalization }} <span
+                  class="text-danger">*</span></label>
+              <input type="number" class="form-control" placeholder="VD: 100" [value]="formMaxUsageCount()"
+                (input)="formMaxUsageCount.set(+$any($event.target).value)" required />
+            </div>
+
+            <!-- Ngày bắt đầu -->
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark">{{ '::Coupons:ModalStartDateLabel' | abpLocalization }} <span class="text-danger">*</span></label>
+              <input type="date" class="form-control" [value]="formStartDate()"
+                (input)="formStartDate.set($any($event.target).value)" required />
+            </div>
+
+            <!-- Ngày kết thúc -->
+            <div class="col-md-6">
+              <label class="form-label fw-bold text-dark">{{ '::Coupons:ModalEndDateLabel' | abpLocalization }} <span class="text-danger">*</span></label>
+              <input type="date" class="form-control" [value]="formEndDate()"
+                (input)="formEndDate.set($any($event.target).value)" required />
+            </div>
+
+            <!-- Kích hoạt -->
+            <div class="col-12 mt-3">
+              <div class="form-check form-switch p-0 d-flex align-items-center gap-2">
+                <input class="form-check-input ms-0" type="checkbox" id="couponActiveSwitch" role="switch"
+                  style="width: 2.5rem; height: 1.3rem; cursor: pointer;" [checked]="formIsActive()"
+                  (change)="formIsActive.set($any($event.target).checked)" />
+                <label class="form-check-label fw-bold text-dark ms-1" for="couponActiveSwitch"
+                  style="cursor: pointer;">
+                  {{ '::Coupons:ModalActiveSwitch' | abpLocalization }}
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer bg-light p-3 border-top">
+          <button type="button" class="btn btn-outline-secondary rounded-pill px-4" (click)="closeModal()"
+            [disabled]="isSubmitting()">
+            {{ '::Close' | abpLocalization }}
+          </button>
+          <button type="button" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" (click)="saveCoupon()"
+            [disabled]="isSubmitting()">
+            @if (isSubmitting()) {
+            <span class="spinner-border spinner-border-sm me-1"></span> {{ '::Coupons:ModalSaving' | abpLocalization }}
+            } @else {
+            {{ '::Coupons:ModalSaveBtn' | abpLocalization }}
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+</div>

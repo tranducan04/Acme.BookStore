@@ -95,7 +95,7 @@ public class ChatHub : Hub
                 .SendAsync("ReceiveMessage", payload);
         }
 
-        // Bắn thêm vào Group Admins để tất cả tab Admin đang mở đều nhận được ngay lập tức
-        await Clients.Group("Admins").SendAsync("ReceiveMessage", payload);
+        // Bắn thêm vào Group Admins (trừ ConnectionId hiện tại) để các tab Admin khác nhận được ngay lập tức
+        await Clients.GroupExcept("Admins", Context.ConnectionId).SendAsync("ReceiveMessage", payload);
     }
 }

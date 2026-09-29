@@ -1,40 +1,119 @@
-<div class="chat-container">
-  <div class="chat-header">
-    <div class="header-info">
-      <div class="avatar"><i class="fas fa-headset"></i></div>
-      <div>
-        <h3>{{ '::ChatSupport:Title' | abpLocalization }}</h3>
-        <span class="status"><i class="fas fa-circle online-dot"></i> {{ '::ChatSupport:Active' | abpLocalization }}</span>
+<div class="chat-wrapper">
+  @if (!isLoggedIn()) {
+    <!-- 🔒 GIAO DIỆN DÀNH CHO KHÁCH CHƯA ĐĂNG NHẬP -->
+    <div class="guest-card shadow-sm border-0 rounded-4 text-center p-5">
+      <div class="guest-icon mb-3 shadow-xs">
+        <i class="fas fa-headset fa-3x text-primary"></i>
+      </div>
+      <h4 class="fw-bold mb-2 text-dark">{{ '::Chat:GuestTitle' | abpLocalization }}</h4>
+      <p class="text-muted mb-4 max-w-400 mx-auto fs-7">
+        {{ '::Chat:GuestDesc' | abpLocalization }}
+      </p>
+      <button type="button" class="btn btn-login rounded-pill px-4 py-2.5 shadow-sm fw-semibold" (click)="login()">
+        <i class="fas fa-sign-in-alt me-2"></i> {{ '::Chat:LoginNow' | abpLocalization }}
+      </button>
+    </div>
+  } @else {
+    <!-- 💬 GIAO DIỆN CHAT TRỰC TUYẾN DÀNH CHO KHÁCH ĐÃ ĐĂNG NHẬP -->
+    <div class="chat-container shadow-sm rounded-4 overflow-hidden border">
+      <!-- HEADER -->
+      <div class="chat-header p-3 px-4 d-flex justify-content-between align-items-center">
+        <div class="header-info d-flex align-items-center gap-3">
+          <div class="avatar rounded-circle d-flex align-items-center justify-content-center shadow-xs">
+            <i class="fas fa-headset"></i>
+          </div>
+          <div>
+            <h5 class="mb-0 fw-bold fs-6">{{ '::Chat:HeaderTitle' | abpLocalization }}</h5>
+            <div class="status-indicator">
+              <span class="pulsing-dot"></span>
+              <span class="status-text">{{ '::Chat:HeaderStatus' | abpLocalization }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MESSAGES AREA (Có padding 28px rộng rãi ngăn cắt viền) -->
+      <div class="chat-messages" id="chat-messages-box">
+        @if (isLoading()) {
+          <div class="loading-state text-center py-5">
+            <div class="spinner-border spinner-border-sm text-primary mb-2" role="status"></div>
+            <p class="text-muted small">{{ '::Chat:LoadingHistory' | abpLocalization }}</p>
+          </div>
+        } @else if (messages().length === 0) {
+          <div class="empty-state text-center py-5">
+            <div class="empty-icon mb-3">
+              <i class="fas fa-comments fa-3x text-primary opacity-35"></i>
+            </div>
+            <h6 class="fw-bold text-dark">{{ '::Chat:EmptyGreeting' | abpLocalization }}</h6>
+            <p class="text-muted small max-w-350 mx-auto">
+              {{ '::Chat:EmptyPrompt' | abpLocalization }}
+            </p>
+          </div>
+        } @else {
+          <!-- DATE PILL -->
+          <div class="text-center my-3">
+            <span class="badge bg-white text-muted border shadow-xs px-3 py-1.5 rounded-pill fs-8 fw-normal">
+              {{ '::Chat:SecurityBadge' | abpLocalization }}
+            </span>
+          </div>
+
+          @for (msg of messages(); track msg.id) {
+            <div
+              class="message-row"
+              [class.justify-content-end]="msg.isMyMessage"
+              [class.justify-content-start]="!msg.isMyMessage"
+            >
+              @if (!msg.isMyMessage) {
+                <div class="sender-avatar rounded-circle d-flex align-items-center justify-content-center text-white shadow-xs">
+                  <i class="fas fa-user-shield"></i>
+                </div>
+              }
+              <div
+                class="message-bubble"
+                [class.my-message]="msg.isMyMessage"
+                [class.other-message]="!msg.isMyMessage"
+              >
+                @if (!msg.isMyMessage) {
+                  <div class="message-sender fw-bold mb-1">{{ msg.senderName || ('::Chat:SupportAgent' | abpLocalization) }}</div>
+                }
+                <div class="message-content">{{ msg.message }}</div>
+                <div class="message-time">
+                  <span>{{ msg.creationTime | date: 'HH:mm dd/MM' }}</span>
+                  @if (msg.isMyMessage) {
+                    <i class="fas fa-check-double text-white-50 ms-1 fs-9"></i>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        }
+      </div>
+
+      <!-- INPUT BOX -->
+      <div class="chat-input-box">
+        <form class="d-flex align-items-center gap-3" (submit)="$event.preventDefault(); send()">
+          <input
+            type="text"
+            class="chat-input-field flex-grow-1"
+            [placeholder]="'::Chat:InputPlaceholder' | abpLocalization"
+            [value]="inputText()"
+            (input)="inputText.set($any($event.target).value)"
+            [disabled]="isSending()"
+          />
+          <button
+            type="submit"
+            class="btn-send flex-shrink-0"
+            [disabled]="!inputText().trim() || isSending()"
+            [title]="'::ChatSupport:SendBtn' | abpLocalization"
+          >
+            @if (isSending()) {
+              <i class="fas fa-spinner fa-spin text-white"></i>
+            } @else {
+              <i class="fas fa-paper-plane text-white"></i>
+            }
+          </button>
+        </form>
       </div>
     </div>
-  </div>
-
-  <div class="chat-messages" id="chat-messages-box">
-    <div *ngIf="messages.length === 0" class="empty-state">
-      <i class="fas fa-comments"></i>
-      <p>{{ '::ChatSupport:Welcome' | abpLocalization }}</p>
-    </div>
-
-    <div
-      *ngFor="let msg of messages"
-      class="message-bubble"
-      [ngClass]="{ 'my-message': msg.isMyMessage, 'other-message': !msg.isMyMessage }"
-    >
-      <div class="message-sender" *ngIf="!msg.isMyMessage">{{ msg.senderName }}</div>
-      <div class="message-content">{{ msg.message }}</div>
-      <div class="message-time">{{ msg.creationTime | date: 'HH:mm dd/MM' }}</div>
-    </div>
-  </div>
-
-  <div class="chat-input-box">
-    <input
-      type="text"
-      [(ngModel)]="newMessage"
-      (keyup.enter)="send()"
-      [placeholder]="'::ChatSupport:InputPlaceholder' | abpLocalization"
-    />
-    <button (click)="send()" [disabled]="!newMessage.trim()">
-      <i class="fas fa-paper-plane"></i> {{ '::ChatSupport:SendBtn' | abpLocalization }}
-    </button>
-  </div>
+  }
 </div>

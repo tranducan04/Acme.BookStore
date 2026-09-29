@@ -84,3 +84,11 @@ public partial class CategoryDtoToCategoryMapper : MapperBase<CategoryDto, Categ
     public override partial Category Map(CategoryDto source);
     public override partial void Map(CategoryDto source, Category destination);
 }
+
+[Mapper]
+public partial class CouponToCouponDtoMapper : MapperBase<Acme.BookStore.Coupons.Coupon, Acme.BookStore.Coupons.CouponDto>
+{
+    public override partial Acme.BookStore.Coupons.CouponDto Map(Acme.BookStore.Coupons.Coupon source);
+    public override partial void Map(Acme.BookStore.Coupons.Coupon source, Acme.BookStore.Coupons.CouponDto destination);
+}
+

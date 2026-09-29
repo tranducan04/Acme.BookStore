@@ -57,13 +57,67 @@
                 }
             </tbody>
         </table>
+        <!-- KHUNG MÃ GIẢM GIÁ (COUPON) -->
+        <div class="card border-0 bg-light p-3 my-3 rounded-3 shadow-sm">
+            <div class="row align-items-center g-2">
+                <div class="col-md-7">
+                    <label class="form-label fw-bold text-dark mb-1">🎟️ Mã Giảm Giá / Voucher:</label>
+                    <div class="input-group">
+                        <input
+                            type="text"
+                            class="form-control text-uppercase fw-bold"
+                            placeholder="Nhập mã (VD: CHAOBANMOI)..."
+                            [disabled]="appliedCoupon() !== null || isApplyingCoupon()"
+                            [value]="couponInput()"
+                            (input)="couponInput.set($any($event.target).value)"
+                        />
+                        @if (appliedCoupon()) {
+                            <button class="btn btn-outline-danger" type="button" (click)="removeCoupon()">
+                                ✕ Hủy mã
+                            </button>
+                        } @else {
+                            <button
+                                class="btn btn-primary fw-bold"
+                                type="button"
+                                [disabled]="isApplyingCoupon()"
+                                (click)="applyCoupon()"
+                            >
+                                @if (isApplyingCoupon()) {
+                                    <span class="spinner-border spinner-border-sm me-1"></span> Đang kiểm tra...
+                                } @else {
+                                    Áp dụng
+                                }
+                            </button>
+                        }
+                    </div>
+                    @if (couponError()) {
+                        <div class="text-danger small mt-1 fw-bold">⚠️ {{ couponError() }}</div>
+                    }
+                    @if (couponSuccess()) {
+                        <div class="text-success small mt-1 fw-bold">🎉 {{ couponSuccess() }}</div>
+                    }
+                </div>
+                <div class="col-md-5 text-md-end">
+                    @if (discountAmount() > 0) {
+                        <div class="text-muted small">Tạm tính: <del>{{ cartStore.cart()?.totalPrice | currency:'VND':'symbol':'1.0-0' }}</del></div>
+                        <div class="text-success fw-bold">Giảm giá voucher: -{{ discountAmount() | currency:'VND':'symbol':'1.0-0' }}</div>
+                    }
+                </div>
+            </div>
+        </div>
+
         <div class="d-flex justify-content-between align-items-center mt-4 p-3.5 soft-pastel-card">
             <h5 class="mb-0 text-dark">{{ '::Cart:TotalItems' | abpLocalization }} <span class="badge bg-primary px-3 py-2 ms-1">{{
                     cartStore.cart()?.totalCount
                     }}</span></h5>
             <div class="d-flex align-items-center gap-3">
-                <h4 class="mb-0 text-dark">{{ '::Cart:TotalPayment' | abpLocalization }} <span class="text-danger fw-bold fs-3 ms-1">{{
-                        cartStore.cart()?.totalPrice | currency:'VND':'symbol':'1.0-0' }}</span></h4>
+                <div class="text-end">
+                    @if (discountAmount() > 0) {
+                        <small class="text-muted d-block">Gốc: <del>{{ cartStore.cart()?.totalPrice | currency:'VND':'symbol':'1.0-0' }}</del></small>
+                    }
+                    <h4 class="mb-0 text-dark">{{ '::Cart:TotalPayment' | abpLocalization }} <span class="text-danger fw-bold fs-3 ms-1">{{
+                            finalPrice() | currency:'VND':'symbol':'1.0-0' }}</span></h4>
+                </div>
                 <button class="btn btn-lg btn-success fw-bold px-4 shadow-sm rounded-pill" (click)="openCheckout()">
                     📦 {{ '::Cart:CheckoutBtn' | abpLocalization }}
                 </button>
@@ -134,14 +188,20 @@
                     <small class="fw-semibold">{{ '::Cart:QrNotice' | abpLocalization }}</small>
                 </div>
                 }
+                @if (discountAmount() > 0) {
+                <div class="alert alert-success py-2 px-3 d-flex justify-content-between align-items-center mb-2">
+                    <span>🎟️ Voucher áp dụng: <strong>{{ appliedCoupon()?.code }}</strong></span>
+                    <span class="fw-bold">-{{ discountAmount() | currency:'VND':'symbol':'1.0-0' }}</span>
+                </div>
+                }
                 <div class="alert alert-info d-flex justify-content-between align-items-center mb-0">
                     <span><strong>{{ '::Cart:TotalPayment' | abpLocalization }}</strong></span>
-                    <span class="fs-4 text-danger font-weight-bold">{{ cartStore.cart()?.totalPrice |
+                    <span class="fs-4 text-danger font-weight-bold">{{ finalPrice() |
                         currency:'VND':'symbol':'1.0-0' }}</span>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" (click)="closeCheckout()">{{ '::Cancel' | abpLocalization }}</button>
+                <button type="button" class="btn btn-secondary" (click)="handleCancelCheckout()">{{ '::Cancel' | abpLocalization }}</button>
                 <button type="button" class="btn btn-success fw-bold px-4" (click)="placeOrder()"
                     [disabled]="isOrdering()">
                     @if (isOrdering()) {
@@ -171,7 +231,7 @@
                         <small class="text-white-50">{{ '::Cart:QrScanDesc' | abpLocalization }}</small>
                     </div>
                 </div>
-                <button type="button" class="btn-close btn-close-white" (click)="closeQrModal()"></button>
+                <button type="button" class="btn-close btn-close-white" (click)="backToPaymentSelection()" [title]="'::Cart:BackToPaymentSelection' | abpLocalization"></button>
             </div>
             <!-- Body -->
             <div class="modal-body text-center p-4">
@@ -203,9 +263,15 @@
                                 <td class="text-muted">{{ '::Cart:AccountHolder' | abpLocalization }}</td>
                                 <td class="fw-bold">TRAN DUC AN</td>
                             </tr>
+                            @if (discountAmount() > 0) {
+                            <tr>
+                                <td class="text-muted">Mã giảm giá:</td>
+                                <td class="fw-bold text-success">🎟️ {{ appliedCoupon()?.code }} (-{{ discountAmount() | currency:'VND':'symbol':'1.0-0' }})</td>
+                            </tr>
+                            }
                             <tr>
                                 <td class="text-muted">{{ '::Cart:Amount' | abpLocalization }}</td>
-                                <td class="fw-bold text-danger">{{ cartStore.cart()?.totalPrice |
+                                <td class="fw-bold text-danger fs-5">{{ createdOrderAmount() |
                                     currency:'VND':'symbol':'1.0-0' }}</td>
                             </tr>
                             <tr>
@@ -222,8 +288,12 @@
                 </div>
             </div>
             <!-- Footer -->
-            <div class="modal-footer justify-content-center">
-                <button type="button" class="btn btn-primary fw-bold px-4" (click)="closeQrModal()">
+            <div class="modal-footer d-flex justify-content-between align-items-center p-3">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-4 py-2 fw-semibold"
+                    (click)="backToPaymentSelection()">
+                    ⬅️ {{ '::Cart:BackToPaymentSelection' | abpLocalization }}
+                </button>
+                <button type="button" class="btn btn-primary rounded-pill fw-bold px-4 py-2" (click)="closeQrModal()">
                     👍 {{ '::Cart:QrDoneBtn' | abpLocalization }}
                 </button>
             </div>

@@ -6,6 +6,7 @@ using Acme.BookStore.Books;
 using Acme.BookStore.Carts;
 using Acme.BookStore.Notifications;
 using Acme.BookStore.Permissions;
+using Acme.BookStore.Coupons;
 using Microsoft.AspNetCore.Authorization;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
@@ -28,6 +29,8 @@ public class OrderAppService : ApplicationService, IOrderAppService
     private readonly IRepository<Book, Guid> _bookRepository;
     private readonly IRepository<AppNotification, Guid> _notificationRepository;
     private readonly IIdentityUserRepository _identityUserRepository;
+    private readonly IRepository<Coupon, Guid> _couponRepository;
+    private readonly IRepository<CouponUsage, Guid> _couponUsageRepository;
 
     private readonly IDataFilter _dataFilter;
 
@@ -39,6 +42,8 @@ public class OrderAppService : ApplicationService, IOrderAppService
         IRepository<Book, Guid> bookRepository,
         IRepository<AppNotification, Guid> notificationRepository,
         IIdentityUserRepository identityUserRepository,
+        IRepository<Coupon, Guid> couponRepository,
+        IRepository<CouponUsage, Guid> couponUsageRepository,
         IDataFilter dataFilter)
     {
         _orderRepository = orderRepository;
@@ -48,6 +53,8 @@ public class OrderAppService : ApplicationService, IOrderAppService
         _bookRepository = bookRepository;
         _notificationRepository = notificationRepository;
         _identityUserRepository = identityUserRepository;
+        _couponRepository = couponRepository;
+        _couponUsageRepository = couponUsageRepository;
         _dataFilter = dataFilter;
     }
 
@@ -111,10 +118,71 @@ public class OrderAppService : ApplicationService, IOrderAppService
             );
             order.Items.Add(orderItem);
         }
-        order.TotalAmount = totalAmount;
+
+        decimal discountAmount = 0;
+        Coupon? appliedCoupon = null;
+        if (!string.IsNullOrWhiteSpace(input.CouponCode))
+        {
+            var code = input.CouponCode.Trim().ToUpperInvariant();
+            appliedCoupon = await _couponRepository.FirstOrDefaultAsync(x => x.Code == code);
+            if (appliedCoupon == null || !appliedCoupon.IsActive)
+            {
+                throw new UserFriendlyException("Mã giảm giá không hợp lệ hoặc đã tạm dừng áp dụng.");
+            }
+            var now = Clock.Now;
+            if (now < appliedCoupon.StartDate || now > appliedCoupon.EndDate)
+            {
+                throw new UserFriendlyException("Mã giảm giá chưa đến đợt hoặc đã hết hạn.");
+            }
+            if (appliedCoupon.UsedCount >= appliedCoupon.MaxUsageCount)
+            {
+                throw new UserFriendlyException("Mã giảm giá đã hết lượt sử dụng.");
+            }
+            if (totalAmount < appliedCoupon.MinOrderAmount)
+            {
+                throw new UserFriendlyException($"Đơn hàng cần đạt tối thiểu {appliedCoupon.MinOrderAmount:N0}₫ để dùng mã này.");
+            }
+            var alreadyUsed = await _couponUsageRepository.AnyAsync(x => x.CouponId == appliedCoupon.Id && x.UserId == userId);
+            if (alreadyUsed)
+            {
+                throw new UserFriendlyException("Bạn đã sử dụng mã giảm giá này rồi (mỗi tài khoản chỉ được dùng 1 lần).");
+            }
+
+            if (appliedCoupon.DiscountType == DiscountType.Percentage)
+            {
+                discountAmount = Math.Round(totalAmount * (appliedCoupon.DiscountValue / 100m));
+                if (appliedCoupon.MaxDiscountAmount.HasValue && appliedCoupon.MaxDiscountAmount.Value > 0)
+                {
+                    discountAmount = Math.Min(discountAmount, appliedCoupon.MaxDiscountAmount.Value);
+                }
+            }
+            else
+            {
+                discountAmount = appliedCoupon.DiscountValue;
+            }
+            discountAmount = Math.Min(discountAmount, totalAmount);
+        }
+
+        order.CouponCode = appliedCoupon?.Code;
+        order.DiscountAmount = discountAmount;
+        order.TotalAmount = Math.Max(0, totalAmount - discountAmount);
         
         await _orderRepository.InsertAsync(order, autoSave: true);
         await _cartItemRepository.DeleteManyAsync(cartItems);
+
+        if (appliedCoupon != null && discountAmount > 0)
+        {
+            appliedCoupon.UsedCount++;
+            await _couponRepository.UpdateAsync(appliedCoupon);
+
+            await _couponUsageRepository.InsertAsync(new CouponUsage(
+                GuidGenerator.Create(),
+                appliedCoupon.Id,
+                userId,
+                order.Id,
+                discountAmount
+            ), autoSave: true);
+        }
 
         // 🔔 TỰ ĐỘNG BẮN THÔNG BÁO CHO KHÁCH HÀNG
         await _notificationRepository.InsertAsync(new AppNotification(
@@ -168,6 +236,7 @@ public class OrderAppService : ApplicationService, IOrderAppService
 
         order.Status = OrderStatus.Cancelled;
         await _orderRepository.UpdateAsync(order);
+        await RevertCouponUsageAsync(order);
 
         // Hoàn kho
         var orderItems = await _orderItemRepository.GetListAsync(x => x.OrderId == order.Id);
@@ -181,6 +250,33 @@ public class OrderAppService : ApplicationService, IOrderAppService
             }
         }
 
+        // Hoàn lại sản phẩm vào giỏ hàng
+        try
+        {
+            var queryable = await _cartRepository.WithDetailsAsync(x => x.Items);
+            var cart = queryable.FirstOrDefault(x => x.UserId == userId);
+            if (cart != null)
+            {
+                foreach (var item in orderItems)
+                {
+                    var existingItem = cart.Items.FirstOrDefault(x => x.BookId == item.BookId);
+                    if (existingItem != null)
+                    {
+                        existingItem.Count += item.Count;
+                    }
+                    else
+                    {
+                        cart.Items.Add(new CartItem { CartId = cart.Id, BookId = item.BookId, Count = item.Count });
+                    }
+                }
+                await _cartRepository.UpdateAsync(cart, autoSave: true);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogWarning("Không thể khôi phục giỏ hàng khi hủy đơn: " + ex.Message);
+        }
+
         // 🔔 BẮN THÔNG BÁO XÁC NHẬN HỦY ĐƠN
         await _notificationRepository.InsertAsync(new AppNotification(
             GuidGenerator.Create(),
@@ -190,6 +286,30 @@ public class OrderAppService : ApplicationService, IOrderAppService
             NotificationType.Order,
             $"/orders?search={order.OrderNo}"
         ), autoSave: true);
+
+        return await MapToOrderDtoAsync(order);
+    }
+
+    /// <summary>
+    /// Đổi phương thức thanh toán của đơn hàng (ví dụ: chuyển từ QR sang COD khi khách không muốn quét QR)
+    /// </summary>
+    public async Task<OrderDto> SwitchPaymentMethodAsync(Guid id, int paymentMethod)
+    {
+        var userId = CurrentUser.GetId();
+        var order = await _orderRepository.GetAsync(id);
+
+        if (order.UserId != userId)
+        {
+            throw new UserFriendlyException("Bạn không thể thay đổi đơn hàng của người khác!");
+        }
+
+        if (order.Status != OrderStatus.Placed && order.Status != OrderStatus.Processing)
+        {
+            throw new UserFriendlyException("Đơn hàng đang vận chuyển hoặc đã kết thúc, không thể đổi phương thức thanh toán!");
+        }
+
+        order.PaymentMethod = (PaymentMethod)paymentMethod;
+        await _orderRepository.UpdateAsync(order);
 
         return await MapToOrderDtoAsync(order);
     }
@@ -219,6 +339,7 @@ public class OrderAppService : ApplicationService, IOrderAppService
                 book.StockCount += item.Count;
                 await _bookRepository.UpdateAsync(book);
             }
+            await RevertCouponUsageAsync(order);
         }
         await _orderRepository.UpdateAsync(order);
         // 🔔 BẮN THÔNG BÁO ĐẾN KHÁCH HÀNG KHI TRẠNG THÁI VẬN CHUYỂN THAY ĐỔI
@@ -331,6 +452,8 @@ public class OrderAppService : ApplicationService, IOrderAppService
             ShippingAddress = order.ShippingAddress,
             PaymentMethod = order.PaymentMethod,
             PaymentStatus = order.PaymentStatus,
+            CouponCode = order.CouponCode,
+            DiscountAmount = order.DiscountAmount,
             CreationTime = order.CreationTime,
             Items = items.Select(i =>
             {
@@ -349,5 +472,23 @@ public class OrderAppService : ApplicationService, IOrderAppService
                 };
             }).ToList()
         };
+    }
+
+    private async Task RevertCouponUsageAsync(Order order)
+    {
+        if (!string.IsNullOrEmpty(order.CouponCode))
+        {
+            var usage = await _couponUsageRepository.FirstOrDefaultAsync(x => x.OrderId == order.Id);
+            if (usage != null)
+            {
+                var coupon = await _couponRepository.FindAsync(usage.CouponId);
+                if (coupon != null && coupon.UsedCount > 0)
+                {
+                    coupon.UsedCount--;
+                    await _couponRepository.UpdateAsync(coupon);
+                }
+                await _couponUsageRepository.DeleteAsync(usage);
+            }
+        }
     }
 }

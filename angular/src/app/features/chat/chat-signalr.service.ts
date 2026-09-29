@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { EnvironmentService } from '@abp/ng.core';
 import { OAuthService } from 'angular-oauth2-oidc';
 import * as signalR from '@microsoft/signalr';
@@ -15,10 +15,19 @@ export class ChatSignalRService {
   private hubConnection: signalR.HubConnection | null = null;
   private messageReceivedSource = new BehaviorSubject<ChatMessageDto | null>(null);
 
-  public messageReceived$: Observable<ChatMessageDto | null> = this.messageReceivedSource.asObservable();
+  public readonly isConnected = signal<boolean>(false);
+  public readonly messageReceived$: Observable<ChatMessageDto | null> = this.messageReceivedSource.asObservable();
 
   public async startConnection(): Promise<void> {
     if (this.hubConnection && this.hubConnection.state === signalR.HubConnectionState.Connected) {
+      this.isConnected.set(true);
+      return;
+    }
+
+    const token = this.oAuthService.getAccessToken();
+    if (!token) {
+      console.warn('ChatSignalR: No access token available. Skipping connection.');
+      this.isConnected.set(false);
       return;
     }
 
@@ -28,7 +37,7 @@ export class ChatSignalRService {
       .withUrl(`${baseUrl}/signalr-hubs/chat`, {
         accessTokenFactory: () => this.oAuthService.getAccessToken() || '',
       })
-      .withAutomaticReconnect()
+      .withAutomaticReconnect([0, 2000, 5000, 10000, 30000])
       .build();
 
     this.hubConnection.on('ReceiveMessage', (message: ChatMessageDto) => {
@@ -36,10 +45,27 @@ export class ChatSignalRService {
       this.messageReceivedSource.next(message);
     });
 
+    this.hubConnection.onreconnecting((err) => {
+      console.warn('SignalR Chat Hub reconnecting...', err);
+      this.isConnected.set(false);
+    });
+
+    this.hubConnection.onreconnected((connectionId) => {
+      console.log('SignalR Chat Hub reconnected:', connectionId);
+      this.isConnected.set(true);
+    });
+
+    this.hubConnection.onclose((err) => {
+      console.warn('SignalR Chat Hub connection closed.', err);
+      this.isConnected.set(false);
+    });
+
     try {
       await this.hubConnection.start();
+      this.isConnected.set(true);
       console.log('SignalR Chat Hub Connected.');
     } catch (err) {
+      this.isConnected.set(false);
       console.error('Error while starting SignalR connection: ', err);
     }
   }
@@ -64,6 +90,7 @@ export class ChatSignalRService {
     if (this.hubConnection) {
       this.hubConnection.stop();
       this.hubConnection = null;
+      this.isConnected.set(false);
     }
   }
 }

@@ -58,4 +58,13 @@ export class OrderService {
       body: input,
     },
     { apiName: this.apiName,...config });
+
+  switchPaymentMethod = (id: string, paymentMethod: number, config?: Partial<Rest.Config>) =>
+    this.restService.request<any, OrderDto>({
+      method: 'POST',
+      headers: { Accept: 'application/json' },
+      url: `/api/app/order/${id}/switch-payment-method`,
+      params: { paymentMethod },
+    },
+    { apiName: this.apiName,...config });
 }

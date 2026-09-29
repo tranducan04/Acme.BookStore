@@ -18,4 +18,6 @@ public class CreateOrderDto
 
     [Required(ErrorMessage = "Vui lòng chọn phương thức thanh toán")]
     public PaymentMethod PaymentMethod { get; set; } = PaymentMethod.COD;
+
+    public string? CouponCode { get; set; }
 }

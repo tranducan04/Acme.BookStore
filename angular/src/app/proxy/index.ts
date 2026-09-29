@@ -10,4 +10,6 @@ import * as Orders from './orders';
 import * as Payments from './payments';
 import * as Publishers from './publishers';
 import * as Wishlists from './wishlists';
-export { Authors, BookReviews, Books, Carts, Categories, ChatBots, Chats, Notifications, Orders, Payments, Publishers, Wishlists };
+import * as Coupons from './coupons';
+export { Authors, BookReviews, Books, Carts, Categories, ChatBots, Chats, Notifications, Orders, Payments, Publishers, Wishlists, Coupons };
+

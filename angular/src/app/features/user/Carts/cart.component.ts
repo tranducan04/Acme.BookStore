@@ -7,6 +7,9 @@ import { firstValueFrom } from 'rxjs';
 import { CartSignalStore } from './cart-signal.store';
 import { OrderService } from '../../../proxy/orders/order.service';
 import { PaymentService } from '../../../proxy/payments/payment.service';
+import { CouponService } from '../../../proxy/coupons/coupon.service';
+import { CouponValidationResultDto } from '../../../proxy/coupons/models';
+import { computed } from '@angular/core';
 
 import { CoreModule } from '@abp/ng.core';
 
@@ -29,6 +32,7 @@ export class CartComponent implements OnInit {
   public cartStore = inject(CartSignalStore);
   private orderService = inject(OrderService);
   private paymentService = inject(PaymentService);
+  private couponService = inject(CouponService);
   private router = inject(Router);
 
   // Form Signals
@@ -41,12 +45,27 @@ export class CartComponent implements OnInit {
   public showCheckoutModal = this.isCheckoutModalOpen;
   public nameError = signal<string>('');
   public phoneError = signal<string>('');
-  public addressError = signal<string>('')
+  public addressError = signal<string>('');
+
+  // 🎟️ COUPON SIGNALS
+  public couponInput = signal<string>('');
+  public appliedCoupon = signal<CouponValidationResultDto | null>(null);
+  public isApplyingCoupon = signal<boolean>(false);
+  public couponError = signal<string>('');
+  public couponSuccess = signal<string>('');
+
+  public discountAmount = computed(() => this.appliedCoupon()?.discountAmount || 0);
+  public finalPrice = computed(() => {
+    const raw = this.cartStore.cart()?.totalPrice || 0;
+    return Math.max(0, raw - this.discountAmount());
+  });
 
   // VietQR Signals
   public isQrModalOpen = signal<boolean>(false);
   public qrCodeUrl = signal<string>('');
   public createdOrderNo = signal<string>('');
+  public createdOrderId = signal<string>('');
+  public createdOrderAmount = signal<number>(0);
 
   // 2. Các hàm kiểm tra dữ liệu từng ô
   validateName(val: string): boolean {
@@ -114,6 +133,9 @@ export class CartComponent implements OnInit {
 
   closeQrModal() {
     this.isQrModalOpen.set(false);
+    this.createdOrderId.set('');
+    this.createdOrderNo.set('');
+    this.removeCoupon();
     this.cartStore.loadCart();
     this.router.navigate(['/orders']);
   }
@@ -142,9 +164,58 @@ export class CartComponent implements OnInit {
     const val = Number((event.target as HTMLSelectElement).value);
     this.paymentMethod.set(val);
   }
+  async applyCoupon() {
+    const code = this.couponInput().trim();
+    if (!code) {
+      this.couponError.set('Vui lòng nhập mã giảm giá.');
+      this.couponSuccess.set('');
+      return;
+    }
+
+    const currentTotal = this.cartStore.cart()?.totalPrice || 0;
+    if (currentTotal <= 0) {
+      this.couponError.set('Giỏ hàng chưa có sách để áp dụng mã.');
+      return;
+    }
+
+    this.isApplyingCoupon.set(true);
+    this.couponError.set('');
+    this.couponSuccess.set('');
+
+    try {
+      const res = await firstValueFrom(this.couponService.validateCoupon({
+        code: code,
+        orderTotal: currentTotal
+      }));
+
+      if (res.isValid) {
+        this.appliedCoupon.set(res);
+        this.couponSuccess.set(`Áp dụng mã ${res.code} thành công: Giảm ${res.discountAmount.toLocaleString('vi-VN')}₫`);
+        this.couponError.set('');
+      } else {
+        this.appliedCoupon.set(null);
+        this.couponError.set(res.errorMessage || 'Mã giảm giá không hợp lệ.');
+      }
+    } catch (err: any) {
+      const msg = err?.error?.error?.message || err?.message || 'Không thể kiểm tra mã giảm giá.';
+      this.appliedCoupon.set(null);
+      this.couponError.set(msg);
+    } finally {
+      this.isApplyingCoupon.set(false);
+    }
+  }
+
+  removeCoupon() {
+    this.appliedCoupon.set(null);
+    this.couponInput.set('');
+    this.couponError.set('');
+    this.couponSuccess.set('');
+  }
+
   async placeOrder() {
     await this.checkout();
   }
+
   async checkout() {
     const isNameValid = this.validateName(this.receiverName());
     const isPhoneValid = this.validatePhone(this.receiverPhone());
@@ -153,6 +224,38 @@ export class CartComponent implements OnInit {
     if (!isNameValid || !isPhoneValid || !isAddressValid) {
       return;
     }
+
+    // Trường hợp đơn đã tạo trước đó khi bật QR (user bấm Quay lại để chọn lại phương thức)
+    const existingOrderId = this.createdOrderId();
+    if (existingOrderId) {
+      if (this.paymentMethod() === 0) {
+        // Đổi sang COD
+        this.isOrdering.set(true);
+        try {
+          await firstValueFrom(this.orderService.switchPaymentMethod(existingOrderId, 0));
+          alert('🎉 Đặt hàng thành công! Cảm ơn bạn đã mua hàng tại Acme BookStore.');
+          this.closeCheckout();
+          this.createdOrderId.set('');
+          this.createdOrderNo.set('');
+          this.removeCoupon();
+          await this.cartStore.loadCart();
+          this.router.navigate(['/orders']);
+        } catch (err: any) {
+          console.error('Lỗi chuyển phương thức:', err);
+          const msg = err?.error?.error?.message || err?.message || 'Có lỗi khi cập nhật phương thức thanh toán!';
+          alert(`❌ ${msg}`);
+        } finally {
+          this.isOrdering.set(false);
+        }
+        return;
+      } else {
+        // Vẫn giữ QR -> Mở lại modal QR đã tạo
+        this.closeCheckout();
+        this.isQrModalOpen.set(true);
+        return;
+      }
+    }
+
     const currentCart = this.cartStore.cart();
     if (!currentCart || !currentCart.items || currentCart.items.length === 0) {
       alert('⚠️ Giỏ hàng của bạn đang trống! Vui lòng chọn sách trước khi đặt.');
@@ -164,20 +267,25 @@ export class CartComponent implements OnInit {
         receiverName: this.receiverName(),
         receiverPhone: this.receiverPhone(),
         shippingAddress: this.shippingAddress(),
-        paymentMethod: this.paymentMethod()
-      }));
+        paymentMethod: this.paymentMethod(),
+        couponCode: this.appliedCoupon()?.code || null
+      } as any));
 
       const orderNo = order?.orderNo || `ORD-${Date.now()}`;
+      const payableAmount = order?.totalAmount != null ? Number(order.totalAmount) : this.finalPrice();
 
       if (this.paymentMethod() === 1) {
-        const defaultQr = `https://img.vietqr.io/image/970436-9394235730-compact2.png?amount=${currentCart.totalPrice}&addInfo=${encodeURIComponent(orderNo)}&accountName=TRAN%20DUC%20AN`;
+        const defaultQr = `https://img.vietqr.io/image/970436-9394235730-compact2.png?amount=${payableAmount}&addInfo=${encodeURIComponent(orderNo)}&accountName=TRAN%20DUC%20AN`;
         this.qrCodeUrl.set(defaultQr);
         this.createdOrderNo.set(orderNo);
+        this.createdOrderId.set(order?.id || '');
+        this.createdOrderAmount.set(payableAmount);
         this.closeCheckout();
         this.isQrModalOpen.set(true);
       } else {
         alert('🎉 Đặt hàng thành công! Cảm ơn bạn đã mua hàng tại Acme BookStore.');
         this.closeCheckout();
+        this.removeCoupon();
         await this.cartStore.loadCart();
         this.router.navigate(['/orders']);
       }
@@ -188,5 +296,25 @@ export class CartComponent implements OnInit {
     } finally {
       this.isOrdering.set(false);
     }
+  }
+
+  backToPaymentSelection() {
+    this.isQrModalOpen.set(false);
+    this.openCheckout();
+  }
+
+  async handleCancelCheckout() {
+    const existingOrderId = this.createdOrderId();
+    if (existingOrderId) {
+      try {
+        await firstValueFrom(this.orderService.cancelMyOrder(existingOrderId));
+      } catch (e) {
+        console.error('Lỗi khi hủy đơn:', e);
+      }
+      this.createdOrderId.set('');
+      this.createdOrderNo.set('');
+      await this.cartStore.loadCart();
+    }
+    this.closeCheckout();
   }
 }

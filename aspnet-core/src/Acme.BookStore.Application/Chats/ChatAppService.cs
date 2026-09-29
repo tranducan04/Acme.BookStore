@@ -77,9 +77,22 @@ public class ChatAppService : ApplicationService, IChatAppService
         // Lấy tất cả tin nhắn trong bảng ChatMessages
         var allMessages = await _chatRepository.GetListAsync();
 
-        // Danh sách ID của các admin
+        // Danh sách ID của các admin (không phân biệt hoa thường)
         var adminUsers = await _userRepository.GetListAsync();
-        var adminIds = adminUsers.Where(u => u.UserName == "admin").Select(u => u.Id).ToHashSet();
+        var adminIds = adminUsers
+            .Where(u => string.Equals(u.UserName, "admin", StringComparison.OrdinalIgnoreCase))
+            .Select(u => u.Id)
+            .ToHashSet();
+
+        using (CurrentTenant.Change(null))
+        {
+            var hostUsers = await _userRepository.GetListAsync();
+            foreach (var hu in hostUsers.Where(u => string.Equals(u.UserName, "admin", StringComparison.OrdinalIgnoreCase)))
+            {
+                adminIds.Add(hu.Id);
+            }
+        }
+
         if (currentUserId != Guid.Empty)
         {
             adminIds.Add(currentUserId);
@@ -154,26 +167,38 @@ public class ChatAppService : ApplicationService, IChatAppService
     [AllowAnonymous]
     public async Task<Guid> GetAdminIdAsync()
     {
-        // Tìm trong tenant hiện tại trước
-        var users = await _userRepository.GetListAsync();
-        var admin = users.FirstOrDefault(u => u.UserName == "admin");
+        // 1. Tìm trong context hiện tại bằng NormalizedUserName
+        var admin = await _userRepository.FindByNormalizedUserNameAsync("ADMIN");
         if (admin != null)
         {
             return admin.Id;
         }
 
-        // Nếu không tìm thấy, tìm ở host tenant (vì admin thường thuộc host)
+        var users = await _userRepository.GetListAsync();
+        admin = users.FirstOrDefault(u => string.Equals(u.UserName, "admin", StringComparison.OrdinalIgnoreCase));
+        if (admin != null)
+        {
+            return admin.Id;
+        }
+
+        // 2. Tìm ở Host tenant (bỏ qua Tenant filter)
         using (CurrentTenant.Change(null))
         {
+            var hostAdmin = await _userRepository.FindByNormalizedUserNameAsync("ADMIN");
+            if (hostAdmin != null)
+            {
+                return hostAdmin.Id;
+            }
+
             var hostUsers = await _userRepository.GetListAsync();
-            var hostAdmin = hostUsers.FirstOrDefault(u => u.UserName == "admin");
+            hostAdmin = hostUsers.FirstOrDefault(u => string.Equals(u.UserName, "admin", StringComparison.OrdinalIgnoreCase));
             if (hostAdmin != null)
             {
                 return hostAdmin.Id;
             }
         }
 
-        // Fallback: trả về Guid.Empty nếu không tìm thấy admin
-        return Guid.Empty;
+        // 3. Fallback: Lấy user đầu tiên nếu không tìm ra admin cụ thể
+        return users.FirstOrDefault()?.Id ?? Guid.Empty;
     }
 }

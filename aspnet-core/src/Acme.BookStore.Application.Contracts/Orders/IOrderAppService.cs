@@ -12,4 +12,5 @@ public interface IOrderAppService : IApplicationService
     Task<PagedResultDto<OrderDto>> GetListAsync(GetOrderFilterDto input);
     Task<OrderDto> PutStatusAsync(Guid id, UpdateOrderStatusDto input);
     Task<OrderDto> CancelMyOrderAsync(Guid id);
+    Task<OrderDto> SwitchPaymentMethodAsync(Guid id, int paymentMethod);
 }

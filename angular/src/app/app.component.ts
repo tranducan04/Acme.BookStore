@@ -36,19 +36,24 @@ export class AppComponent implements OnInit {
 
     // Lắng nghe Signal Giỏ hàng bằng effect()
     effect(() => {
-      const cart = this.cartStore.cart();
-      const count = cart?.totalCount || 0;
-      const isAdmin = this.permissionService.getGrantedPolicy('BookStore.Books.Edit');
-
-      if (!isAdmin) {
-        const cartRoute = this.routesService.find(r => r.path === '/cart');
-        if (cartRoute) {
-          const localizedCartName = this.localization.instant('::Menu:Cart') || 'Cart 🛒';
-          const cartLabel = count > 0 ? `${localizedCartName.replace('🛒', '').trim()} 🔴${count} 🛒` : localizedCartName;
-          this.routesService.patch(cartRoute.name, { name: cartLabel });
-        }
-      }
+      this.cartStore.cart();
+      this.updateCartRoute();
     });
+  }
+
+  private updateCartRoute(): void {
+    const cart = this.cartStore.cart();
+    const count = cart?.totalCount || 0;
+    const isAdmin = this.permissionService.getGrantedPolicy('BookStore.Books.Edit');
+
+    if (!isAdmin) {
+      const cartRoute = this.routesService.find(r => r.path === '/cart');
+      if (cartRoute) {
+        const localizedCartName = this.localization.instant('::Menu:Cart') || 'Cart 🛒';
+        const cartLabel = count > 0 ? `${localizedCartName.replace('🛒', '').trim()} 🔴${count} 🛒` : localizedCartName;
+        this.routesService.patch(cartRoute.name, { name: cartLabel });
+      }
+    }
   }
 
   ngOnInit(): void {
@@ -63,6 +68,7 @@ export class AppComponent implements OnInit {
           this.routesService.patch(route.name, { invisible: isAdmin });
         }
       });
+      this.updateCartRoute();
     });
   }
 }

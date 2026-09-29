@@ -24,6 +24,7 @@ using Acme.BookStore.Wishlists;
 using Acme.BookStore.Notifications;
 using Acme.BookStore.Categories;
 using Acme.BookStore.Chats;
+using Acme.BookStore.Coupons;
 
 
 namespace Acme.BookStore.EntityFrameworkCore;
@@ -75,6 +76,8 @@ public class BookStoreDbContext :
     public DbSet<AppNotification> Notifications { get; set; }
     public DbSet<Category> Categories { get; set; }
     public DbSet<ChatMessage> ChatMessages { get; set; }
+    public DbSet<Coupon> Coupons { get; set; }
+    public DbSet<CouponUsage> CouponUsages { get; set; }
 
 
 
@@ -198,6 +201,28 @@ public class BookStoreDbContext :
         {
             b.ToTable(BookStoreConsts.DbTablePrefix + "ChatMessages", BookStoreConsts.DbSchema);
             b.ConfigureByConvention();
+        });
+
+        // 13. Cấu hình bảng Mã Giảm Giá (Coupons)
+        builder.Entity<Coupon>(b =>
+        {
+            b.ToTable(BookStoreConsts.DbTablePrefix + "Coupons", BookStoreConsts.DbSchema);
+            b.ConfigureByConvention();
+            b.Property(x => x.Code).IsRequired().HasMaxLength(50);
+            b.HasIndex(x => x.Code).IsUnique();
+            b.Property(x => x.Title).IsRequired().HasMaxLength(256);
+            b.Property(x => x.DiscountValue).HasPrecision(18, 2);
+            b.Property(x => x.MaxDiscountAmount).HasPrecision(18, 2);
+            b.Property(x => x.MinOrderAmount).HasPrecision(18, 2);
+        });
+
+        // 14. Cấu hình bảng Lịch sử sử dụng Coupon (CouponUsages)
+        builder.Entity<CouponUsage>(b =>
+        {
+            b.ToTable(BookStoreConsts.DbTablePrefix + "CouponUsages", BookStoreConsts.DbSchema);
+            b.ConfigureByConvention();
+            b.Property(x => x.DiscountAmount).HasPrecision(18, 2);
+            b.HasIndex(x => new { x.CouponId, x.UserId });
         });
 
 

@@ -18,5 +18,8 @@ public class OrderDto : AuditedEntityDto<Guid>
     public PaymentMethod PaymentMethod { get; set; }
     public PaymentStatus PaymentStatus { get; set; }
 
+    public string? CouponCode { get; set; }
+    public decimal DiscountAmount { get; set; }
+
     public List<OrderItemDto> Items { get; set; } = new();
 }

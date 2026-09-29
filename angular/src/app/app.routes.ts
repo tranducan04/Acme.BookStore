@@ -90,5 +90,13 @@ export const appRoutes: Routes = [
     path: 'admin/chat',
     loadComponent: () => import('./features/admin/AdminChat/admin-chat.component').then(m => m.AdminChatComponent),
   },
-
+  {
+    path: 'coupons',
+    loadComponent: () => import('./features/admin/Coupons/coupon.component').then(m => m.CouponComponent),
+  },
+  {
+    path: 'admin/coupons',
+    loadComponent: () => import('./features/admin/Coupons/coupon.component').then(m => m.CouponComponent),
+  },
 ];
+

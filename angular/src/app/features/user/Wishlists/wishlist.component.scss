@@ -1,41 +1,16 @@
-.wishlist-page {
-    background-color: #f8fafc;
-    min-height: 85vh;
+.storefront-wishlist-page {
+  animation: fadeIn 0.3s ease-out;
 }
 
-.fs-7 {
-    font-size: 0.875rem;
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.product-card {
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-    border: 1px solid #edf2f7 !important;
+.fs-7 { font-size: 0.85rem; }
+.fs-8 { font-size: 0.75rem; }
 
-    &:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08) !important;
-    }
-}
-
-.btn-heart-active {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.9);
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.1rem;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-    cursor: pointer;
-    transition: all 0.2s ease;
-
-    &:hover {
-        transform: scale(1.15);
-        background: #ffffff;
-    }
+:host-context([data-theme="dark"]) {
+  .text-dark { color: #f8fafc !important; }
+  .text-muted { color: #94a3b8 !important; }
 }

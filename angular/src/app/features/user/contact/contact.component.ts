@@ -1,38 +1,40 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { CoreModule } from '@abp/ng.core';
-import { trigger, transition, style, animate } from '@angular/animations';
+import { RouterLink } from '@angular/router';
+import { ToastService } from '../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-contact',
   standalone: true,
-  imports: [CommonModule, FormsModule, CoreModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './contact.component.html',
-  styleUrl: './contact.component.scss',
-  animations: [
-    trigger('pageEnter', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'translateY(25px)' }),
-        animate('600ms cubic-bezier(0.16, 1, 0.3, 1)', style({ opacity: 1, transform: 'translateY(0)' }))
-      ])
-    ])
-  ]
+  styleUrls: ['./contact.component.scss']
 })
 export class ContactComponent {
+  private readonly toastService = inject(ToastService);
+
   contactForm = {
     name: '',
     email: '',
+    phone: '',
     subject: '',
-    message: '',
+    message: ''
   };
 
-  sendContact() {
-    if (!this.contactForm.name || !this.contactForm.email || !this.contactForm.message) {
-      alert('Vui lòng điền đầy đủ thông tin!');
+  isSubmitting: boolean = false;
+
+  sendContact(): void {
+    if (!this.contactForm.name.trim() || !this.contactForm.email.trim() || !this.contactForm.message.trim()) {
+      this.toastService.showWarning('Vui lòng điền đầy đủ họ tên, email và nội dung tin nhắn.');
       return;
     }
-    alert('🎉 Cảm ơn bạn đã liên hệ! Đội ngũ BookStore sẽ phản hồi qua email trong thời gian sớm nhất.');
-    this.contactForm = { name: '', email: '', subject: '', message: '' };
+
+    this.isSubmitting = true;
+    setTimeout(() => {
+      this.toastService.showSuccess('🎉 Cảm ơn bạn đã liên hệ! Đội ngũ Acme BookStore sẽ phản hồi qua email trong thời gian sớm nhất.');
+      this.contactForm = { name: '', email: '', phone: '', subject: '', message: '' };
+      this.isSubmitting = false;
+    }, 600);
   }
 }

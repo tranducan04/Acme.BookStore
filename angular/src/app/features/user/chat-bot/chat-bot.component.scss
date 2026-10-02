@@ -39,6 +39,17 @@
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.22) !important;
     border: 1px solid rgba(0, 0, 0, 0.1);
 
+    &.embedded {
+        position: relative !important;
+        bottom: auto !important;
+        right: auto !important;
+        width: 100% !important;
+        height: 100% !important;
+        box-shadow: none !important;
+        border: none !important;
+        border-radius: 0 !important;
+    }
+
     @media (max-width: 576px) {
         width: calc(100vw - 32px);
         right: 16px;

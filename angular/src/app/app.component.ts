@@ -12,9 +12,8 @@ import { ChatBotComponent } from './features/user/chat-bot/chat-bot.component';
     <abp-loader-bar />
     <abp-dynamic-layout />
     <abp-internet-status />
-    <app-chat-bot />
   `,
-  imports: [LoaderBarComponent, DynamicLayoutComponent, InternetConnectionStatusComponent, ChatBotComponent],
+  imports: [LoaderBarComponent, DynamicLayoutComponent, InternetConnectionStatusComponent],
 })
 export class AppComponent implements OnInit {
   private routesService = inject(RoutesService);
@@ -60,12 +59,12 @@ export class AppComponent implements OnInit {
     this.cartStore.loadCart(true);
 
     this.configState.getAll$().subscribe(() => {
-      const isAdmin = this.permissionService.getGrantedPolicy('BookStore.Books.Edit');
-      const hideForAdminPaths = ['/cart', '/orders', '/about', '/contact', '/chat-support'];
-      hideForAdminPaths.forEach(path => {
+      // Đảm bảo toàn bộ các route storefront luôn ẩn khỏi sidebar LeptonX
+      const storefrontPaths = ['/', '/books', '/cart', '/wishlist', '/orders', '/notifications', '/about', '/contact', '/chat-support'];
+      storefrontPaths.forEach(path => {
         const route = this.routesService.find(r => r.path === path);
         if (route) {
-          this.routesService.patch(route.name, { invisible: isAdmin });
+          this.routesService.patch(route.name, { invisible: true });
         }
       });
       this.updateCartRoute();

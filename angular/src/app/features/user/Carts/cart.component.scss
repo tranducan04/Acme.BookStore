@@ -1,109 +1,61 @@
-.table td {
-  vertical-align: middle !important;
+.storefront-cart-page {
+  animation: fadeIn 0.3s ease-out;
 }
 
-.card-footer {
-  background: linear-gradient(135deg, #2b3674 0%, #111c44 100%) !important;
-  border-radius: 16px !important;
-  color: #ffffff !important;
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* ===== QR Modal Styles ===== */
-.qr-modal-content {
-  border-radius: 16px !important;
-  overflow: hidden;
-}
+.fs-7 { font-size: 0.85rem; }
+.fs-8 { font-size: 0.75rem; }
+.fs-9 { font-size: 0.68rem; }
 
-.qr-modal-header {
-  background: linear-gradient(135deg, #1e8449 0%, #27ae60 100%);
-  border-bottom: none;
-  padding: 1rem 1.25rem;
-}
-
-.qr-image-wrapper {
-  display: inline-block;
-  padding: 12px;
-  background: #ffffff;
-  border-radius: 12px;
-  border: 2px dashed #27ae60;
-}
-
-.qr-image-wrapper img {
-  transition: transform 0.3s ease;
-}
-
-.qr-image-wrapper:hover img {
-  transform: scale(1.03);
-}
-
-/* Alert style adjustments */
-.alert-primary {
-  border-left: 4px solid #4361ee !important;
-}
-
-.alert-warning {
-  border-left: 4px solid #f0ad4e !important;
-}
-
-/* 🌟 KHUNG OPTION 2: ELEGANT SOFT PASTEL GRADIENT */
-.soft-pastel-card {
-  background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 50%, #e0e7ff 100%) !important;
-  border: 1px solid #ddd6fe !important;
-  border-radius: 16px !important;
-  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.08) !important;
-}
-
-/* 🔢 Bộ tăng giảm số lượng cao cấp */
-.quantity-stepper {
-  display: inline-flex;
-  align-items: center;
-  background: #ffffff;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 50px;
-  padding: 2px 4px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
-  transition: border-color 0.2s ease;
-
+.cart-item-row {
+  transition: background-color 0.2s ease;
   &:hover {
-    border-color: #6366f1;
+    background-color: #f8fafc;
   }
+}
 
-  .btn-step {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    border: none;
-    background: #f1f5f9;
-    color: #334155;
-    font-size: 0.9rem;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.15s ease;
-
-    &:hover:not(:disabled) {
-      background: #6366f1;
-      color: #ffffff;
-      transform: scale(1.08);
-    }
-
-    &:active:not(:disabled) {
-      transform: scale(0.95);
-    }
-
-    &:disabled {
-      opacity: 0.35;
-      cursor: not-allowed;
-    }
+.btn-delete-item {
+  width: 32px;
+  height: 32px;
+  background-color: #f8fafc;
+  transition: all 0.2s ease;
+  &:hover {
+    background-color: #fee2e2;
+    color: #ef4444 !important;
   }
+}
 
-  .step-value {
-    min-width: 32px;
-    text-align: center;
-    font-weight: 700;
-    font-size: 0.9rem;
-    color: #1e293b;
+.hover-primary:hover {
+  color: #1e40af !important;
+}
+
+:host-context([data-theme="dark"]) {
+  .card {
+    background-color: #111c44 !important;
+    border-color: #1e293b !important;
+  }
+  .cart-item-row:hover {
+    background-color: #15224e;
+  }
+  .text-dark { color: #f8fafc !important; }
+  .text-secondary { color: #cbd5e1 !important; }
+  .text-muted { color: #94a3b8 !important; }
+  .table thead th {
+    color: #94a3b8 !important;
+    border-color: #1e293b !important;
+  }
+  .table tbody td {
+    border-color: #1e293b !important;
+  }
+  .btn-delete-item {
+    background-color: #1e293b;
+    &:hover {
+      background-color: #7f1d1d;
+      color: #fca5a5 !important;
+    }
   }
 }

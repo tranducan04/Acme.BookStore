@@ -1,12 +1,25 @@
-/* About Component SCSS */
-:host {
-  display: block;
+.storefront-about-page {
+  animation: fadeIn 0.3s ease-out;
 }
 
-/* 🌟 KHUNG OPTION 2: ELEGANT SOFT PASTEL GRADIENT */
-.soft-pastel-card {
-  background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 50%, #e0e7ff 100%) !important;
-  border: 1px solid #ddd6fe !important;
-  border-radius: 16px !important;
-  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.08) !important;
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fs-7 { font-size: 0.85rem; }
+.fs-8 { font-size: 0.75rem; }
+
+:host-context([data-theme="dark"]) {
+  .card, .about-hero {
+    background-color: #111c44 !important;
+    border-color: #1e293b !important;
+  }
+  .stat-card, .about-img-badge {
+    background-color: #15224e !important;
+    border-color: #1e293b !important;
+  }
+  .text-dark { color: #f8fafc !important; }
+  .text-secondary { color: #cbd5e1 !important; }
+  .text-muted { color: #94a3b8 !important; }
 }

@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
@@ -32,6 +32,7 @@ export class ChatBotComponent {
         return !isAdminOrAuthor;
     }
 
+    public isEmbedded = input<boolean>(false);
     public isOpen = signal<boolean>(false);
     public isTyping = signal<boolean>(false);
     public addingBookId = signal<string | null>(null);

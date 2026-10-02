@@ -1,0 +1,49 @@
+.storefront-checkout-page {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fs-7 { font-size: 0.85rem; }
+.fs-8 { font-size: 0.75rem; }
+.fs-9 { font-size: 0.68rem; }
+
+.payment-method-card {
+  border: 1.5px solid #e2e8f0;
+  background-color: #ffffff;
+  transition: all 0.2s ease;
+  &:hover {
+    border-color: #93c5fd;
+    background-color: #f8fafc;
+  }
+  &.selected {
+    border-color: #1e40af !important;
+    background-color: #eff6ff !important;
+    box-shadow: 0 4px 12px rgba(30, 64, 175, 0.1);
+  }
+}
+
+:host-context([data-theme="dark"]) {
+  .card, .modal-content {
+    background-color: #111c44 !important;
+    border-color: #1e293b !important;
+  }
+  .payment-method-card {
+    background-color: #162044;
+    border-color: #1e293b;
+    &:hover { background-color: #1a2754; }
+    &.selected {
+      background-color: #1e2d63 !important;
+      border-color: #3b82f6 !important;
+    }
+  }
+  .vietqr-frame, .bg-light {
+    background-color: #1e293b !important;
+  }
+  .text-dark { color: #f8fafc !important; }
+  .text-secondary { color: #cbd5e1 !important; }
+  .text-muted { color: #94a3b8 !important; }
+}

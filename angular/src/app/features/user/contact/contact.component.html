@@ -1,110 +1,174 @@
-<div class="contact-page py-5" @pageEnter>
+<div class="storefront-contact-page py-4">
   <div class="container">
-    <!-- Header Section -->
+
+    <!-- BREADCRUMB -->
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb fs-8">
+        <li class="breadcrumb-item"><a routerLink="/" class="text-decoration-none text-muted"><i class="fas fa-home me-1"></i>Trang chủ</a></li>
+        <li class="breadcrumb-item active text-primary fw-bold" aria-current="page">Liên Hệ & Hỗ Trợ</li>
+      </ol>
+    </nav>
+
+    <!-- HEADER SECTION -->
     <div class="text-center mb-5">
-      <span class="badge badge-pill support-badge mb-2">⚡ {{ '::Contact:Badge' | abpLocalization }}</span>
-      <h1 class="fw-bold display-5 text-dark mt-2 mb-3">{{ '::Contact:Title' | abpLocalization }}</h1>
-      <p class="text-secondary fs-6 mx-auto" style="max-width: 600px;">
-        {{ '::Contact:Subtitle' | abpLocalization }}
+      <span class="badge rounded-pill bg-primary-subtle text-primary px-3 py-1 fs-8 fw-bold mb-2">
+        🎧 TRUNG TÂM HỖ TRỢ KHÁCH HÀNG 24/7
+      </span>
+      <h1 class="fw-extrabold display-5 text-dark mb-2">Chúng Tôi Luôn Lắng Nghe Bạn</h1>
+      <p class="text-muted fs-6 mx-auto" style="max-width: 600px;">
+        Mọi thắc mắc về đơn hàng, chính sách đổi trả hoặc đề xuất hợp tác, xin vui lòng gửi tin nhắn hoặc liên hệ với chúng tôi qua các kênh dưới đây.
       </p>
     </div>
 
-    <div class="row g-4 align-items-stretch">
-      <!-- Cột Trái: Thẻ Thông Tin Liên Hệ Gradient -->
-      <div class="col-lg-5">
-        <div class="contact-info-card h-100 p-4 p-md-5 d-flex flex-column justify-content-between">
+    <div class="row g-4 mb-5 align-items-stretch">
+      
+      <!-- CỘT TRÁI: THẺ THÔNG TIN LIÊN HỆ -->
+      <div class="col-12 col-lg-5">
+        <div class="contact-info-card h-100 p-4 p-md-5 rounded-5 text-white d-flex flex-column justify-content-between shadow-lg"
+             style="background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);">
           <div>
-            <h3 class="fw-bold text-white mb-2">{{ '::Contact:InfoTitle' | abpLocalization }}</h3>
-            <p class="text-white-50 mb-4 small">{{ '::Contact:InfoDesc' | abpLocalization }}</p>
+            <h3 class="fw-extrabold text-white mb-2">Thông Tin Trực Tiếp</h3>
+            <p class="text-light opacity-80 fs-7 mb-4">
+              Bạn có thể ghé thăm trực tiếp thư viện hoặc gọi ngay hotline miễn phí cước.
+            </p>
 
-            <div class="info-list d-flex flex-column gap-4">
-              <div class="info-item d-flex align-items-start gap-3">
-                <div class="info-icon">📍</div>
+            <div class="d-flex flex-column gap-4">
+              <div class="d-flex align-items-start gap-3">
+                <div class="contact-icon rounded-circle bg-white text-primary d-flex align-items-center justify-content-center shadow-sm"
+                     style="width: 44px; height: 44px; flex-shrink: 0;">
+                  <i class="fas fa-map-marker-alt fs-6"></i>
+                </div>
                 <div>
-                  <h6 class="text-white fw-bold mb-1">{{ '::Contact:AddressLabel' | abpLocalization }}</h6>
-                  <p class="text-white-50 mb-0 small">{{ '::Contact:AddressValue' | abpLocalization }}</p>
+                  <h6 class="fw-bold text-white mb-1 fs-7">Địa Chỉ Thư Viện</h6>
+                  <p class="text-light opacity-85 fs-8 mb-0">Tòa nhà Tri Thức, Số 123 Đường Sách, Quận 1, TP. Hồ Chí Minh</p>
                 </div>
               </div>
 
-              <div class="info-item d-flex align-items-start gap-3">
-                <div class="info-icon">📞</div>
+              <div class="d-flex align-items-start gap-3">
+                <div class="contact-icon rounded-circle bg-white text-primary d-flex align-items-center justify-content-center shadow-sm"
+                     style="width: 44px; height: 44px; flex-shrink: 0;">
+                  <i class="fas fa-phone-alt fs-6"></i>
+                </div>
                 <div>
-                  <h6 class="text-white fw-bold mb-1">{{ '::Contact:HotlineLabel' | abpLocalization }}</h6>
-                  <p class="text-white fw-semibold mb-0">0394333730<span
-                      class="badge bg-white text-primary ms-1 fs-8">{{ '::Contact:HotlineFree' | abpLocalization }}</span></p>
+                  <h6 class="fw-bold text-white mb-1 fs-7">Tổng Đài Hỗ Trợ</h6>
+                  <p class="text-light opacity-85 fs-7 fw-bold mb-0">1900 888 666 <span class="badge bg-warning text-dark fs-9 rounded-pill ms-1">Miễn phí</span></p>
                 </div>
               </div>
 
-              <div class="info-item d-flex align-items-start gap-3">
-                <div class="info-icon">✉️</div>
+              <div class="d-flex align-items-start gap-3">
+                <div class="contact-icon rounded-circle bg-white text-primary d-flex align-items-center justify-content-center shadow-sm"
+                     style="width: 44px; height: 44px; flex-shrink: 0;">
+                  <i class="fas fa-envelope fs-6"></i>
+                </div>
                 <div>
-                  <h6 class="text-white fw-bold mb-1">{{ '::Contact:EmailLabel' | abpLocalization }}</h6>
-                  <p class="text-white-50 mb-0 small">support&#64;bookstore.com.vn</p>
+                  <h6 class="fw-bold text-white mb-1 fs-7">Hộp Thư Điện Tử</h6>
+                  <p class="text-light opacity-85 fs-8 mb-0">support&#64;acmebookstore.vn</p>
                 </div>
               </div>
 
-              <div class="info-item d-flex align-items-start gap-3">
-                <div class="info-icon">⏰</div>
+              <div class="d-flex align-items-start gap-3">
+                <div class="contact-icon rounded-circle bg-white text-primary d-flex align-items-center justify-content-center shadow-sm"
+                     style="width: 44px; height: 44px; flex-shrink: 0;">
+                  <i class="fas fa-clock fs-6"></i>
+                </div>
                 <div>
-                  <h6 class="text-white fw-bold mb-1">{{ '::Contact:HoursLabel' | abpLocalization }}</h6>
-                  <p class="text-white-50 mb-0 small">{{ '::Contact:HoursValue' | abpLocalization }}</p>
+                  <h6 class="fw-bold text-white mb-1 fs-7">Thời Gian Hoạt Động</h6>
+                  <p class="text-light opacity-85 fs-8 mb-0">8:00 - 21:00 (Tất cả các ngày trong tuần)</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="social-links mt-4 pt-4 border-top border-white-10 d-flex gap-3">
-            <span class="text-white-50 small">{{ '::Contact:Connect' | abpLocalization }}</span>
-            <a href="#" class="social-badge">Facebook</a>
-            <a href="#" class="social-badge">Zalo</a>
-            <a href="#" class="social-badge">Instagram</a>
+          <div class="pt-4 border-top border-white-50 mt-4 d-flex align-items-center justify-content-between">
+            <span class="fs-8 text-light opacity-75">Kết nối mạng xã hội:</span>
+            <div class="d-flex gap-2">
+              <a href="#" class="btn btn-sm btn-light rounded-circle text-primary" style="width: 34px; height: 34px;"><i class="fab fa-facebook-f fs-8"></i></a>
+              <a href="#" class="btn btn-sm btn-light rounded-circle text-primary" style="width: 34px; height: 34px;"><i class="fab fa-youtube fs-8"></i></a>
+              <a href="#" class="btn btn-sm btn-light rounded-circle text-primary" style="width: 34px; height: 34px;"><i class="fab fa-instagram fs-8"></i></a>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Cột Phải: Form Gửi Phản Hồi Hiện Đại -->
-      <div class="col-lg-7">
-        <div class="contact-form-card h-100 p-4 p-md-5">
-          <h4 class="fw-bold text-dark mb-1">{{ '::Contact:FormTitle' | abpLocalization }}</h4>
-          <p class="text-muted small mb-4">{{ '::Contact:FormDesc' | abpLocalization }}</p>
+      <!-- CỘT PHẢI: FORM GỬI TIN NHẮN LIÊN HỆ -->
+      <div class="col-12 col-lg-7">
+        <div class="card p-4 p-md-5 rounded-5 bg-white border border-light shadow-sm h-100 d-flex flex-column justify-content-between">
+          <div>
+            <h4 class="fw-bold text-dark mb-2">Gửi Tin Nhắn Cho Chúng Tôi</h4>
+            <p class="text-muted fs-7 mb-4">Điền vào biểu mẫu dưới đây, chúng tôi sẽ phản hồi trong vòng 2 giờ làm việc.</p>
 
-          <form (ngSubmit)="sendContact()">
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label class="form-label fw-bold text-dark fs-7">{{ '::Contact:FullName' | abpLocalization }} <span class="text-danger">*</span></label>
-                <input type="text" class="form-control form-control-custom" [(ngModel)]="contactForm.name" name="name"
-                  placeholder="Nguyễn Văn A" required>
+            <form (ngSubmit)="sendContact()">
+              <div class="row g-3 mb-3">
+                <div class="col-12 col-sm-6">
+                  <label class="form-label fs-8 fw-bold text-dark">Họ và tên <span class="text-danger">*</span></label>
+                  <input type="text"
+                         [(ngModel)]="contactForm.name"
+                         name="contactName"
+                         class="form-control rounded-3 fs-7"
+                         placeholder="Nguyễn Văn A"
+                         required>
+                </div>
+                <div class="col-12 col-sm-6">
+                  <label class="form-label fs-8 fw-bold text-dark">Địa chỉ Email <span class="text-danger">*</span></label>
+                  <input type="email"
+                         [(ngModel)]="contactForm.email"
+                         name="contactEmail"
+                         class="form-control rounded-3 fs-7"
+                         placeholder="email&#64;example.com"
+                         required>
+                </div>
               </div>
 
-              <div class="col-md-6">
-                <label class="form-label fw-bold text-dark fs-7">{{ '::Contact:Email' | abpLocalization }} <span
-                    class="text-danger">*</span></label>
-                <input type="email" class="form-control form-control-custom" [(ngModel)]="contactForm.email"
-                  name="email" placeholder="example@gmail.com" required>
+              <div class="row g-3 mb-3">
+                <div class="col-12 col-sm-6">
+                  <label class="form-label fs-8 fw-bold text-dark">Số điện thoại</label>
+                  <input type="tel"
+                         [(ngModel)]="contactForm.phone"
+                         name="contactPhone"
+                         class="form-control rounded-3 fs-7"
+                         placeholder="0912 345 678">
+                </div>
+                <div class="col-12 col-sm-6">
+                  <label class="form-label fs-8 fw-bold text-dark">Chủ đề cần hỗ trợ</label>
+                  <select [(ngModel)]="contactForm.subject"
+                          name="contactSubject"
+                          class="form-select rounded-3 fs-7">
+                    <option value="">Chọn chủ đề...</option>
+                    <option value="Đơn hàng & Giao hàng">Đơn hàng & Giao nhận</option>
+                    <option value="Đổi trả bảo hành">Chính sách Đổi trả - Hoàn tiền</option>
+                    <option value="Tư vấn sách">Tư vấn chọn mua sách</option>
+                    <option value="Hợp tác xuất bản">Hợp tác kinh doanh / Xuất bản</option>
+                  </select>
+                </div>
               </div>
 
-              <div class="col-12">
-                <label class="form-label fw-bold text-dark fs-7">{{ '::Contact:Subject' | abpLocalization }} <span class="text-danger">*</span></label>
-                <input type="text" class="form-control form-control-custom" [(ngModel)]="contactForm.subject"
-                  name="subject" [placeholder]="'::Contact:SubjectPlaceholder' | abpLocalization" required>
+              <div class="mb-4">
+                <label class="form-label fs-8 fw-bold text-dark">Nội dung tin nhắn <span class="text-danger">*</span></label>
+                <textarea [(ngModel)]="contactForm.message"
+                          name="contactMessage"
+                          rows="4"
+                          class="form-control rounded-3 fs-7"
+                          placeholder="Nhập chi tiết câu hỏi hoặc yêu cầu hỗ trợ của bạn..."
+                          required></textarea>
               </div>
 
-              <div class="col-12">
-                <label class="form-label fw-bold text-dark fs-7">{{ '::Contact:Message' | abpLocalization }} <span
-                    class="text-danger">*</span></label>
-                <textarea class="form-control form-control-custom" rows="4" [(ngModel)]="contactForm.message"
-                  name="message" [placeholder]="'::Contact:MessagePlaceholder' | abpLocalization" required></textarea>
-              </div>
-
-              <div class="col-12 mt-4">
-                <button type="submit" class="btn btn-send-message fw-bold px-4 py-3 w-100 shadow-sm">
-                  🚀 {{ '::Contact:SendBtn' | abpLocalization }}
-                </button>
-              </div>
-            </div>
-          </form>
+              <button type="submit"
+                      class="btn btn-primary btn-lg rounded-pill px-5 py-3 fw-bold fs-7 shadow d-flex align-items-center gap-2"
+                      [disabled]="isSubmitting">
+                @if (isSubmitting) {
+                  <i class="fas fa-spinner fa-spin"></i>
+                  <span>Đang gửi tin...</span>
+                } @else {
+                  <i class="fas fa-paper-plane"></i>
+                  <span>Gửi Tin Nhắn Ngay</span>
+                }
+              </button>
+            </form>
+          </div>
         </div>
       </div>
+
     </div>
+
   </div>
 </div>

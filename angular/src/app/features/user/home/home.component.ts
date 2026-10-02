@@ -1,229 +1,255 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
-import { AuthService, PermissionService, LocalizationPipe } from '@abp/ng.core';
-import { BookService, bookTypeOptions } from '@proxy/books';
+import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '@abp/ng.core';
+import { BookService } from '@proxy/books';
 import { BookReviewService } from '../../../proxy/book-reviews/book-review.service';
-import { BookReviewSummaryDto } from '../../../proxy/book-reviews/models';
-import { CartSignalStore } from '../Carts/cart-signal.store';
-import { firstValueFrom } from 'rxjs';
+import { CategoryService } from '../../../proxy/categories/category.service';
 import { WishlistService } from '../../../proxy/wishlists/wishlist.service';
-import { trigger, transition, style, animate } from '@angular/animations';
+import { CartSignalStore } from '../Carts/cart-signal.store';
+import { ToastService } from '../../../shared/services/toast.service';
+import { StorefrontBook, formatAgeLimit } from '../../../shared/models/storefront.models';
+import { BookCardComponent } from '../../../shared/components/storefront/book-card/book-card.component';
+import { CategoryCardComponent } from '../../../shared/components/storefront/category-card/category-card.component';
+import { LoadingSkeletonComponent } from '../../../shared/components/storefront/loading-skeleton/loading-skeleton.component';
+import { firstValueFrom } from 'rxjs';
+
+interface HeroSlide {
+  title: string;
+  subtitle: string;
+  badge: string;
+  image: string;
+  ctaText: string;
+  ctaLink: string;
+}
 
 @Component({
   selector: 'app-home',
   standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterLink,
+    BookCardComponent,
+    CategoryCardComponent,
+    LoadingSkeletonComponent
+  ],
   templateUrl: './home.component.html',
-  styleUrl: './home.component.scss',
-  imports: [CommonModule, FormsModule, RouterLink, LocalizationPipe],
-  animations: [
-    trigger('pageEnter', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'translateY(25px)' }),
-        animate('600ms cubic-bezier(0.16, 1, 0.3, 1)', style({ opacity: 1, transform: 'translateY(0)' }))
-      ])
-    ])
-  ]
+  styleUrls: ['./home.component.scss']
 })
-export class HomeComponent implements OnInit {
-  private authService = inject(AuthService);
-  private bookService = inject(BookService);
-  private reviewService = inject(BookReviewService);
-  public permission = inject(PermissionService);
-  public cartStore = inject(CartSignalStore);
-  public isModalOpen = signal<boolean>(false);
-  public featuredBooks = signal<any[]>([]);
-  public isLoading = signal<boolean>(false);
-  public selectedBook = signal<any | null>(null);
-  // 🌟 SIGNALS CHO TÍNH NĂNG ĐÁNH GIÁ & GỢI Ý
-  public reviewSummary = signal<BookReviewSummaryDto | null>(null);
-  public userRating = signal<number>(5);
-  public userComment = signal<string>('');
-  public isSubmittingReview = signal<boolean>(false);
-  private wishlistService = inject(WishlistService);
-  public wishlistBookIds = signal<string[]>([]);
-  public bookTypes = bookTypeOptions;
-  public addingBookId = signal<string | null>(null);
+export class HomeComponent implements OnInit, OnDestroy {
+  private readonly router = inject(Router);
+  private readonly authService = inject(AuthService);
+  private readonly bookService = inject(BookService);
+  private readonly reviewService = inject(BookReviewService);
+  private readonly categoryService = inject(CategoryService);
+  private readonly wishlistService = inject(WishlistService);
+  readonly cartStore = inject(CartSignalStore);
+  private readonly toastService = inject(ToastService);
 
-  public Math = Math;
+  readonly isLoading = signal<boolean>(true);
+  readonly featuredBooks = signal<StorefrontBook[]>([]);
+  readonly newArrivalBooks = signal<StorefrontBook[]>([]);
+  readonly categories = signal<{ id: string; name: string; icon: string; count?: number }[]>([]);
+  readonly wishlistBookIds = signal<Set<string>>(new Set());
 
-  getStarsArray(rating: number = 5): { full: boolean; empty: boolean }[] {
-    const stars = [];
-    const rounded = Math.round((rating || 5) * 2) / 2; // Làm tròn đến 0.5
-    for (let i = 1; i <= 5; i++) {
-      if (i <= rounded) {
-        stars.push({ full: true, empty: false });
-      } else {
-        stars.push({ full: false, empty: true });
-      }
+  // Hero Slider
+  readonly currentSlide = signal<number>(0);
+  private slideInterval: any;
+
+  readonly heroSlides: HeroSlide[] = [
+    {
+      badge: 'Thư Viện Số Hiện Đại 2026',
+      title: 'Khám Phá Thế Giới Tri Thức Đỉnh Cao',
+      subtitle: 'Hơn 50,000+ tựa sách chọn lọc, bản quyền chính thống từ các nhà xuất bản hàng đầu với ưu đãi hấp dẫn.',
+      image: 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=1200&q=80',
+      ctaText: 'Khám Phá Ngay',
+      ctaLink: '/books'
+    },
+    {
+      badge: 'Đặc Quyền Hội Viên',
+      title: 'Đọc Sách Không Giới Hạn, Ưu Đãi Mỗi Tuần',
+      subtitle: 'Miễn phí giao hàng toàn quốc từ 250k. Nhận voucher giảm ngay 15% cho đơn hàng đầu tiên cùng mã BOOK2026.',
+      image: 'https://images.unsplash.com/photo-1507842229452-472d17208151?auto=format&fit=crop&w=1200&q=80',
+      ctaText: 'Xem Sách Mới',
+      ctaLink: '/books'
+    },
+    {
+      badge: 'Cộng Đồng Đọc Sách',
+      title: 'Nuôi Dưỡng Thói Quen Đọc Sách Tinh Hoa',
+      subtitle: 'Giao lưu cùng tác giả, lắng nghe đánh giá chân thực từ độc giả và tư vấn thông minh từ trợ lý AI Gemini.',
+      image: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=1200&q=80',
+      ctaText: 'Tìm Hiểu Thêm',
+      ctaLink: '/about'
     }
-    return stars;
+  ];
+
+  ngOnInit(): void {
+    this.startSlideShow();
+    this.loadData();
   }
 
-  get hasLoggedIn(): boolean {
-    return this.authService.isAuthenticated;
+  ngOnDestroy(): void {
+    if (this.slideInterval) {
+      clearInterval(this.slideInterval);
+    }
   }
-  ngOnInit(): void {
-    this.loadFeaturedBooks();
-    this.loadWishlist();
+
+  startSlideShow(): void {
+    this.slideInterval = setInterval(() => {
+      this.nextSlide();
+    }, 6000);
   }
-  async loadFeaturedBooks() {
+
+  nextSlide(): void {
+    this.currentSlide.update(idx => (idx + 1) % this.heroSlides.length);
+  }
+
+  prevSlide(): void {
+    this.currentSlide.update(idx => (idx - 1 + this.heroSlides.length) % this.heroSlides.length);
+  }
+
+  goToSlide(idx: number): void {
+    this.currentSlide.set(idx);
+  }
+
+  async loadData(): Promise<void> {
     this.isLoading.set(true);
     try {
-      const res = await firstValueFrom(this.bookService.getList({ maxResultCount: 100, skipCount: 0 }));
-      const allBooks = res.items || [];
-      // Lọc lấy top sách nổi bật
-      const topPriced = allBooks.sort((a, b) => (b.price || 0) - (a.price || 0)).slice(0, 4);
-
-      // Tải kèm thông tin review summary cho từng sách nổi bật
-      const enrichedBooks = await Promise.all(
-        topPriced.map(async (book) => {
-          if (!book.id) return { ...book, averageRating: 5, totalReviews: 0 };
-          try {
-            const summary = await firstValueFrom(this.reviewService.getSummary(book.id));
-            return {
-              ...book,
-              averageRating: summary?.averageRating || 5,
-              totalReviews: summary?.totalReviews || 0
-            };
-          } catch {
-            return { ...book, averageRating: 5, totalReviews: 0 };
-          }
-        })
-      );
-
-      this.featuredBooks.set(enrichedBooks);
+      await Promise.all([
+        this.loadWishlist(),
+        this.loadCategories(),
+      ]);
+      await this.loadBooks();
     } catch (err) {
-      console.error('Lỗi tải danh sách sách nổi bật:', err);
+      console.error('Lỗi nạp dữ liệu trang chủ:', err);
     } finally {
       this.isLoading.set(false);
     }
   }
-  login() {
-    this.authService.navigateToLogin();
-  }
-  // 🌟 MỞ MODAL XEM CHI TIẾT SÁCH & TẢI ĐÁNH GIÁ + GỢI Ý
-  async openDetailModal(book: any) {
-    this.selectedBook.set(book);
-    this.isModalOpen.set(true);
-    this.userRating.set(5);
-    this.userComment.set('');
-    await this.loadReviewSummary(book.id);
-  }
-  // 2. Thêm hàm xử lý khóa nút & phản hồi "✓ Đã thêm"
-  async addToCart(event: Event, bookId: string) {
-    event.stopPropagation(); // Ngăn mở modal chi tiết sách
-    if (this.addingBookId()) return; // 🛑 Chặn bấm liên tục
-    this.addingBookId.set(bookId);
-    try {
-      await this.cartStore.addToCart(bookId, 1);
-    } finally {
-      // ⌛ Đợi 1.2 giây rồi khôi phục lại trạng thái nút ban đầu
-      setTimeout(() => this.addingBookId.set(null), 1200);
+
+  async loadWishlist(): Promise<void> {
+    if (this.authService.isAuthenticated) {
+      try {
+        const ids = await firstValueFrom(this.wishlistService.getMyWishlistBookIds());
+        this.wishlistBookIds.set(new Set(ids || []));
+      } catch (e) {
+        console.error('Lỗi tải danh sách yêu thích:', e);
+      }
     }
   }
 
-  closeModal() {
-    this.isModalOpen.set(false);
-    this.selectedBook.set(null);
-    this.reviewSummary.set(null);
-  }
-  // 🌟 TẢI THÔNG TIN ĐÁNH GIÁ VÀ SÁCH GỢI Ý
-  async loadReviewSummary(bookId: string) {
+  async loadCategories(): Promise<void> {
     try {
-      const summary = await firstValueFrom(this.reviewService.getSummary(bookId));
-      this.reviewSummary.set(summary);
-    } catch (err) {
-      console.error('Lỗi tải đánh giá và sách gợi ý:', err);
-    }
-  }
-  // 🌟 CHỌN SỐ SAO (1 - 5)
-  setRating(stars: number) {
-    this.userRating.set(stars);
-  }
-  // 🌟 GỬI ĐÁNH GIÁ MỚI
-  async submitReview() {
-    if (!this.hasLoggedIn) {
-      alert('⚠️ Vui lòng đăng nhập để đánh giá cuốn sách này!');
-      this.login();
-      return;
-    }
-    const comment = this.userComment().trim();
-    if (!comment) {
-      alert('⚠️ Vui lòng nhập nội dung nhận xét của bạn!');
-      return;
-    }
-    const book = this.selectedBook();
-    if (!book || !book.id) return;
-    this.isSubmittingReview.set(true);
-    try {
-      await firstValueFrom(this.reviewService.create({
-        bookId: book.id,
-        rating: this.userRating(),
-        comment: comment
+      const res = await firstValueFrom(this.categoryService.getList({ maxResultCount: 6, skipCount: 0 }));
+      const icons = ['fa-graduation-cap', 'fa-magic', 'fa-heart', 'fa-landmark', 'fa-laptop-code', 'fa-palette'];
+      const mapped = (res.items || []).map((c, i) => ({
+        id: c.id || '',
+        name: c.name || '',
+        icon: icons[i % icons.length],
+        count: (c as any).bookCount || 12
       }));
-      this.userComment.set('');
-      this.userRating.set(5);
-      alert('🎉 Cảm ơn bạn đã gửi đánh giá cho cuốn sách này!');
-      await this.loadReviewSummary(book.id);
-      this.loadFeaturedBooks();
-    } catch (err: any) {
-      console.error('Lỗi gửi đánh giá:', err);
-      alert('❌ Gửi đánh giá thất bại: ' + (err?.error?.error?.message || err?.message));
-    } finally {
-      this.isSubmittingReview.set(false);
+      this.categories.set(mapped);
+    } catch (e) {
+      console.error('Lỗi tải danh mục:', e);
     }
   }
-  // 🌟 XÓA BÌNH LUẬN (CHO ADMIN)
-  async deleteReview(reviewId: string) {
-    if (confirm('❓ Bạn có chắc muốn xóa nhận xét này không?')) {
-      try {
-        await firstValueFrom(this.reviewService.delete(reviewId));
-        const book = this.selectedBook();
-        if (book?.id) {
-          await this.loadReviewSummary(book.id);
-          this.loadFeaturedBooks();
-        }
-      } catch (err) {
-        console.error('Lỗi xóa đánh giá:', err);
-      }
-    }
-  }
-  getBookTypeName(typeVal: any): string {
-    const found = this.bookTypes.find(t => t.value === Number(typeVal));
-    return found ? found.key : 'Khác';
-  }
-  async loadWishlist() {
-    if (!this.hasLoggedIn) return;
+
+  async loadBooks(): Promise<void> {
     try {
-      const ids = await firstValueFrom(this.wishlistService.getMyWishlistBookIds());
-      this.wishlistBookIds.set(ids || []);
+      const res = await firstValueFrom(this.bookService.getList({ maxResultCount: 50, skipCount: 0 }));
+      const allBooks = res.items || [];
+      const wishlisted = this.wishlistBookIds();
+
+      // Transform to StorefrontBook
+      const transformed: StorefrontBook[] = allBooks.map((b: any) => ({
+        id: b.id,
+        name: b.name,
+        type: b.type,
+        categoryName: b.categoryName || 'Sách tổng hợp',
+        categoryId: b.categoryId,
+        publishDate: b.publishDate,
+        price: b.price || 0,
+        discountPrice: b.originalPrice && b.originalPrice > b.price ? b.price : undefined,
+        authorId: b.authorId,
+        authorName: b.authorName,
+        coverImage: b.coverImage,
+        stockCount: b.stockCount ?? 10,
+        averageRating: 5,
+        reviewCount: 0,
+        ageLimit: formatAgeLimit(b.ageLimit),
+        isWishlisted: wishlisted.has(b.id)
+      }));
+
+      // Enrich reviews for top books
+      const topBooks = transformed.slice(0, 8);
+      await Promise.all(topBooks.map(async (book) => {
+        try {
+          const sum = await firstValueFrom(this.reviewService.getSummary(book.id));
+          if (sum) {
+            book.averageRating = sum.averageRating || 5;
+            book.reviewCount = sum.totalReviews || 0;
+          }
+        } catch { }
+      }));
+
+      // Featured: highest price / rating
+      this.featuredBooks.set(topBooks.slice(0, 4));
+      // New arrivals: remaining
+      this.newArrivalBooks.set(transformed.slice(4, 12));
     } catch (err) {
-      console.error('Chưa đăng nhập hoặc lỗi tải wishlist:', err);
+      console.error('Lỗi nạp sách:', err);
     }
   }
-  async toggleWishlist(event: Event, bookId?: string) {
-    event.stopPropagation();
-    if (!bookId) return;
-    if (!this.hasLoggedIn) {
-      alert('⚠️ Vui lòng đăng nhập để thêm sản phẩm vào danh sách Yêu thích!');
-      this.login();
+
+  async onAddToCart(book: StorefrontBook): Promise<void> {
+    if (!this.authService.isAuthenticated) {
+      this.toastService.showWarning('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!');
+      this.authService.navigateToLogin();
       return;
     }
     try {
-      const isAdded = await firstValueFrom(this.wishlistService.toggleWishlist(bookId));
-      if (isAdded) {
-        this.wishlistBookIds.update(ids => [...ids, bookId]);
-      } else {
-        this.wishlistBookIds.update(ids => ids.filter(id => id !== bookId));
-      }
-    } catch (err) {
-      console.error('Lỗi khi thả tim:', err);
+      await this.cartStore.addToCart(book.id, 1);
+      this.toastService.showSuccess(`Đã thêm "${book.name}" vào giỏ hàng!`);
+    } catch (e) {
+      this.toastService.showError('Có lỗi xảy ra khi thêm vào giỏ hàng.');
     }
   }
-  isBookInWishlist(bookId?: string): boolean {
-    if (!bookId) return false;
-    return this.wishlistBookIds().includes(bookId);
+
+  async onToggleFavorite(book: StorefrontBook): Promise<void> {
+    if (!this.authService.isAuthenticated) {
+      this.toastService.showWarning('Vui lòng đăng nhập để lưu sách yêu thích');
+      this.authService.navigateToLogin();
+      return;
+    }
+    try {
+      const isFav = await firstValueFrom(this.wishlistService.toggleWishlist(book.id));
+      const current = this.wishlistBookIds();
+      if (isFav) {
+        current.add(book.id);
+        this.toastService.showSuccess(`Đã lưu "${book.name}" vào danh sách yêu thích!`);
+      } else {
+        current.delete(book.id);
+        this.toastService.showInfo(`Đã bỏ "${book.name}" khỏi danh sách yêu thích.`);
+      }
+      this.wishlistBookIds.set(new Set(current));
+
+      // Cập nhật immutably Signals để kích hoạt Change Detection cho các BookCard
+      this.featuredBooks.update(list => list.map(b => b.id === book.id ? { ...b, isWishlisted: isFav } : b));
+      this.newArrivalBooks.update(list => list.map(b => b.id === book.id ? { ...b, isWishlisted: isFav } : b));
+    } catch (e) {
+      this.toastService.showError('Không thể cập nhật danh sách yêu thích.');
+      this.featuredBooks.update(list => list.map(b => b.id === book.id ? { ...b, isWishlisted: book.isWishlisted } : b));
+      this.newArrivalBooks.update(list => list.map(b => b.id === book.id ? { ...b, isWishlisted: book.isWishlisted } : b));
+    }
+  }
+
+  onCategorySelect(catId: string): void {
+    this.router.navigate(['/books'], { queryParams: { categoryId: catId } });
+  }
+
+  onViewDetail(bookId: string): void {
+    this.router.navigate(['/books', bookId]);
   }
 }

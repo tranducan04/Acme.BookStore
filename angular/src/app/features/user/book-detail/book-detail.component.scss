@@ -1,0 +1,110 @@
+.storefront-book-detail-page {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.detail-cover-wrapper {
+  background: linear-gradient(180deg, #f8fafc 0%, #eff6ff 100%);
+  border: 1px solid #e2e8f0;
+}
+
+.detail-cover-img {
+  max-height: 440px;
+  width: 100%;
+  object-fit: cover;
+}
+
+.detail-title {
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+.fs-7 { font-size: 0.85rem; }
+.fs-8 { font-size: 0.75rem; }
+.fs-9 { font-size: 0.68rem; }
+
+// Soft Light Gray Containers (Thay thế màu xám đậm)
+.price-box {
+  background-color: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+blockquote {
+  background-color: #f8fafc !important;
+  border-color: #3b82f6 !important;
+}
+
+.table td.bg-light {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+.review-item {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+.rating-overview-box {
+  background-color: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+.btn-wishlist-detail {
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+  &:hover {
+    background-color: #fef2f2 !important;
+    border-color: #fecaca !important;
+    transform: scale(1.05);
+  }
+}
+
+.nav-pills .nav-link {
+  color: #475569;
+  background-color: #f1f5f9;
+  transition: all 0.2s ease;
+  &:hover {
+    color: #1e40af;
+    background-color: #eff6ff;
+  }
+  &.active {
+    background-color: #1e40af !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(30, 64, 175, 0.25);
+  }
+}
+
+:host-context([data-theme="dark"]) {
+  .card {
+    background-color: #111c44 !important;
+    border-color: #1e293b !important;
+  }
+  .detail-cover-wrapper {
+    background: #0b1329 !important;
+    border-color: #1e293b !important;
+  }
+  .price-box,
+  .review-item,
+  .table td.bg-light {
+    background-color: #1e293b !important;
+  }
+  .text-dark { color: #f8fafc !important; }
+  .text-secondary { color: #cbd5e1 !important; }
+  .text-muted { color: #94a3b8 !important; }
+  .nav-pills .nav-link {
+    background-color: #1e293b;
+    color: #cbd5e1;
+    &:hover { background-color: #27354d; color: #60a5fa; }
+    &.active { background-color: #3b82f6 !important; }
+  }
+  .review-form-card {
+    background-color: #15224e !important;
+    border-color: #1e293b !important;
+  }
+}

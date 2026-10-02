@@ -1,179 +1,49 @@
-<div class="container-fluid py-4" @pageEnter>
+<div class="storefront-wishlist-page py-4">
+  <div class="container">
+    
+    <!-- BREADCRUMB -->
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb fs-8">
+        <li class="breadcrumb-item"><a routerLink="/" class="text-decoration-none text-muted"><i class="fas fa-home me-1"></i>Trang chủ</a></li>
+        <li class="breadcrumb-item active text-primary fw-bold" aria-current="page">Danh Sách Yêu Thích</li>
+      </ol>
+    </nav>
 
-    <!-- ============================================================== -->
-    <!-- 👑 GIAO DIỆN DÀNH CHO ADMIN / TÁC GIẢ: BẢNG XẾP HẠNG YÊU THÍCH -->
-    <!-- ============================================================== -->
-    @if (isAdminOrAuthor) {
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h3 class="fw-bold text-dark mb-1">📊 {{ '::Wishlist:Title' | abpLocalization }}</h3>
-            <p class="text-muted small mb-0">{{ '::Wishlist:Subtitle' | abpLocalization }}
-            </p>
-        </div>
-        <button class="btn btn-outline-primary btn-sm rounded-pill px-3 shadow-sm" (click)="loadData()">
-            🔄 {{ '::Wishlist:UpdateData' | abpLocalization }}
-        </button>
+    <!-- HEADER TIÊU ĐỀ -->
+    <div class="d-flex align-items-center justify-content-between mb-4 pb-2 border-bottom">
+      <div>
+        <h3 class="fw-bold text-dark mb-1">
+          <i class="fas fa-heart text-danger me-2"></i>Sách Bạn Đã Thả Tim
+        </h3>
+        <p class="text-muted fs-7 mb-0">Lưu lại những cuốn sách yêu thích để đọc và mua sắm sau</p>
+      </div>
+      @if (wishlistItems().length > 0) {
+        <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2 fs-7 fw-bold">
+          {{ wishlistItems().length }} cuốn đã lưu
+        </span>
+      }
     </div>
 
     @if (isLoading()) {
-    <div class="card border-0 shadow-sm rounded-4 text-center py-5">
-        <div class="spinner-border text-danger mx-auto mb-3"></div>
-        <p class="text-muted">{{ '::Loading' | abpLocalization }}</p>
-    </div>
-    } @else if (adminFavoriteBooks().length === 0) {
-    <div class="card border-0 shadow-sm rounded-4 text-center py-5">
-        <div class="display-1 text-muted mb-3">🤍</div>
-        <h4 class="fw-bold text-dark">{{ '::NoData' | abpLocalization }}</h4>
-    </div>
-    } @else {
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
-        <div class="w-100 overflow-hidden">
-            <table class="table table-hover align-middle mb-0 w-100">
-                <thead class="table-dark">
-                    <tr>
-                        <th class="ps-4 text-center" style="width: 80px;">{{ '::Wishlist:Rank' | abpLocalization }}</th>
-                        <th style="width: 80px;">{{ '::Wishlist:Cover' | abpLocalization }}</th>
-                        <th>{{ '::Wishlist:BookTitle' | abpLocalization }}</th>
-                        <th>{{ '::Wishlist:Author' | abpLocalization }}</th>
-                        <th>{{ '::Wishlist:Price' | abpLocalization }}</th>
-                        <th>{{ '::Wishlist:Status' | abpLocalization }}</th>
-                        <th class="text-end pe-4">{{ '::Wishlist:LikesCount' | abpLocalization }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @for (book of adminFavoriteBooks(); track book.bookId) {
-                    <tr>
-                        <!-- Thứ hạng Huy hiệu Top 1, 2, 3 -->
-                        <td class="ps-4 text-center">
-                            @if (book.rank === 1) {
-                            <span class="badge bg-warning text-dark rounded-circle p-2 fs-6 shadow-sm" title="Top 1">🥇
-                                1</span>
-                            } @else if (book.rank === 2) {
-                            <span class="badge bg-secondary text-white rounded-circle p-2 fs-6 shadow-sm"
-                                title="Top 2">🥈 2</span>
-                            } @else if (book.rank === 3) {
-                            <span class="badge bg-danger text-white rounded-circle p-2 fs-6 shadow-sm"
-                                style="background-color: #cd7f32 !important;" title="Top 3">🥉 3</span>
-                            } @else {
-                            <span class="badge bg-light text-secondary rounded-circle p-2 fs-7 border">#{{ book.rank
-                                }}</span>
-                            }
-                        </td>
-
-                        <!-- Bìa Sách -->
-                        <td>
-                            <img [src]="book.coverImage || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80'"
-                                [alt]="book.bookName" class="rounded border shadow-sm object-fit-cover"
-                                style="width: 45px; height: 60px;">
-                        </td>
-
-                        <!-- Tên sách -->
-                        <td>
-                            <div class="fw-bold text-dark fs-6">{{ book.bookName }}</div>
-                        </td>
-
-                        <!-- Tác giả -->
-                        <td>
-                            <span class="fw-semibold text-secondary">✍️ {{ book.authorName }}</span>
-                        </td>
-
-                        <!-- Giá bán -->
-                        <td>
-                            <span class="fw-bold text-danger">{{ book.price | currency:'VND':'symbol':'1.0-0' }}</span>
-                        </td>
-
-                        <!-- Tồn kho -->
-                        <td>
-                            <span class="badge"
-                                [ngClass]="(book.stockCount ?? 0) > 0 ? 'bg-success-subtle text-success border' : 'bg-danger-subtle text-danger border'">
-                                {{ (book.stockCount ?? 0) > 0 ? ('🟢 ' + ('::InStock' | abpLocalization) + ' (' + book.stockCount + ')') : ('🔴 ' + ('::OutOfStock' | abpLocalization))
-                                }}
-                            </span>
-                        </td>
-
-                        <!-- Số lượt thích -->
-                        <td class="text-end pe-4">
-                            <span
-                                class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3 py-2 fs-6 fw-bold shadow-sm">
-                                💖 {{ book.favoriteCount }} {{ '::Wishlist:Likes' | abpLocalization }}
-                            </span>
-                        </td>
-                    </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    </div>
-    }
-    }
-    <!-- ============================================================== -->
-    <!-- 👤 GIAO DIỆN DÀNH CHO KHÁCH HÀNG: DANH SÁCH YÊU THÍCH CÁ NHÂN -->
-    <!-- ============================================================== -->
-    @if (!isAdminOrAuthor) {
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h3 class="fw-bold text-dark mb-1">💖 {{ '::Wishlist:UserTitle' | abpLocalization }}</h3>
-            <p class="text-muted small mb-0">{{ '::Wishlist:UserSubtitle' | abpLocalization }}</p>
-        </div>
-        <div class="badge bg-danger fs-6 px-3 py-2 rounded-pill shadow-sm">
-            {{ '::Wishlist:SavedCount' | abpLocalization }} <strong>{{ wishlistItems().length }}</strong> {{ '::Pagination:BooksSuffix' | abpLocalization }}
-        </div>
-    </div>
-
-    @if (isLoading()) {
-    <div class="card border-0 shadow-sm rounded-4 text-center py-5">
-        <div class="spinner-border text-danger mx-auto mb-3"></div>
-        <p class="text-muted">{{ '::Wishlist:Loading' | abpLocalization }}</p>
-    </div>
+      <app-loading-skeleton [type]="'card'" [count]="4" />
     } @else if (wishlistItems().length === 0) {
-    <div class="card border-0 shadow-sm rounded-4 text-center py-5">
-        <div class="display-1 text-danger mb-3">💔</div>
-        <h4 class="fw-bold text-dark">{{ '::Wishlist:EmptyTitle' | abpLocalization }}</h4>
-        <p class="text-muted">{{ '::Wishlist:EmptyDesc' | abpLocalization }}</p>
-        <div class="mt-3">
-            <a routerLink="/books" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">
-                📖 {{ '::Wishlist:ExploreNow' | abpLocalization }}
-            </a>
-        </div>
-    </div>
+      <app-empty-state [icon]="'fa-heart-broken'"
+                       [title]="'Danh sách yêu thích đang trống'"
+                       [description]="'Bạn chưa lưu cuốn sách nào vào danh sách yêu thích. Hãy dạo quanh tủ sách và bấm vào icon trái tim trên các cuốn sách ưng ý nhé!'"
+                       [actionText]="'Khám phá tủ sách ngay'"
+                       (actionClick)="router.navigate(['/books'])" />
     } @else {
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-        @for (book of wishlistItems(); track book.id) {
-        <div class="col">
-            <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden bg-white hover-card">
-                <div class="position-relative overflow-hidden bg-light text-center">
-                    <img [src]="book.coverImage || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80'"
-                        [alt]="book.bookName" class="card-img-top object-fit-cover" style="height: 220px; width: 100%;">
-                    <button type="button" class="btn-heart-active" (click)="removeItem(book.bookId)"
-                        [title]="'::Home:RemoveFromWishlist' | abpLocalization">
-                        ❤️
-                    </button>
-                </div>
-                <div class="card-body p-3 d-flex flex-column justify-content-between">
-                    <div>
-                        <small class="text-muted d-block mb-1">✍️ {{ book.authorName || ('::Home:Unknown' | abpLocalization) }}</small>
-                        <h6 class="card-title fw-bold text-dark mb-2 text-truncate" [title]="book.bookName">
-                            {{ book.bookName }}
-                        </h6>
-                    </div>
-                    <div class="pt-2 border-top mt-2">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <span class="fs-5 fw-bold text-danger">{{ book.price | currency:'VND':'symbol':'1.0-0'
-                                }}</span>
-                            <span class="badge" [ngClass]="(book.stockCount ?? 0) > 0 ? 'bg-success' : 'bg-danger'">
-                                {{ (book.stockCount ?? 0) > 0 ? ('🟢 ' + ('::Home:InStockWithCount' | abpLocalization)) : ('🔴 ' + ('::Home:OutOfStock' | abpLocalization)) }}
-                            </span>
-                        </div>
-                        <button class="btn btn-primary w-100 rounded-pill fw-bold shadow-sm"
-                            [disabled]="(book.stockCount ?? 0) <= 0" (click)="addToCart(book.bookId)">
-                            🛒 {{ '::Books:AddToCart' | abpLocalization }}
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 mb-5">
+        @for (item of wishlistItems(); track item.bookId) {
+          <div class="col">
+            <app-book-card [book]="toStorefrontBook(item)"
+                           (addToCart)="addToCart($event)"
+                           (toggleFavorite)="removeItem(item.bookId)"
+                           (viewDetail)="viewDetail($event)" />
+          </div>
         }
-    </div>
+      </div>
     }
-    }
+
+  </div>
 </div>

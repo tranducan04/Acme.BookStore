@@ -1,33 +1,37 @@
 @if (isCustomer) {
-<!-- 💬 NÚT TRÒN NỔI GÓC DƯỚI BÊN PHẢI -->
-<button type="button" class="btn-chat-toggle shadow-lg" (click)="toggleChat()"
-    [title]="isOpen() ? 'Đóng chat' : 'Chat với AI Gemini'">
-    @if (!isOpen()) {
-    <span class="fs-3">🤖</span>
-    } @else {
-    <span class="fs-4 fw-bold">✕</span>
-    }
-</button>
+  @if (!isEmbedded()) {
+    <!-- 💬 NÚT TRÒN NỔI GÓC DƯỚI BÊN PHẢI -->
+    <button type="button" class="btn-chat-toggle shadow-lg" (click)="toggleChat()"
+        [title]="isOpen() ? 'Đóng chat' : 'Chat với AI Gemini'">
+        @if (!isOpen()) {
+        <span class="fs-3">🤖</span>
+        } @else {
+        <span class="fs-4 fw-bold">✕</span>
+        }
+    </button>
+  }
 
-<!-- 🪟 KHUNG CỬA SỔ CHATBOX -->
-@if (isOpen()) {
-<div class="chatbox-card shadow-lg border-0 rounded-4 overflow-hidden">
-    <!-- HEADER -->
-    <div class="chatbox-header d-flex justify-content-between align-items-center p-3 text-white">
-        <div class="d-flex align-items-center gap-2">
-            <div
-                class="bot-avatar rounded-circle bg-white text-primary d-flex align-items-center justify-content-center shadow-sm">
-                🤖
-            </div>
-            <div>
-                <h6 class="mb-0 fw-bold">BookStore</h6>
-                <small class="text-white-50 fs-8 d-flex align-items-center gap-1">
-                    <span class="online-dot"></span> {{ '::ChatBot:ReadyToConsult' | abpLocalization }}
-                </small>
-            </div>
-        </div>
-        <button type="button" class="btn-close btn-close-white" (click)="toggleChat()"></button>
-    </div>
+  <!-- 🪟 KHUNG CỬA SỔ CHATBOX -->
+  @if (isOpen() || isEmbedded()) {
+  <div class="chatbox-card shadow-lg border-0 rounded-4 overflow-hidden" [class.embedded]="isEmbedded()">
+    @if (!isEmbedded()) {
+      <!-- HEADER -->
+      <div class="chatbox-header d-flex justify-content-between align-items-center p-3 text-white">
+          <div class="d-flex align-items-center gap-2">
+              <div
+                  class="bot-avatar rounded-circle bg-white text-primary d-flex align-items-center justify-content-center shadow-sm">
+                  🤖
+              </div>
+              <div>
+                  <h6 class="mb-0 fw-bold">BookStore</h6>
+                  <small class="text-white-50 fs-8 d-flex align-items-center gap-1">
+                      <span class="online-dot"></span> {{ '::ChatBot:ReadyToConsult' | abpLocalization }}
+                  </small>
+              </div>
+          </div>
+          <button type="button" class="btn-close btn-close-white" (click)="toggleChat()"></button>
+      </div>
+    }
 
     <!-- BODY: DANH SÁCH TIN NHẮN -->
     <div class="chatbox-body p-3 overflow-y-auto">

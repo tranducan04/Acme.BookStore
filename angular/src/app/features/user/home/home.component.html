@@ -1,296 +1,215 @@
-<div class="container-fluid pt-3 pb-4" @pageEnter>
-  <!-- 🔥 BANNER CHỮ CHẠY KHUYẾN MÃI (ANNOUNCEMENT MARQUEE) -->
-  <div class="announcement-bar mb-3 shadow-sm">
-    <div class="announcement-content">
-      <div class="marquee-track">
-        <span>🔥 <strong>{{ '::Home:FlashSalePrefix' | abpLocalization }}</strong> {{ '::Home:FlashSaleContent' | abpLocalization }}</span>
-        <span class="dot">•</span>
-        <span>🚀 <strong>{{ '::Home:FreeShipPrefix' | abpLocalization }}</strong> {{ '::Home:FreeShipContent' | abpLocalization }}</span>
-        <span class="dot">•</span>
-        <span>🎁 <strong>{{ '::Home:PromoPrefix' | abpLocalization }}</strong> {{ '::Home:PromoContent' | abpLocalization }}</span>
-        <span class="dot">•</span>
-        <!-- Lặp lại 1 lần nữa để chữ chạy lặp vô tận mượt mà không hẫng -->
-        <span>🔥 <strong>{{ '::Home:FlashSalePrefix' | abpLocalization }}</strong> {{ '::Home:FlashSaleContent' | abpLocalization }}</span>
-        <span class="dot">•</span>
+<div class="storefront-home-page pb-5">
+  <div class="container py-4">
+
+    <!-- 1. HERO LIBRARY CAROUSEL / SLIDER -->
+    <section class="hero-slider-section mb-5 position-relative rounded-5 overflow-hidden shadow-lg">
+      <div class="hero-slides-wrapper position-relative" style="min-height: 440px;">
+        @for (slide of heroSlides; track slide.title; let idx = $index) {
+          <div class="hero-slide-item position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center"
+               [class.active]="currentSlide() === idx"
+               [style.backgroundImage]="'linear-gradient(90deg, rgba(11, 19, 41, 0.92) 0%, rgba(15, 23, 42, 0.75) 50%, rgba(15, 23, 42, 0.3) 100%), url(' + slide.image + ')'"
+               style="background-size: cover; background-position: center; transition: opacity 0.8s ease;">
+            
+            <div class="container px-4 px-md-5">
+              <div class="col-12 col-md-8 col-lg-7 text-white">
+                <span class="badge rounded-pill bg-primary px-3 py-2 mb-3 fs-8 fw-semibold shadow-sm">
+                  <i class="fas fa-sparkles me-1 text-warning"></i> {{ slide.badge }}
+                </span>
+                <h1 class="display-5 fw-extrabold mb-3 text-white hero-title">
+                  {{ slide.title }}
+                </h1>
+                <p class="fs-6 text-light opacity-85 mb-4 hero-subtitle lh-base" style="max-width: 520px;">
+                  {{ slide.subtitle }}
+                </p>
+                <div class="d-flex align-items-center gap-3">
+                  <a [routerLink]="slide.ctaLink" class="btn btn-primary btn-lg rounded-pill px-4 py-3 fw-bold fs-7 shadow d-inline-flex align-items-center gap-2">
+                    <span>{{ slide.ctaText }}</span>
+                    <i class="fas fa-arrow-right fs-8"></i>
+                  </a>
+                  <a routerLink="/about" class="btn btn-outline-light btn-lg rounded-pill px-4 py-3 fw-semibold fs-7">
+                    Về Chúng Tôi
+                  </a>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        }
+
+        <!-- Carousel Navigation Controls -->
+        <button type="button"
+                class="carousel-nav-btn prev-btn rounded-circle d-flex align-items-center justify-content-center border-0 position-absolute top-50 start-0 translate-middle-y ms-3 shadow text-white"
+                (click)="prevSlide()"
+                aria-label="Slide trước">
+          <i class="fas fa-chevron-left fs-6"></i>
+        </button>
+        <button type="button"
+                class="carousel-nav-btn next-btn rounded-circle d-flex align-items-center justify-content-center border-0 position-absolute top-50 end-0 translate-middle-y me-3 shadow text-white"
+                (click)="nextSlide()"
+                aria-label="Slide kế tiếp">
+          <i class="fas fa-chevron-right fs-6"></i>
+        </button>
+
+        <!-- Carousel Indicators (Dots) -->
+        <div class="carousel-indicators-custom position-absolute bottom-0 start-50 translate-middle-x mb-3 d-flex gap-2">
+          @for (slide of heroSlides; track slide.title; let idx = $index) {
+            <button type="button"
+                    class="dot-indicator rounded-pill border-0 p-0"
+                    [class.active]="currentSlide() === idx"
+                    (click)="goToSlide(idx)"
+                    [attr.aria-label]="'Chuyển đến slide ' + (idx + 1)">
+            </button>
+          }
+        </div>
       </div>
-    </div>
-  </div>
-  <!-- BANNER CHÍNH -->
-  <div class="p-5 mb-4 bg-primary text-white rounded-4 shadow-sm text-center position-relative overflow-hidden"
-    style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);">
-    <div class="container-fluid py-3">
-      <h1 class="display-5 fw-bold mb-3">📚 {{ '::Welcome' | abpLocalization }}</h1>
-      <p class="col-md-8 fs-5 mx-auto text-light opacity-75">
-        {{ '::LongWelcomeMessage' | abpLocalization }}
-      </p>
-      <div class="mt-4">
-        <a routerLink="/books" class="btn btn-warning btn-lg px-4 fw-bold rounded-pill shadow-sm">
-          📖 {{ '::ExploreBooks' | abpLocalization }}
+    </section>
+
+    <!-- 2. BOOK CATEGORIES SECTION -->
+    <section class="categories-section mb-5">
+      <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+          <h3 class="fw-bold text-dark mb-1">
+            <i class="fas fa-shapes text-primary me-2"></i>Danh Mục Tuyển Chọn
+          </h3>
+          <p class="text-muted fs-7 mb-0">Lựa chọn các chủ đề sách phong phú phù hợp sở thích của bạn</p>
+        </div>
+        <a routerLink="/books" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-semibold">
+          Xem tất cả <i class="fas fa-angle-right ms-1"></i>
         </a>
       </div>
-    </div>
-  </div>
-  <!-- TIÊU ĐỀ SÁCH NỔI BẬT -->
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <div>
-      <h4 class="fw-bold text-dark mb-0">🔥 {{ '::FeaturedBooks' | abpLocalization }}</h4>
-      <small class="text-muted">{{ '::FeaturedBooksSub' | abpLocalization }}</small>
-    </div>
-    <a routerLink="/books" class="btn btn-outline-primary btn-sm rounded-pill px-3">
-      {{ '::ExploreBooks' | abpLocalization }} →
-    </a>
-  </div>
-  <!-- DANH SÁCH SÁCH NỔI BẬT -->
-  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mb-5">
-    @for (book of featuredBooks(); track book.id) {
-    <div class="col">
-      <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden transition card-hover bg-white"
-        style="cursor: pointer;" (click)="openDetailModal(book)">
-        <!-- Bìa Sách -->
-        <div
-          class="bg-light text-center overflow-hidden d-flex align-items-center justify-content-center position-relative"
-          style="height: 220px;">
-          <img
-            [src]="book.coverImage || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80'"
-            [alt]="book.name" class="img-fluid h-100 w-100 object-fit-cover">
-          <!-- Nhãn Flash Sale % nếu có -->
-          @if (book.originalPrice && book.originalPrice > book.price) {
-          <span
-            class="position-absolute top-0 start-0 m-2 badge bg-danger text-white rounded-pill px-2.5 py-1 shadow-sm fw-bold">
-            🔥 -{{ (((book.originalPrice - book.price) / book.originalPrice) * 100) | number:'1.0-0' }}%
-          </span>
-          }
-          <!-- 💖 NÚT THẢ TIM YÊU THÍCH -->
-          <button type="button" class="btn-heart-toggle" [class.active]="isBookInWishlist(book.id)"
-            (click)="toggleWishlist($event, book.id)"
-            [title]="isBookInWishlist(book.id) ? ('::Home:RemoveFromWishlist' | abpLocalization) : ('::Home:AddToWishlist' | abpLocalization)">
-            {{ isBookInWishlist(book.id) ? '❤️' : '🤍' }}
-          </button>
-        </div>
-        <!-- Thông tin sách -->
-        <div class="card-body d-flex flex-column p-3">
-          <div class="d-flex align-items-center justify-content-between mb-2">
-            <span
-              class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1 fs-8">
-              {{ getBookTypeName(book.type) }}
-            </span>
-            @if (book.ageLimit === 1) {
-            <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2.5 py-1 fs-8">{{ '::Home:AgeChild' | abpLocalization }}</span>
-            } @else if (book.ageLimit === 2) {
-            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1 fs-8">{{ '::Home:AgeTeen' | abpLocalization }}</span>
-            } @else if (book.ageLimit === 3) {
-            <span class="badge bg-warning-subtle text-dark border border-warning-subtle rounded-pill px-2.5 py-1 fs-8">{{ '::Home:AgeAdult' | abpLocalization }}</span>
-            } @else {
-            <small class="text-warning fw-semibold fs-8">★ Premium</small>
-            }
+
+      <div class="row row-cols-2 row-cols-md-3 row-cols-lg-6 g-3">
+        @for (cat of categories(); track cat.id) {
+          <div class="col">
+            <app-category-card [category]="cat" (selected)="onCategorySelect($event)" />
           </div>
-          <h6 class="card-title fw-bold text-dark mb-1 text-truncate" [title]="book.name">{{ book.name }}</h6>
-          <p class="small text-muted mb-0">{{ '::Books:Author' | abpLocalization }}: <strong>{{ book.authorName || ('::Home:Unknown' | abpLocalization) }}</strong></p>
-          <p class="small text-muted mb-1">{{ '::Books:Publisher' | abpLocalization }}: <strong class="text-primary">🏢 {{ book.publisherName || ('::Home:Unknown' | abpLocalization)
-              }}</strong></p>
-          <!-- 🌟 CHUỖI 5 NGÔI SAO VÀ SỐ LƯỢT ĐÁNH GIÁ (ĐỘNG THEO ĐIỂM SỐ CHUẨN 100%) -->
-          <div class="mb-2">
-            <div class="d-flex align-items-center gap-1 fs-7">
-              @for (star of getStarsArray(book.averageRating); track $index) {
-              @if (star.full) {
-              <span class="text-warning">★</span>
-              } @else {
-              <span class="text-secondary opacity-30">★</span>
-              }
-              }
-              <span class="text-dark fw-bold ms-1 fs-8">{{ book.averageRating | number:'1.1-1' }}</span>
-            </div>
-            <small class="text-muted fs-8 d-block">{{ book.totalReviews || 0 }} {{ '::Home:ReviewsCount' | abpLocalization }}</small>
-          </div>
-          <div class="mt-auto pt-2 border-top">
-            <div class="mb-2">
-              <small class="text-muted d-block fs-8">{{ '::Books:Price' | abpLocalization }}</small>
-              <div class="d-flex align-items-baseline gap-1.5 flex-wrap">
-                <span class="fw-bold text-danger fs-6">{{ book.price | currency:'VND':'symbol':'1.0-0' }}</span>
-                @if (book.originalPrice && book.originalPrice > book.price) {
-                <small class="text-muted text-decoration-line-through fs-8">
-                  {{ book.originalPrice | currency:'VND':'symbol':'1.0-0' }}
-                </small>
-                }
-              </div>
-            </div>
-            @if (!permission.getGrantedPolicy('BookStore.Books.Edit') &&
-            !permission.getGrantedPolicy('BookStore.Books.Create')) {
-            <button class="btn btn-sm rounded-pill w-100 py-1.5 fw-semibold shadow-sm transition"
-              [class.btn-success]="addingBookId() === book.id" [class.btn-primary]="addingBookId() !== book.id"
-              [disabled]="(book.stockCount ?? 0) <= 0 || addingBookId() === book.id"
-              (click)="addToCart($event, book.id)">
-              @if (addingBookId() === book.id) {
-              ✓ {{ '::Books:AddedToCart' | abpLocalization }}
-              } @else {
-              🛒 {{ '::Books:AddToCart' | abpLocalization }}
-              }
-            </button>
-            }
-          </div>
-        </div>
-      </div>
-    </div>
-    }
-  </div>
-</div>
-<!-- 🌟 POPUP MODAL: CHI TIẾT SÁCH + ĐÁNH GIÁ SAO + GỢI Ý SÁCH (RECOMMENDATIONS) -->
-@if (isModalOpen() && selectedBook()) {
-<div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.6); z-index: 1050;"
-  (click)="closeModal()">
-  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" (click)="$event.stopPropagation()">
-    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-      <!-- HEADER POPUP -->
-      <div class="modal-header bg-primary text-white border-0 py-3"
-        style="background: linear-gradient(135deg, #4318ff 0%, #868ebd 100%) !important;">
-        <h5 class="modal-title fw-bold">📖 {{ '::Books:DetailModalTitle' | abpLocalization }}</h5>
-        <button type="button" class="btn-close btn-close-white" (click)="closeModal()"></button>
-      </div>
-      <!-- NỘI DUNG POPUP -->
-      <div class="modal-body p-4">
-        <!-- PHẦN 1: THÔNG TIN SÁCH CHÍNH -->
-        <div class="row g-4 mb-4 pb-4 border-bottom">
-          <div class="col-md-4 text-center">
-            <img
-              [src]="selectedBook().coverImage || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80'"
-              [alt]="selectedBook().name" class="img-fluid rounded-4 shadow-sm border object-fit-cover"
-              style="max-height: 260px; width: 100%;">
-          </div>
-          <div class="col-md-8 d-flex flex-column justify-content-between">
-            <div>
-              <div class="d-flex gap-2 mb-2">
-                <span class="badge bg-primary-subtle text-primary border rounded-pill">
-                  {{ getBookTypeName(selectedBook().type) }}
-                </span>
-                <span class="badge" [ngClass]="(selectedBook().stockCount ?? 0) > 0 ? 'bg-success' : 'bg-danger'">
-                  {{ (selectedBook().stockCount ?? 0) > 0 ? ('🟢 ' + ('::Home:InStockWithCount' | abpLocalization) + ' (' + selectedBook().stockCount + ')') : ('🔴 ' + ('::Home:OutOfStock' | abpLocalization)) }}
-                </span>
-              </div>
-              <h4 class="fw-bold text-dark mb-2">{{ selectedBook().name }}</h4>
-              <p class="text-muted mb-1">✍️ {{ '::Books:Author' | abpLocalization }}: <strong class="text-dark">{{ selectedBook().authorName || ('::Home:Unknown' | abpLocalization)
-                  }}</strong></p>
-              <p class="text-muted mb-1">🏢 {{ '::Books:Publisher' | abpLocalization }}: <strong class="text-primary">{{ selectedBook().publisherName
-                  || ('::Home:Unknown' | abpLocalization) }}</strong></p>
-              <p class="text-muted mb-2">📅 {{ '::Books:PublishedDate' | abpLocalization }}: <strong>{{ selectedBook().publishDate | date:'dd/MM/yyyy'
-                  }}</strong></p>
-            </div>
-            <!-- Giá tiền & Nút Mua -->
-            <div class="d-flex justify-content-between align-items-center pt-3 border-top flex-wrap gap-2">
-              <div>
-                <small class="text-muted d-block">{{ '::Books:Price' | abpLocalization }}:</small>
-                <div class="d-flex align-items-baseline gap-2">
-                  <h4 class="fw-bold text-danger mb-0">{{ selectedBook().price | currency:'VND':'symbol':'1.0-0' }}</h4>
-                  @if (selectedBook().originalPrice && selectedBook().originalPrice > selectedBook().price) {
-                  <span class="text-muted text-decoration-line-through fs-6">
-                    {{ selectedBook().originalPrice | currency:'VND':'symbol':'1.0-0' }}
-                  </span>
-                  }
-                </div>
-              </div>
-              @if (!permission.getGrantedPolicy('BookStore.Books.Edit') &&
-              !permission.getGrantedPolicy('BookStore.Books.Create')) {
-              <button
-                class="btn btn-primary btn-lg rounded-pill px-4 py-2.5 shadow fw-bold transition text-nowrap d-inline-flex align-items-center justify-content-center gap-2"
-                [class.btn-success]="addingBookId() === selectedBook().id"
-                [class.btn-primary]="addingBookId() !== selectedBook().id"
-                [disabled]="(selectedBook().stockCount ?? 0) <= 0 || addingBookId() === selectedBook().id"
-                (click)="selectedBook().id && addToCart($event, selectedBook().id)">
-                @if (addingBookId() === selectedBook().id) {
-                <span>✓ {{ '::Books:AddedToCart' | abpLocalization }}</span>
-                } @else {
-                <span>🛒 {{ '::Books:AddToCart' | abpLocalization }}</span>
-                }
-              </button>
-              }
-            </div>
-          </div>
-        </div>
-        <!-- PHẦN 2: GỢI Ý SÁCH CÙNG THỂ LOẠI (RECOMMENDATIONS) -->
-        @if (reviewSummary()?.recommendedBooks && reviewSummary()!.recommendedBooks!.length > 0) {
-        <div class="mb-4 pb-4 border-bottom">
-          <h5 class="fw-bold text-dark mb-3">💡 {{ '::Books:YouMayAlsoLike' | abpLocalization }}</h5>
-          <div class="row row-cols-2 row-cols-md-4 g-3">
-            @for (rec of reviewSummary()!.recommendedBooks; track rec.id) {
-            <div class="col">
-              <div class="card h-100 border shadow-none rounded-3 p-2 text-center cursor-pointer transition card-hover"
-                style="cursor: pointer;" (click)="openDetailModal(rec)">
-                <img
-                  [src]="rec.coverImage || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80'"
-                  [alt]="rec.name" class="img-fluid rounded-2 object-fit-cover mb-2"
-                  style="height: 110px; width: 100%;">
-                <h6 class="fw-bold text-dark fs-8 text-truncate mb-1" [title]="rec.name">{{ rec.name }}</h6>
-                <span class="text-danger fw-bold fs-8">{{ rec.price | currency:'VND':'symbol':'1.0-0' }}</span>
-              </div>
-            </div>
-            }
-          </div>
-        </div>
         }
-        <!-- PHẦN 3: FORM ĐÁNH GIÁ & CHẤM SAO -->
-        <div class="mb-4 soft-pastel-card p-3.5">
-          <h6 class="fw-bold text-dark mb-2">⭐ {{ '::Books:SendReview' | abpLocalization }}</h6>
-          <!-- Chọn số sao 1 - 5 -->
-          <div class="d-flex align-items-center gap-1 mb-2">
-            <span class="text-muted me-2 small">{{ '::Books:SelectStars' | abpLocalization }}:</span>
-            @for (star of [1, 2, 3, 4, 5]; track star) {
-            <button type="button" class="btn btn-sm p-0 border-0 fs-4"
-              [ngClass]="star <= userRating() ? 'text-warning' : 'text-secondary opacity-50'" (click)="setRating(star)">
-              ★
-            </button>
-            }
-            <span class="ms-2 fw-bold text-warning small">({{ userRating() }} {{ '::Books:StarsSuffix' | abpLocalization }})</span>
-          </div>
-          <!-- Nhập bình luận -->
-          <div class="input-group">
-            <input type="text" class="form-control" [placeholder]="'::Books:ReviewPlaceholder' | abpLocalization"
-              [value]="userComment()" (input)="userComment.set($any($event.target).value)">
-            <button class="btn btn-primary fw-semibold px-3" [disabled]="isSubmittingReview()" (click)="submitReview()">
-              {{ isSubmittingReview() ? ('::Books:SubmittingReview' | abpLocalization) : ('🚀 ' + ('::Books:SubmitReviewBtn' | abpLocalization)) }}
-            </button>
-          </div>
-        </div>
-        <!-- PHẦN 4: DANH SÁCH BÌNH LUẬN ĐÃ CÓ -->
+      </div>
+    </section>
+
+    <!-- 3. FEATURED BOOKS (SÁCH NỔI BẬT) -->
+    <section class="featured-books-section mb-5">
+      <div class="d-flex align-items-center justify-content-between mb-4">
         <div>
-          <h6 class="fw-bold text-dark mb-3">💬 {{ '::Books:CustomerReviews' | abpLocalization }} ({{ reviewSummary()?.totalReviews || 0 }})</h6>
-          @if (!reviewSummary()?.reviews || reviewSummary()!.reviews!.length === 0) {
-          <div class="text-center py-4 text-muted small bg-white border rounded-3">
-            ✨ {{ '::Books:NoReviewsYet' | abpLocalization }}
+          <div class="badge rounded-pill bg-danger-subtle text-danger px-3 py-1 mb-1 fs-8 fw-bold">
+            🔥 ĐƯỢC ĐỘC GIẢ YÊU THÍCH NHẤT
           </div>
-          } @else {
-          <div class="d-flex flex-column gap-3">
-            @for (rev of reviewSummary()!.reviews; track rev.id) {
-            <div class="p-3 bg-white border rounded-3 shadow-none">
-              <div class="d-flex justify-content-between align-items-center mb-1">
-                <div class="d-flex align-items-center gap-2">
-                  <span class="badge bg-secondary rounded-circle p-2">👤</span>
-                  <div>
-                    <strong class="text-dark small d-block">{{ rev.userName }}</strong>
-                    <span class="text-warning small">
-                      {{ '★'.repeat(rev.rating || 5) }}{{ '☆'.repeat(5 - (rev.rating || 5)) }}
-                    </span>
-                  </div>
-                </div>
-                <div class="d-flex align-items-center gap-2">
-                  <small class="text-muted fs-8">{{ rev.creationTime | date:'dd/MM/yyyy HH:mm' }}</small>
-                  @if (permission.getGrantedPolicy('BookStore.Books.Edit') && rev.id) {
-                  <button class="btn btn-outline-danger btn-sm py-0 px-2 fs-8" (click)="deleteReview(rev.id)">
-                    🗑️ {{ '::Delete' | abpLocalization }}
-                  </button>
-                  }
-                </div>
-              </div>
-              <p class="mb-0 text-secondary small ps-4 ms-2">{{ rev.comment }}</p>
+          <h3 class="fw-bold text-dark mb-1">Sách Nổi Bật Tuyển Chọn</h3>
+          <p class="text-muted fs-7 mb-0">Những tác phẩm kinh điển và bán chạy nhất tại thư viện</p>
+        </div>
+        <a routerLink="/books" [queryParams]="{ sortBy: 'bestSeller' }" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-semibold">
+          Xem thêm <i class="fas fa-angle-right ms-1"></i>
+        </a>
+      </div>
+
+      @if (isLoading()) {
+        <app-loading-skeleton [type]="'card'" [count]="4" />
+      } @else {
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+          @for (book of featuredBooks(); track book.id) {
+            <div class="col">
+              <app-book-card [book]="book"
+                             (addToCart)="onAddToCart($event)"
+                             (toggleFavorite)="onToggleFavorite($event)"
+                             (viewDetail)="onViewDetail($event)" />
             </div>
-            }
-          </div>
           }
         </div>
+      }
+    </section>
+
+    <!-- 4. PROMOTIONAL BANNER SECTION -->
+    <section class="promo-banner-section mb-5 p-4 p-md-5 rounded-5 shadow-sm text-white position-relative overflow-hidden"
+             style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #2563eb 100%);">
+      <div class="row align-items-center g-4 position-relative z-1">
+        <div class="col-12 col-md-7">
+          <span class="badge bg-warning text-dark rounded-pill px-3 py-1 fw-bold fs-8 mb-2">ƯU ĐÃI ĐỘC QUYỀN</span>
+          <h2 class="fw-extrabold display-6 mb-3 text-white">Giảm 15% Cho Đơn Hàng Đầu Tiên!</h2>
+          <p class="text-light fs-6 mb-4 opacity-90">
+            Sử dụng mã <strong class="badge bg-white text-primary fs-6 px-3 py-1">BOOK2026</strong> khi đặt hàng. Miễn phí vận chuyển tận nhà trên toàn quốc.
+          </p>
+          <a routerLink="/books" class="btn btn-light text-primary btn-lg rounded-pill px-4 py-2 fw-bold fs-7 shadow-sm">
+            Mua Sách Ngay
+          </a>
+        </div>
+        <div class="col-12 col-md-5 text-center d-none d-md-block">
+          <i class="fas fa-book-open-reader fs-1 opacity-25" style="font-size: 8rem !important;"></i>
+        </div>
       </div>
-      <!-- FOOTER POPUP -->
-      <div class="modal-footer border-top bg-white py-3">
-        <button type="button" class="btn btn-primary rounded-pill px-4 shadow-sm" (click)="closeModal()">{{ '::Close' | abpLocalization }}</button>
+    </section>
+
+    <!-- 5. NEW ARRIVALS (SÁCH MỚI VỀ) -->
+    <section class="new-arrivals-section mb-5">
+      <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+          <div class="badge rounded-pill bg-success-subtle text-success px-3 py-1 mb-1 fs-8 fw-bold">
+            ✨ VỪA CẬP NHẬT
+          </div>
+          <h3 class="fw-bold text-dark mb-1">Sách Mới Về Thư Viện</h3>
+          <p class="text-muted fs-7 mb-0">Các ấn bản mới nhất vừa cập bến kho sách Acme BookStore</p>
+        </div>
+        <a routerLink="/books" [queryParams]="{ sortBy: 'newest' }" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-semibold">
+          Xem tất cả <i class="fas fa-angle-right ms-1"></i>
+        </a>
       </div>
-    </div>
+
+      @if (isLoading()) {
+        <app-loading-skeleton [type]="'card'" [count]="4" />
+      } @else {
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+          @for (book of newArrivalBooks(); track book.id) {
+            <div class="col">
+              <app-book-card [book]="book"
+                             (addToCart)="onAddToCart($event)"
+                             (toggleFavorite)="onToggleFavorite($event)"
+                             (viewDetail)="onViewDetail($event)" />
+            </div>
+          }
+        </div>
+      }
+    </section>
+
+    <!-- 6. VALUE PROPOSITIONS -->
+    <section class="value-props-section pt-4 border-top">
+      <div class="row g-4 text-center">
+        <div class="col-6 col-md-3">
+          <div class="p-3">
+            <div class="prop-icon mx-auto rounded-circle d-flex align-items-center justify-content-center bg-primary-subtle text-primary mb-3">
+              <i class="fas fa-shield-alt fs-4"></i>
+            </div>
+            <h6 class="fw-bold text-dark mb-1">100% Sách Thật</h6>
+            <p class="text-muted fs-8 mb-0">Cam kết chính hãng từ nhà xuất bản</p>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="p-3">
+            <div class="prop-icon mx-auto rounded-circle d-flex align-items-center justify-content-center bg-success-subtle text-success mb-3">
+              <i class="fas fa-truck-fast fs-4"></i>
+            </div>
+            <h6 class="fw-bold text-dark mb-1">Giao Hàng Tốc Hành</h6>
+            <p class="text-muted fs-8 mb-0">Miễn phí ship cho đơn từ 250,000₫</p>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="p-3">
+            <div class="prop-icon mx-auto rounded-circle d-flex align-items-center justify-content-center bg-info-subtle text-info mb-3">
+              <i class="fas fa-sync-alt fs-4"></i>
+            </div>
+            <h6 class="fw-bold text-dark mb-1">Đổi Trả 7 Ngày</h6>
+            <p class="text-muted fs-8 mb-0">Bảo hành 1 đổi 1 nếu lỗi in ấn</p>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="p-3">
+            <div class="prop-icon mx-auto rounded-circle d-flex align-items-center justify-content-center bg-warning-subtle text-warning mb-3">
+              <i class="fas fa-headset fs-4"></i>
+            </div>
+            <h6 class="fw-bold text-dark mb-1">Hỗ Trợ 24/7</h6>
+            <p class="text-muted fs-8 mb-0">Đội ngũ tư vấn & Trợ lý ảo AI</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </div>
 </div>
-}

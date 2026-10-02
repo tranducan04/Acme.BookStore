@@ -1,54 +1,132 @@
-<div class="container py-5" @pageEnter>
-  <!-- Hero Banner Giới thiệu -->
-  <div class="row align-items-center mb-5">
-    <div class="col-lg-6">
-      <span class="badge bg-primary px-3 py-2 text-uppercase mb-3">{{ '::About:Badge' | abpLocalization }}</span>
-      <h1 class="fw-bold text-dark display-5 mb-3">{{ '::About:HeroTitle' | abpLocalization }}</h1>
-      <p class="lead text-secondary mb-4">
-        {{ '::About:HeroDesc' | abpLocalization }}
-      </p>
-      <div class="row g-3">
-        <div class="col-6">
-          <div class="p-3.5 soft-pastel-card">
-            <h3 class="fw-bold text-primary mb-1">10.000+</h3>
-            <small class="text-muted">{{ '::About:StatBooks' | abpLocalization }}</small>
-          </div>
-        </div>
-        <div class="col-6">
-          <div class="p-3.5 soft-pastel-card">
-            <h3 class="fw-bold text-success mb-1">50.000+</h3>
-            <small class="text-muted">{{ '::About:StatReaders' | abpLocalization }}</small>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-lg-6 mt-4 mt-lg-0">
-      <img src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=800&auto=format&fit=crop&q=80" alt="BookStore Library" class="img-fluid rounded-4 shadow-lg">
-    </div>
-  </div>
+<div class="storefront-about-page py-4">
+  <div class="container">
+    
+    <!-- BREADCRUMB -->
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb fs-8">
+        <li class="breadcrumb-item"><a routerLink="/" class="text-decoration-none text-muted"><i class="fas fa-home me-1"></i>Trang chủ</a></li>
+        <li class="breadcrumb-item active text-primary fw-bold" aria-current="page">Về Chúng Tôi</li>
+      </ol>
+    </nav>
 
-  <!-- Sứ mệnh & Giá trị cốt lõi -->
-  <div class="row g-4 my-5">
-    <div class="col-md-4">
-      <div class="card h-100 border-0 shadow-sm rounded-4 p-4 text-center">
-        <div class="fs-1 text-primary mb-3">📖</div>
-        <h4 class="fw-bold text-dark">{{ '::About:FeatureAuthenticTitle' | abpLocalization }}</h4>
-        <p class="text-muted small">{{ '::About:FeatureAuthenticDesc' | abpLocalization }}</p>
+    <!-- HERO SECTION -->
+    <section class="about-hero p-4 p-md-5 rounded-5 bg-white border border-light shadow-sm mb-5">
+      <div class="row align-items-center g-5">
+        <div class="col-12 col-lg-6">
+          <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1 fs-8 fw-bold mb-3">
+            📚 CÂU CHUYỆN THƯ VIỆN SỐ ACME
+          </span>
+          <h1 class="display-5 fw-extrabold text-dark mb-3 lh-sm">
+            Nơi Khởi Nguồn Của <span class="text-primary">Đam Mê Đọc Sách</span> & Tri Thức Bất Tận
+          </h1>
+          <p class="fs-6 text-secondary mb-4 lh-base">
+            Được thành lập với sứ mệnh lan tỏa văn hóa đọc đến từng thế hệ độc giả Việt Nam, <strong>Acme BookStore</strong> không đơn thuần là một trang thương mại điện tử, mà là không gian thư viện số nơi kết nối độc giả với những tác phẩm tinh hoa nhất.
+          </p>
+          <div class="row g-3">
+            <div class="col-6 col-sm-4">
+              <div class="stat-card p-3 rounded-4 bg-light text-center border">
+                <div class="display-6 fw-extrabold text-primary mb-1">50K+</div>
+                <div class="fs-8 text-muted fw-semibold">Tựa Sách Bản Quyền</div>
+              </div>
+            </div>
+            <div class="col-6 col-sm-4">
+              <div class="stat-card p-3 rounded-4 bg-light text-center border">
+                <div class="display-6 fw-extrabold text-success mb-1">120K+</div>
+                <div class="fs-8 text-muted fw-semibold">Độc Giả Thân Thiết</div>
+              </div>
+            </div>
+            <div class="col-12 col-sm-4">
+              <div class="stat-card p-3 rounded-4 bg-light text-center border">
+                <div class="display-6 fw-extrabold text-warning mb-1">99.8%</div>
+                <div class="fs-8 text-muted fw-semibold">Hài Lòng Dịch Vụ</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-lg-6 text-center">
+          <div class="about-img-frame rounded-5 overflow-hidden shadow-lg position-relative">
+            <img src="https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=800&auto=format&fit=crop&q=80"
+                 alt="Acme Library Interior"
+                 class="img-fluid w-100 object-fit-cover"
+                 style="height: 420px;">
+            <div class="about-img-badge position-absolute bottom-0 start-0 m-4 p-3 rounded-4 bg-white shadow d-flex align-items-center gap-3">
+              <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
+                   style="width: 44px; height: 44px;">
+                <i class="fas fa-award fs-5"></i>
+              </div>
+              <div class="text-start">
+                <div class="fw-bold fs-7 text-dark">Thương Hiệu Xuất Sắc</div>
+                <div class="fs-8 text-muted">Bảo trợ tri thức 2026</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card h-100 border-0 shadow-sm rounded-4 p-4 text-center">
-        <div class="fs-1 text-success mb-3">⚡</div>
-        <h4 class="fw-bold text-dark">{{ '::About:FeatureDeliveryTitle' | abpLocalization }}</h4>
-        <p class="text-muted small">{{ '::About:FeatureDeliveryDesc' | abpLocalization }}</p>
+    </section>
+
+    <!-- SỨ MỆNH & GIÁ TRỊ CỐT LÕI -->
+    <section class="about-values mb-5">
+      <div class="text-center mb-5">
+        <h3 class="fw-bold text-dark mb-2">Giá Trị Cốt Lõi Tạo Nên Sự Khác Biệt</h3>
+        <p class="text-muted fs-7 mx-auto" style="max-width: 600px;">
+          Chúng tôi nỗ lực từng ngày để mang lại trải nghiệm đọc sách trọn vẹn và an tâm nhất cho mọi khách hàng.
+        </p>
       </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card h-100 border-0 shadow-sm rounded-4 p-4 text-center">
-        <div class="fs-1 text-warning mb-3">💖</div>
-        <h4 class="fw-bold text-dark">{{ '::About:FeatureSupportTitle' | abpLocalization }}</h4>
-        <p class="text-muted small">{{ '::About:FeatureSupportDesc' | abpLocalization }}</p>
+
+      <div class="row g-4">
+        <div class="col-12 col-md-4">
+          <div class="card h-100 rounded-5 bg-white border border-light shadow-sm p-4 text-center">
+            <div class="value-icon-circle mx-auto mb-3 rounded-circle d-flex align-items-center justify-content-center bg-primary-subtle text-primary"
+                 style="width: 68px; height: 68px;">
+              <i class="fas fa-certificate fs-3"></i>
+            </div>
+            <h5 class="fw-bold text-dark mb-2">100% Sách Thật & Bản Quyền</h5>
+            <p class="text-secondary fs-7 mb-0">
+              Hợp tác trực tiếp với các nhà xuất bản hàng đầu trong và ngoài nước, cam kết hoàn tiền 200% nếu phát hiện sách giả, sách in lậu.
+            </p>
+          </div>
+        </div>
+
+        <div class="col-12 col-md-4">
+          <div class="card h-100 rounded-5 bg-white border border-light shadow-sm p-4 text-center">
+            <div class="value-icon-circle mx-auto mb-3 rounded-circle d-flex align-items-center justify-content-center bg-success-subtle text-success"
+                 style="width: 68px; height: 68px;">
+              <i class="fas fa-truck-fast fs-3"></i>
+            </div>
+            <h5 class="fw-bold text-dark mb-2">Đóng Gói Chuyên Nghiệp</h5>
+            <p class="text-secondary fs-7 mb-0">
+              Tất cả sách đều được bọc màng co và chèn túi khí cẩn thận, bảo vệ gáy sách và góc bìa nguyên vẹn suốt quá trình vận chuyển.
+            </p>
+          </div>
+        </div>
+
+        <div class="col-12 col-md-4">
+          <div class="card h-100 rounded-5 bg-white border border-light shadow-sm p-4 text-center">
+            <div class="value-icon-circle mx-auto mb-3 rounded-circle d-flex align-items-center justify-content-center bg-info-subtle text-info"
+                 style="width: 68px; height: 68px;">
+              <i class="fas fa-robot fs-3"></i>
+            </div>
+            <h5 class="fw-bold text-dark mb-2">Công Nghệ AI Tiên Tiến</h5>
+            <p class="text-secondary fs-7 mb-0">
+              Tích hợp Trợ lý AI Gemini thông minh hỗ trợ tìm kiếm và gợi ý các tác phẩm phù hợp nhất với sở thích và tâm trạng độc giả.
+            </p>
+          </div>
+        </div>
       </div>
-    </div>
+    </section>
+
+    <!-- CTA KHÁM PHÁ -->
+    <section class="about-cta p-5 rounded-5 shadow text-center text-white position-relative overflow-hidden mb-5"
+             style="background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);">
+      <h2 class="fw-extrabold display-6 mb-3 text-white">Bạn Đã Sẵn Sàng Khám Phá?</h2>
+      <p class="fs-6 text-light opacity-90 mb-4 mx-auto" style="max-width: 540px;">
+        Ghé thăm tủ sách của chúng tôi ngay hôm nay và tìm cho mình người bạn đồng hành tri thức tiếp theo!
+      </p>
+      <a routerLink="/books" class="btn btn-warning btn-lg rounded-pill px-5 py-3 fw-bold fs-7 shadow-sm">
+        Khám Phá Tủ Sách
+      </a>
+    </section>
+
   </div>
 </div>

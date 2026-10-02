@@ -1,120 +1,22 @@
-/* Contact Component SCSS */
-:host {
-  display: block;
+.storefront-contact-page {
+  animation: fadeIn 0.3s ease-out;
 }
 
-.contact-page {
-  background: #f8fafc;
-  min-height: 80vh;
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* Badge hỗ trợ */
-.support-badge {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: #fff;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  padding: 6px 14px;
-  border-radius: 50px;
-  font-size: 0.75rem;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
-}
+.fs-7 { font-size: 0.85rem; }
+.fs-8 { font-size: 0.75rem; }
+.fs-9 { font-size: 0.68rem; }
 
-/* 💎 Thẻ thông tin Gradient bên trái */
-.contact-info-card {
-  background: linear-gradient(135deg, #4318ff 0%, #7551ff 60%, #905cfc 100%);
-  border-radius: 24px;
-  box-shadow: 0 20px 40px -15px rgba(67, 24, 255, 0.35);
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: -50px;
-    right: -50px;
-    width: 160px;
-    height: 160px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
-    pointer-events: none;
+:host-context([data-theme="dark"]) {
+  .card {
+    background-color: #111c44 !important;
+    border-color: #1e293b !important;
   }
-}
-
-.info-icon {
-  width: 44px;
-  height: 44px;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.25rem;
-  flex-shrink: 0;
-  backdrop-filter: blur(8px);
-}
-
-.social-badge {
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-decoration: none;
-  padding: 4px 10px;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 20px;
-  transition: all 0.2s ease;
-
-  &:hover {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.3);
-  }
-}
-
-/* 📝 Thẻ Form gửi tin nhắn bên phải */
-.contact-form-card {
-  background: #ffffff;
-  border-radius: 24px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-  border: 1px solid #f1f5f9;
-}
-
-.fs-7 {
-  font-size: 0.875rem;
-}
-
-.fs-8 {
-  font-size: 0.75rem;
-}
-
-.form-control-custom {
-  background-color: #f8fafc;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 0.75rem 1rem;
-  font-size: 0.95rem;
-  color: #1e293b;
-  transition: all 0.25s ease;
-
-  &:focus {
-    background-color: #ffffff;
-    border-color: #4318ff;
-    box-shadow: 0 0 0 4px rgba(67, 24, 255, 0.12);
-  }
-}
-
-/* Nút bấm gửi tin nhắn */
-.btn-send-message {
-  background: linear-gradient(135deg, #4318ff 0%, #7551ff 100%);
-  color: #ffffff;
-  border: none;
-  border-radius: 14px;
-  font-size: 1rem;
-  letter-spacing: 0.3px;
-  transition: all 0.3s ease;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px -5px rgba(67, 24, 255, 0.4);
-    filter: brightness(1.05);
-  }
+  .text-dark { color: #f8fafc !important; }
+  .text-secondary { color: #cbd5e1 !important; }
+  .text-muted { color: #94a3b8 !important; }
 }

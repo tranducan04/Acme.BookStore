@@ -1,0 +1,292 @@
+<div class="storefront-catalog-page py-4">
+  <div class="container">
+    
+    <!-- BREADCRUMB -->
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb fs-8">
+        <li class="breadcrumb-item"><a routerLink="/" class="text-decoration-none text-muted"><i class="fas fa-home me-1"></i>Trang chủ</a></li>
+        <li class="breadcrumb-item active text-primary fw-bold" aria-current="page">Tủ Sách Trực Tuyến</li>
+      </ol>
+    </nav>
+
+    <div class="row g-4 align-items-start">
+      
+      <!-- CỘT TRÁI: FILTER SIDEBAR -->
+      <aside class="col-12 col-lg-3 filter-sidebar-col">
+        <div class="filter-sidebar px-4 py-3 rounded-4 bg-white shadow-sm border border-light">
+          
+          <div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom">
+            <h5 class="fw-bold text-dark mb-0 fs-6">
+              <i class="fas fa-sliders-h text-primary me-2"></i>Bộ Lọc Sách
+            </h5>
+            <button type="button" class="btn btn-link btn-sm text-decoration-none p-0 fs-8 text-primary fw-semibold" (click)="resetFilters()">
+              Đặt lại
+            </button>
+          </div>
+
+          <!-- 1. Tìm kiếm nhanh -->
+          <div class="mb-3">
+            <label class="form-label fs-8 fw-bold text-dark mb-1.5">Tìm kiếm từ khóa</label>
+            <app-search-bar [placeholder]="'Tên sách, tác giả...'"
+                            [initialValue]="filter().searchQuery"
+                            (search)="onSearch($event)" />
+          </div>
+
+          <!-- 2. Danh mục sách (Custom Dropdown) -->
+          <div class="mb-3 position-relative category-custom-dropdown">
+            <div class="d-flex align-items-center justify-content-between mb-1.5">
+              <label class="form-label fs-8 fw-bold text-dark mb-0">
+                <i class="fas fa-tags text-primary me-1"></i>Thể loại
+              </label>
+              @if (filter().categoryId) {
+                <span class="badge bg-primary-subtle text-primary rounded-pill fs-9">Đang lọc</span>
+              }
+            </div>
+
+            <button type="button"
+                    class="custom-dropdown-trigger w-100 d-flex align-items-center justify-content-between pe-3 rounded-3 border text-start fs-8 shadow-none"
+                    [class.open]="isCategoryOpen()"
+                    (click)="toggleCategoryDropdown($event)">
+              <span class="text-truncate fw-medium" [class.text-dark]="filter().categoryId" [class.text-secondary]="!filter().categoryId">
+                {{ selectedCategoryName() }}
+              </span>
+              <i class="fas fa-chevron-down fs-9 text-muted ms-2 transition-transform" [class.rotate-180]="isCategoryOpen()"></i>
+            </button>
+
+            @if (isCategoryOpen()) {
+              <div class="custom-dropdown-menu shadow-lg rounded-3 border p-1 position-absolute w-100 mt-1"
+                   (click)="$event.stopPropagation()">
+                <button type="button"
+                        class="dropdown-item-custom w-100 d-flex align-items-center justify-content-between px-3 py-2 rounded-2 border-0 bg-transparent text-start fs-8"
+                        [class.active]="!filter().categoryId"
+                        (click)="selectCategory(undefined)">
+                  <span>-- Tất cả thể loại --</span>
+                  @if (!filter().categoryId) {
+                    <i class="fas fa-check text-primary fs-9"></i>
+                  }
+                </button>
+                <div class="dropdown-divider my-1"></div>
+                <div class="custom-dropdown-list">
+                  @for (cat of categories(); track cat.id) {
+                    <button type="button"
+                            class="dropdown-item-custom w-100 d-flex align-items-center justify-content-between px-3 py-2 rounded-2 border-0 bg-transparent text-start fs-8"
+                            [class.active]="filter().categoryId === cat.id"
+                            (click)="selectCategory(cat.id)">
+                      <span class="text-truncate">{{ cat.name }}</span>
+                      @if (filter().categoryId === cat.id) {
+                        <i class="fas fa-check text-primary fs-9"></i>
+                      }
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+
+          <!-- 3. Khoảng giá (Custom Dropdown) -->
+          <div class="mb-3 position-relative price-custom-dropdown">
+            <div class="d-flex align-items-center justify-content-between mb-1.5">
+              <label class="form-label fs-8 fw-bold text-dark mb-0">
+                <i class="fas fa-coins text-warning me-1"></i>Khoảng giá
+              </label>
+              @if (selectedPriceRange() > 0) {
+                <span class="badge bg-primary-subtle text-primary rounded-pill fs-9">Đang lọc</span>
+              }
+            </div>
+
+            <button type="button"
+                    class="custom-dropdown-trigger w-100 d-flex align-items-center justify-content-between pe-3 rounded-3 border text-start fs-8 shadow-none"
+                    [class.open]="isPriceOpen()"
+                    (click)="togglePriceDropdown($event)">
+              <span class="text-truncate fw-medium" [class.text-dark]="selectedPriceRange() > 0" [class.text-secondary]="selectedPriceRange() === 0">
+                {{ selectedPriceRangeLabel() }}
+              </span>
+              <i class="fas fa-chevron-down fs-9 text-muted ms-2 transition-transform" [class.rotate-180]="isPriceOpen()"></i>
+            </button>
+
+            @if (isPriceOpen()) {
+              <div class="custom-dropdown-menu shadow-lg rounded-3 border p-1 position-absolute w-100 mt-1"
+                   (click)="$event.stopPropagation()">
+                @for (range of priceRanges; track range.label; let idx = $index) {
+                  <button type="button"
+                          class="dropdown-item-custom w-100 d-flex align-items-center justify-content-between px-3 py-2 rounded-2 border-0 bg-transparent text-start fs-8"
+                          [class.active]="selectedPriceRange() === idx"
+                          (click)="selectPriceRange(idx)">
+                    <span>{{ range.label }}</span>
+                    @if (selectedPriceRange() === idx) {
+                      <i class="fas fa-check text-primary fs-9"></i>
+                    }
+                  </button>
+                }
+              </div>
+            }
+          </div>
+
+          <!-- 4. Độ tuổi độc giả -->
+          <div class="mb-4">
+            <label class="form-label fs-8 fw-bold text-dark mb-2">Độ tuổi độc giả</label>
+            <div class="d-flex flex-wrap gap-1">
+              @for (limit of ageLimits; track limit) {
+                <button type="button"
+                        class="btn btn-sm rounded-pill fs-8"
+                        [class.btn-primary]="filter().ageLimit === limit || (!filter().ageLimit && limit === 'Tất cả')"
+                        [class.btn-outline-secondary]="filter().ageLimit !== limit && (filter().ageLimit || limit !== 'Tất cả')"
+                        (click)="onAgeLimitChange(limit)">
+                  {{ limit }}
+                </button>
+              }
+            </div>
+          </div>
+
+          <!-- 5. Tình trạng tồn kho -->
+          <div class="mb-2 pt-2 border-top">
+            <div class="form-check">
+              <input class="form-check-input cursor-pointer"
+                     type="checkbox"
+                     id="inStockCheck"
+                     [checked]="filter().inStockOnly"
+                     (change)="onInStockOnlyChange($event)">
+              <label class="form-check-label fs-8 fw-semibold text-dark cursor-pointer user-select-none" for="inStockCheck">
+                Chỉ hiển thị sách còn hàng
+              </label>
+            </div>
+          </div>
+
+        </div>
+      </aside>
+
+      <!-- CỘT PHẢI: BOOK GRID & TOOLBAR -->
+      <main class="col-12 col-lg-9">
+        
+        <!-- TOOLBAR: KẾT QUẢ & SẮP XẾP -->
+        <div class="catalog-toolbar p-3 rounded-4 bg-white shadow-sm border border-light mb-4 d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
+          <div class="fs-7 text-muted">
+            Hiển thị <strong class="text-dark">{{ paginatedBooks().length }}</strong> trên tổng số <strong class="text-primary">{{ totalItems() }}</strong> cuốn sách
+          </div>
+
+          <div class="d-flex align-items-center gap-3">
+            <!-- Sắp xếp -->
+            <div class="d-flex align-items-center gap-2 position-relative sort-dropdown-container">
+              <label class="fs-8 text-muted text-nowrap mb-0">Sắp xếp:</label>
+              <button type="button"
+                      class="toolbar-dropdown-trigger d-flex align-items-center justify-content-between rounded-pill fs-8 shadow-none"
+                      [class.open]="isSortOpen()"
+                      (click)="toggleSortDropdown($event)">
+                <span class="dropdown-trigger-label text-truncate">{{ selectedSortLabel() }}</span>
+                <i class="fas fa-chevron-down dropdown-arrow-icon" [class.rotate-180]="isSortOpen()"></i>
+              </button>
+
+              @if (isSortOpen()) {
+                <div class="toolbar-dropdown-menu shadow-lg rounded-3 border p-1 position-absolute"
+                     (click)="$event.stopPropagation()">
+                  @for (opt of sortOptions; track opt.value) {
+                    <button type="button"
+                            class="dropdown-item-custom w-100 d-flex align-items-center justify-content-between px-3 py-2 rounded-2 border-0 bg-transparent text-start fs-8"
+                            [class.active]="filter().sortBy === opt.value"
+                            (click)="selectSort(opt.value)">
+                      <span>{{ opt.label }}</span>
+                      @if (filter().sortBy === opt.value) {
+                        <i class="fas fa-check text-primary fs-9 ms-2"></i>
+                      }
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+
+            <!-- Số lượng / Trang -->
+            <div class="d-flex align-items-center gap-2 position-relative pagesize-dropdown-container">
+              <label class="fs-8 text-muted text-nowrap mb-0 d-none d-sm-inline">Hiển thị:</label>
+              <button type="button"
+                      class="toolbar-dropdown-trigger d-flex align-items-center justify-content-between rounded-pill fs-8 shadow-none"
+                      [class.open]="isPageSizeOpen()"
+                      (click)="togglePageSizeDropdown($event)">
+                <span class="dropdown-trigger-label text-truncate">{{ selectedPageSizeLabel() }}</span>
+                <i class="fas fa-chevron-down dropdown-arrow-icon" [class.rotate-180]="isPageSizeOpen()"></i>
+              </button>
+
+              @if (isPageSizeOpen()) {
+                <div class="toolbar-dropdown-menu shadow-lg rounded-3 border p-1 position-absolute"
+                     (click)="$event.stopPropagation()">
+                  @for (size of pageSizeOptions; track size) {
+                    <button type="button"
+                            class="dropdown-item-custom w-100 d-flex align-items-center justify-content-between px-3 py-2 rounded-2 border-0 bg-transparent text-start fs-8"
+                            [class.active]="filter().pageSize === size"
+                            (click)="selectPageSize(size)">
+                      <span>{{ size }} / trang</span>
+                      @if (filter().pageSize === size) {
+                        <i class="fas fa-check text-primary fs-9 ms-2"></i>
+                      }
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- DANH SÁCH SÁCH HOẶC SKELETON -->
+        @if (isLoading()) {
+          <app-loading-skeleton [type]="'card'" [count]="filter().pageSize" />
+        } @else if (paginatedBooks().length === 0) {
+          <app-empty-state [icon]="'fa-search'"
+                           [title]="'Không tìm thấy cuốn sách nào'"
+                           [description]="'Hãy thử thay đổi từ khóa tìm kiếm hoặc điều chỉnh lại các tiêu chí bộ lọc bên trái.'"
+                           [actionText]="'Xóa tất cả bộ lọc'"
+                           (actionClick)="resetFilters()" />
+        } @else {
+          <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4 mb-5">
+            @for (book of paginatedBooks(); track book.id) {
+              <div class="col">
+                <app-book-card [book]="book"
+                               (addToCart)="onAddToCart($event)"
+                               (toggleFavorite)="onToggleFavorite($event)"
+                               (viewDetail)="onViewDetail($event)" />
+              </div>
+            }
+          </div>
+
+          <!-- NUMBERED PAGINATION BAR -->
+          @if (totalPages() > 1) {
+            <nav aria-label="Catalog pagination" class="d-flex justify-content-center pt-3 pb-4">
+              <ul class="pagination pagination-modern gap-2 mb-0">
+                
+                <!-- Nút Trước -->
+                <li class="page-item" [class.disabled]="filter().page <= 1">
+                  <button class="page-link rounded-pill px-3 fs-8 fw-semibold"
+                          (click)="goToPage(filter().page - 1)"
+                          [disabled]="filter().page <= 1">
+                    <i class="fas fa-chevron-left me-1"></i> Trước
+                  </button>
+                </li>
+
+                <!-- Danh sách số trang -->
+                @for (p of pageNumbers(); track p) {
+                  <li class="page-item" [class.active]="filter().page === p">
+                    <button class="page-link rounded-circle d-flex align-items-center justify-content-center fs-8 fw-bold"
+                            style="width: 38px; height: 38px;"
+                            (click)="goToPage(p)">
+                      {{ p }}
+                    </button>
+                  </li>
+                }
+
+                <!-- Nút Sau -->
+                <li class="page-item" [class.disabled]="filter().page >= totalPages()">
+                  <button class="page-link rounded-pill px-3 fs-8 fw-semibold"
+                          (click)="goToPage(filter().page + 1)"
+                          [disabled]="filter().page >= totalPages()">
+                    Sau <i class="fas fa-chevron-right ms-1"></i>
+                  </button>
+                </li>
+
+              </ul>
+            </nav>
+          }
+        }
+
+      </main>
+
+    </div>
+  </div>
+</div>

@@ -3,7 +3,7 @@
 > **Dự án**: Hệ thống Thương Mại Điện Tử Cửa Hàng Sách (Acme.BookStore)  
 > **Kiến trúc công nghệ**: ASP.NET Core (ABP Framework v9.0) + Angular Signals (LeptonX Lite) + SQL Server  
 > **Phương pháp quản lý**: Spec-Driven Development (SpecKit SDD)  
-> **Trạng thái**: Hoàn thiện toàn bộ các tính năng cốt lõi (100% Core Features Completed)
+> **Trạng thái**: Hoàn thiện toàn bộ Core Features (001 - 008) · Đang tiến hành Giai đoạn 5 Refactor UI Khách hàng (`refactorUI`)
 
 ---
 
@@ -11,11 +11,12 @@
 
 ```mermaid
 timeline
-    title Lộ trình Triển khai Chuẩn Acme.BookStore (001 - 008)
+    title Lộ trình Triển khai Chuẩn Acme.BookStore (001 - 009)
     Giai đoạn 1 : Nền tảng Dữ liệu : Quản lý Tác giả (001) : Quản lý Sách (002)
     Giai đoạn 2 : Bán hàng & Dòng tiền : Giỏ hàng & Đơn hàng VietQR (003) : Khuyến mãi & Voucher (004)
     Giai đoạn 3 : Trải nghiệm & Trí tuệ nhân tạo : Chat Trực tuyến SignalR (005) : Đánh giá Sách (006) : Trợ lý ảo AI Gemini (007)
     Giai đoạn 4 : Vận hành Quản trị : Bảng Thống kê Dashboard (008) : Tối ưu & Bàn giao
+    Giai đoạn 5 : Nâng cấp Giao diện Khách hàng : Thiết kế lại UI/UX Storefront (009)
 ```
 
 ---
@@ -62,9 +63,18 @@ timeline
 
 ---
 
+### 🔷 Giai đoạn 5: Hiện đại hóa Giao diện Khách hàng (User UI/UX Modernization & Redesign)
+*Mục tiêu: Tái thiết kế toàn bộ Storefront theo phong cách Thư viện Số hiện đại, tông màu Xanh dương + Trắng, tối ưu trải nghiệm đọc sách và mua sắm, tách biệt hoàn toàn khỏi Admin UI.*
+
+| Mã Spec | Tên Tính Năng | Mô tả Nghiệp vụ | Trạng thái | Tài liệu Đặc tả Chi tiết |
+| :---: | :--- | :--- | :---: | :--- |
+| **`009`** | **Thiết Kế Lại Giao Diện Người Dùng (User UI Redesign)** | Refactor Home (Hero slider, Categories, Book grids), Catalog có Sidebar lọc đa tiêu chí, Chi tiết sách, Giỏ hàng, Đơn hàng, Thông báo, Chatbot & Live Chat nổi, Reusable Components. Branch: `refactorUI`. | <span style="color:orange">🟡 Đang triển khai</span> | [specs/009-user-ui-refactor/spec.md](specs/009-user-ui-refactor/spec.md) |
+
+---
+
 ## 🔄 Quy trình Phát triển Tính năng Chuẩn theo Roadmap (SpecKit SDD Lifecycle)
 
-Khi tiếp tục mở rộng thêm các tính năng mới trong tương lai, hệ thống tuân thủ nghiêm ngặt chu trình 5 bước:
+Khi triển khai hoặc mở rộng tính năng mới, hệ thống tuân thủ nghiêm ngặt chu trình 5 bước:
 
 ```text
 ┌────────────────┐     ┌────────────────┐     ┌────────────────┐     ┌────────────────┐     ┌────────────────┐

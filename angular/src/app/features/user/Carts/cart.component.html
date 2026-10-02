@@ -1,303 +1,218 @@
-<div class="card shadow-sm border-0 rounded-3" @pageEnter>
-    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-        <h3 class="mb-0 fw-bold text-dark">🛒 {{ '::Cart:Title' | abpLocalization }}</h3>
-        <a routerLink="/books" class="btn btn-outline-primary btn-sm rounded-pill px-3 shadow-sm d-flex align-items-center gap-1.5" [title]="'::Cart:ContinueShopping' | abpLocalization">
-            <span>📚</span>
-            <span class="fw-semibold">{{ '::Cart:ContinueShopping' | abpLocalization }}</span>
-        </a>
+<div class="storefront-cart-page py-4">
+  <div class="container">
+
+    <!-- BREADCRUMB -->
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb fs-8">
+        <li class="breadcrumb-item"><a routerLink="/" class="text-decoration-none text-muted"><i class="fas fa-home me-1"></i>Trang chủ</a></li>
+        <li class="breadcrumb-item active text-primary fw-bold" aria-current="page">Giỏ Hàng Của Bạn</li>
+      </ol>
+    </nav>
+
+    <div class="d-flex align-items-center justify-content-between mb-4 pb-2 border-bottom">
+      <div>
+        <h3 class="fw-bold text-dark mb-1">
+          <i class="fas fa-shopping-bag text-primary me-2"></i>Giỏ Hàng Mua Sắm
+        </h3>
+        <p class="text-muted fs-7 mb-0">Kiểm tra danh sách sách đã chọn trước khi tiến hành thanh toán</p>
+      </div>
+      @if (cartStore.cart()?.items?.length) {
+        <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2 fs-7 fw-bold">
+          {{ cartStore.cart()?.totalCount || 0 }} sản phẩm
+        </span>
+      }
     </div>
-    <div class="card-body">
-        @if (cartStore.isLoading()) {
-        <div class="text-center py-4">
-            <div class="spinner-border text-primary" role="status"></div>
-            <p class="mt-2 text-muted">{{ '::Cart:Loading' | abpLocalization }}</p>
-        </div>
-        } @else if (!cartStore.cart() || cartStore.cart()?.items?.length === 0) {
-        <div class="text-center py-5">
-            <div class="display-4 text-muted mb-3">🛒</div>
-            <h5 class="fw-bold text-dark mb-2">{{ '::Cart:EmptyTitle' | abpLocalization }}</h5>
-            <p class="text-muted small mb-4">{{ '::Cart:EmptyDesc' | abpLocalization }}</p>
-            <a routerLink="/books" class="btn btn-primary fw-bold rounded-pill px-4 shadow-sm">
-                📚 {{ '::Cart:ExploreNow' | abpLocalization }}
-            </a>
-        </div>
-        } @else {
-        <table class="table table-hover align-middle">
-            <thead class="table-dark">
-                <tr>
-                    <th class="ps-3">{{ '::Cart:BookName' | abpLocalization }}</th>
-                    <th>{{ '::Cart:UnitPrice' | abpLocalization }}</th>
-                    <th style="width: 140px;">{{ '::Cart:Quantity' | abpLocalization }}</th>
-                    <th>{{ '::Cart:TotalPrice' | abpLocalization }}</th>
-                    <th class="text-end pe-3">{{ '::Cart:Action' | abpLocalization }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                @for (item of cartStore.cart()?.items; track item.id) {
-                <tr>
-                    <td class="ps-3 fw-bold text-dark">{{ item.bookName }}</td>
-                    <td>{{ item.price | currency:'VND':'symbol':'1.0-0' }}</td>
-                    <td>
-                        <div class="quantity-stepper">
-                            <button class="btn-step" type="button" [disabled]="(item.count || 1) <= 1"
-                                (click)="item.bookId && cartStore.updateCount(item.bookId, (item.count || 1) - 1)">-</button>
-                            <span class="step-value">{{ item.count }}</span>
-                            <button class="btn-step" type="button"
-                                (click)="item.bookId && cartStore.updateCount(item.bookId, (item.count || 1) + 1)">+</button>
+
+    <!-- EMPTY STATE KHI GIỎ TRỐNG -->
+    @if (!cartStore.cart()?.items?.length) {
+      <app-empty-state [icon]="'fa-shopping-cart'"
+                       [title]="'Giỏ hàng của bạn đang trống'"
+                       [description]="'Có vẻ như bạn chưa chọn cuốn sách nào vào giỏ. Hãy dạo quanh kho sách để tìm những cuốn sách thú vị nhé!'"
+                       [actionText]="'Tiếp tục khám phá sách'"
+                       (actionClick)="router.navigate(['/books'])" />
+    } @else {
+      <div class="row g-4 mb-5">
+        
+        <!-- CỘT TRÁI: DANH SÁCH MÓN HÀNG -->
+        <div class="col-12 col-lg-8">
+          <div class="card rounded-4 bg-white border border-light shadow-sm overflow-hidden p-3 p-md-4">
+            
+            <div class="table-responsive">
+              <table class="table align-middle mb-0">
+                <thead class="border-bottom text-muted fs-8">
+                  <tr>
+                    <th scope="col" style="min-width: 260px;">Cuốn sách</th>
+                    <th scope="col" class="text-center" style="width: 120px;">Đơn giá</th>
+                    <th scope="col" class="text-center" style="width: 140px;">Số lượng</th>
+                    <th scope="col" class="text-end" style="width: 130px;">Tổng tiền</th>
+                    <th scope="col" class="text-center" style="width: 50px;"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (item of cartStore.cart()?.items; track item.bookId) {
+                    <tr class="cart-item-row">
+                      <!-- Thông tin sách -->
+                      <td>
+                        <div class="d-flex align-items-center gap-3">
+                          <img [src]="$any(item).coverImage || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=200&q=80'"
+                               [alt]="item.bookName"
+                               class="rounded-3 shadow-sm cart-item-thumb"
+                               style="width: 54px; height: 72px; object-fit: cover;">
+                          <div>
+                            <h6 class="fw-bold fs-7 text-dark mb-1 text-truncate" style="max-width: 260px;" [title]="item.bookName">
+                              <a [routerLink]="['/books', item.bookId]" class="text-decoration-none text-dark hover-primary">
+                                {{ item.bookName }}
+                              </a>
+                            </h6>
+                            <span class="badge bg-light text-muted fs-9 rounded-pill">Sách giấy</span>
+                          </div>
                         </div>
-                    </td>
-                    <td class="fw-bold text-danger">{{ item.totalPrice | currency:'VND':'symbol':'1.0-0' }}</td>
-                    <td class="text-end pe-3">
-                        <button class="btn btn-sm btn-outline-danger border-0"
-                            (click)="item.bookId && removeItem(item.bookId)">
-                            🗑️ {{ '::Delete' | abpLocalization }}
+                      </td>
+
+                      <!-- Đơn giá -->
+                      <td class="text-center fs-7 text-secondary fw-semibold">
+                        {{ formatCurrency(item.price || 0) }}
+                      </td>
+
+                      <!-- Bộ tăng giảm số lượng -->
+                      <td class="text-center">
+                        <app-quantity-selector [quantity]="item.count || 1"
+                                               [min]="1"
+                                               [max]="99"
+                                               (quantityChange)="updateItemQuantity(item.bookId, $event)" />
+                      </td>
+
+                      <!-- Tổng tiền món -->
+                      <td class="text-end fs-7 fw-bold text-primary">
+                        {{ formatCurrency(item.totalPrice || 0) }}
+                      </td>
+
+                      <!-- Nút xóa món -->
+                      <td class="text-center">
+                        <button type="button"
+                                class="btn btn-sm btn-delete-item rounded-circle border-0 d-flex align-items-center justify-content-center text-muted"
+                                (click)="removeItem(item.bookId)"
+                                title="Xóa cuốn sách này"
+                                aria-label="Xóa món">
+                          <i class="fas fa-trash-alt fs-8"></i>
                         </button>
-                    </td>
-                </tr>
-                }
-            </tbody>
-        </table>
-        <!-- KHUNG MÃ GIẢM GIÁ (COUPON) -->
-        <div class="card border-0 bg-light p-3 my-3 rounded-3 shadow-sm">
-            <div class="row align-items-center g-2">
-                <div class="col-md-7">
-                    <label class="form-label fw-bold text-dark mb-1">🎟️ Mã Giảm Giá / Voucher:</label>
-                    <div class="input-group">
-                        <input
-                            type="text"
-                            class="form-control text-uppercase fw-bold"
-                            placeholder="Nhập mã (VD: CHAOBANMOI)..."
-                            [disabled]="appliedCoupon() !== null || isApplyingCoupon()"
-                            [value]="couponInput()"
-                            (input)="couponInput.set($any($event.target).value)"
-                        />
-                        @if (appliedCoupon()) {
-                            <button class="btn btn-outline-danger" type="button" (click)="removeCoupon()">
-                                ✕ Hủy mã
-                            </button>
-                        } @else {
-                            <button
-                                class="btn btn-primary fw-bold"
-                                type="button"
-                                [disabled]="isApplyingCoupon()"
-                                (click)="applyCoupon()"
-                            >
-                                @if (isApplyingCoupon()) {
-                                    <span class="spinner-border spinner-border-sm me-1"></span> Đang kiểm tra...
-                                } @else {
-                                    Áp dụng
-                                }
-                            </button>
-                        }
-                    </div>
-                    @if (couponError()) {
-                        <div class="text-danger small mt-1 fw-bold">⚠️ {{ couponError() }}</div>
-                    }
-                    @if (couponSuccess()) {
-                        <div class="text-success small mt-1 fw-bold">🎉 {{ couponSuccess() }}</div>
-                    }
-                </div>
-                <div class="col-md-5 text-md-end">
-                    @if (discountAmount() > 0) {
-                        <div class="text-muted small">Tạm tính: <del>{{ cartStore.cart()?.totalPrice | currency:'VND':'symbol':'1.0-0' }}</del></div>
-                        <div class="text-success fw-bold">Giảm giá voucher: -{{ discountAmount() | currency:'VND':'symbol':'1.0-0' }}</div>
-                    }
-                </div>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
             </div>
+
+            <!-- Nút tiếp tục mua hàng -->
+            <div class="d-flex justify-content-between align-items-center pt-3 border-top mt-3">
+              <a routerLink="/books" class="btn btn-link text-decoration-none fs-8 text-primary fw-semibold p-0">
+                <i class="fas fa-arrow-left me-1"></i> Tiếp tục chọn sách
+              </a>
+            </div>
+
+          </div>
         </div>
 
-        <div class="d-flex justify-content-between align-items-center mt-4 p-3.5 soft-pastel-card">
-            <h5 class="mb-0 text-dark">{{ '::Cart:TotalItems' | abpLocalization }} <span class="badge bg-primary px-3 py-2 ms-1">{{
-                    cartStore.cart()?.totalCount
-                    }}</span></h5>
-            <div class="d-flex align-items-center gap-3">
-                <div class="text-end">
-                    @if (discountAmount() > 0) {
-                        <small class="text-muted d-block">Gốc: <del>{{ cartStore.cart()?.totalPrice | currency:'VND':'symbol':'1.0-0' }}</del></small>
-                    }
-                    <h4 class="mb-0 text-dark">{{ '::Cart:TotalPayment' | abpLocalization }} <span class="text-danger fw-bold fs-3 ms-1">{{
-                            finalPrice() | currency:'VND':'symbol':'1.0-0' }}</span></h4>
-                </div>
-                <button class="btn btn-lg btn-success fw-bold px-4 shadow-sm rounded-pill" (click)="openCheckout()">
-                    📦 {{ '::Cart:CheckoutBtn' | abpLocalization }}
-                </button>
-            </div>
-        </div>
-        }
-    </div>
-</div>
+        <!-- CỘT PHẢI: TÓM TẮT ĐƠN HÀNG (STICKY SIDEBAR) -->
+        <div class="col-12 col-lg-4">
+          <div class="card rounded-4 bg-white border border-light shadow-sm p-4 sticky-lg-top" style="top: 80px;">
+            
+            <h5 class="fw-bold text-dark mb-3 pb-2 border-bottom fs-6">
+              <i class="fas fa-file-invoice-dollar text-primary me-2"></i>Tóm Tắt Đơn Hàng
+            </h5>
 
-<!-- ========== CHECKOUT MODAL ========== -->
-@if (showCheckoutModal()) {
-<div class="modal-backdrop fade show"></div>
-<div class="modal d-block fade show" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg">
-            <div class="modal-header bg-success text-white">
-                <h5 class="modal-title mb-0">📦 {{ '::Cart:CheckoutModalTitle' | abpLocalization }}</h5>
-                <button type="button" class="btn-close btn-close-white" (click)="closeCheckout()"></button>
+            <!-- Tạm tính -->
+            <div class="d-flex justify-content-between align-items-center mb-2 fs-7">
+              <span class="text-secondary">Tạm tính tiền sách:</span>
+              <span class="fw-bold text-dark">{{ formatCurrency(subtotal()) }}</span>
             </div>
-            <div class="modal-body p-4">
-                <div class="mb-3">
-                    <label class="form-label fw-bold">{{ '::Cart:ReceiverName' | abpLocalization }} *</label>
-                    <input type="text" class="form-control" [class.is-invalid]="nameError()" [value]="receiverName()"
-                        (input)="onInput('receiverName', $event)" [placeholder]="'::Cart:ReceiverNamePlaceholder' | abpLocalization">
-                    @if (nameError()) {
-                    <div class="text-danger small mt-1 fw-bold">{{ nameError() }}</div>
-                    }
-                </div>
-                <div class="mb-3">
-                    <label class="form-label fw-bold">{{ '::Cart:ReceiverPhone' | abpLocalization }} *</label>
-                    <input type="text" class="form-control" [class.is-invalid]="phoneError()" [value]="receiverPhone()"
-                        (input)="onInput('receiverPhone', $event)" [placeholder]="'::Cart:ReceiverPhonePlaceholder' | abpLocalization">
-                    @if (phoneError()) {
-                    <div class="text-danger small mt-1 fw-bold">{{ phoneError() }}</div>
-                    }
-                </div>
-                <div class="mb-3">
-                    <label class="form-label fw-bold">{{ '::Cart:ShippingAddress' | abpLocalization }} *</label>
-                    <textarea class="form-control" rows="2" [class.is-invalid]="addressError()"
-                        [value]="shippingAddress()" (input)="onInput('shippingAddress', $event)"
-                        [placeholder]="'::Cart:ShippingAddressPlaceholder' | abpLocalization"></textarea>
-                    @if (addressError()) {
-                    <div class="text-danger small mt-1 fw-bold">{{ addressError() }}</div>
-                    }
-                </div>
-                <!-- LỰA CHỌN PHƯƠNG THỨC THANH TOÁN -->
-                <div class="mb-3">
-                    <label class="form-label fw-bold">{{ '::Cart:PaymentMethod' | abpLocalization }} *</label>
-                    <div class="form-check border rounded p-2 mb-2">
-                        <input class="form-check-input ms-1" type="radio" name="pMethod" id="pCod" [value]="0"
-                            [checked]="paymentMethod() === 0" (change)="onPaymentMethodChange($event)">
-                        <label class="form-check-label ms-2 fw-bold" for="pCod">
-                            💵 {{ '::Cart:PaymentCOD' | abpLocalization }}
-                        </label>
-                    </div>
-                    <div class="form-check border rounded p-2">
-                        <input class="form-check-input ms-1" type="radio" name="pMethod" id="pQr" [value]="1"
-                            [checked]="paymentMethod() === 1" (change)="onPaymentMethodChange($event)">
-                        <label class="form-check-label ms-2 fw-bold text-primary" for="pQr">
-                            📱 {{ '::Cart:PaymentQR' | abpLocalization }}
-                        </label>
-                    </div>
-                </div>
-                <!-- THÔNG BÁO NHẸ KHI CHỌN QR -->
-                @if (paymentMethod() === 1) {
-                <div class="alert alert-primary py-2 px-3 d-flex align-items-center gap-2 mb-3">
-                    <span class="fs-5">📱</span>
-                    <small class="fw-semibold">{{ '::Cart:QrNotice' | abpLocalization }}</small>
-                </div>
-                }
-                @if (discountAmount() > 0) {
-                <div class="alert alert-success py-2 px-3 d-flex justify-content-between align-items-center mb-2">
-                    <span>🎟️ Voucher áp dụng: <strong>{{ appliedCoupon()?.code }}</strong></span>
-                    <span class="fw-bold">-{{ discountAmount() | currency:'VND':'symbol':'1.0-0' }}</span>
-                </div>
-                }
-                <div class="alert alert-info d-flex justify-content-between align-items-center mb-0">
-                    <span><strong>{{ '::Cart:TotalPayment' | abpLocalization }}</strong></span>
-                    <span class="fs-4 text-danger font-weight-bold">{{ finalPrice() |
-                        currency:'VND':'symbol':'1.0-0' }}</span>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" (click)="handleCancelCheckout()">{{ '::Cancel' | abpLocalization }}</button>
-                <button type="button" class="btn btn-success fw-bold px-4" (click)="placeOrder()"
-                    [disabled]="isOrdering()">
-                    @if (isOrdering()) {
-                    ⏳ {{ '::Cart:Processing' | abpLocalization }}
-                    } @else {
-                    ✅ {{ '::Cart:ConfirmOrder' | abpLocalization }}
-                    }
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-}
 
-<!-- ========== QR CODE MODAL (Hiển thị SAU KHI đặt hàng thành công) ========== -->
-@if (isQrModalOpen()) {
-<div class="modal-backdrop fade show" style="z-index: 1060;"></div>
-<div class="modal d-block fade show" tabindex="-1" style="z-index: 1065;">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg qr-modal-content">
-            <!-- Header -->
-            <div class="modal-header qr-modal-header">
-                <div class="d-flex align-items-center gap-2">
-                    <span class="fs-4">✅</span>
+            <!-- Phí vận chuyển -->
+            <div class="d-flex justify-content-between align-items-center mb-2 fs-7">
+              <span class="text-secondary">Phí vận chuyển:</span>
+              <span class="fw-semibold" [class.text-success]="shippingFee() === 0" [class.text-dark]="shippingFee() > 0">
+                {{ shippingFee() === 0 ? 'Miễn phí' : formatCurrency(shippingFee()) }}
+              </span>
+            </div>
+
+            @if (shippingFee() > 0) {
+              <div class="alert alert-info py-2 px-3 rounded-3 fs-9 mb-3">
+                <i class="fas fa-truck text-primary me-1"></i>
+                Mua thêm <strong>{{ formatCurrency(250000 - subtotal()) }}</strong> để nhận <strong>Freeship</strong>!
+              </div>
+            }
+
+            <!-- KHUNG NHẬP MÃ GIẢM GIÁ (COUPON) -->
+            <div class="coupon-section my-3 pt-3 border-top">
+              <label class="form-label fs-8 fw-bold text-dark mb-2">Mã ưu đãi / Voucher</label>
+              
+              @if (appliedCoupon(); as c) {
+                <div class="applied-coupon-card p-2 rounded-3 bg-success-subtle border border-success-subtle d-flex align-items-center justify-content-between">
+                  <div class="d-flex align-items-center gap-2">
+                    <i class="fas fa-ticket-alt text-success fs-7"></i>
                     <div>
-                        <h5 class="modal-title mb-0 fw-bold text-white">{{ '::Cart:QrSuccessTitle' | abpLocalization }}</h5>
-                        <small class="text-white-50">{{ '::Cart:QrScanDesc' | abpLocalization }}</small>
+                      <div class="fw-bold fs-8 text-success">{{ c.code }}</div>
+                      <div class="fs-9 text-muted">-{{ formatCurrency(c.discountAmount) }}</div>
                     </div>
+                  </div>
+                  <button type="button" class="btn btn-sm btn-link text-danger text-decoration-none p-0 fs-8 fw-bold" (click)="removeCoupon()">
+                    Gỡ bỏ
+                  </button>
                 </div>
-                <button type="button" class="btn-close btn-close-white" (click)="backToPaymentSelection()" [title]="'::Cart:BackToPaymentSelection' | abpLocalization"></button>
+              } @else {
+                <div class="d-flex gap-2">
+                  <input type="text"
+                         [(ngModel)]="couponInput"
+                         class="form-control rounded-pill fs-8 text-uppercase"
+                         placeholder="Nhập mã BOOK2026...">
+                  <button type="button"
+                          class="btn btn-outline-primary rounded-pill px-3 fs-8 fw-bold text-nowrap"
+                          (click)="applyCoupon()"
+                          [disabled]="isApplyingCoupon()">
+                    @if (isApplyingCoupon()) {
+                      <i class="fas fa-spinner fa-spin"></i>
+                    } @else {
+                      Áp dụng
+                    }
+                  </button>
+                </div>
+              }
             </div>
-            <!-- Body -->
-            <div class="modal-body text-center p-4">
-                <!-- Mã đơn hàng -->
-                <div class="mb-3">
-                    <span class="badge bg-success-subtle text-success px-3 py-2 fs-6 fw-bold rounded-pill">
-                        🧾 {{ '::Cart:OrderCodeLabel' | abpLocalization }} {{ createdOrderNo() }}
-                    </span>
-                </div>
-                <!-- QR Image -->
-                <div class="qr-image-wrapper mb-3">
-                    <img [src]="qrCodeUrl()" alt="VietQR Payment" class="img-fluid rounded shadow"
-                        style="max-height: 300px; border: 3px solid #e0e0e0;">
-                </div>
-                <!-- Thông tin chuyển khoản -->
-                <div class="text-start bg-light rounded-3 p-3 mb-3">
-                    <h6 class="fw-bold mb-2 text-primary">📋 {{ '::Cart:BankTransferInfo' | abpLocalization }}</h6>
-                    <table class="table table-sm table-borderless mb-0">
-                        <tbody>
-                            <tr>
-                                <td class="text-muted" style="width: 140px;">{{ '::Cart:BankName' | abpLocalization }}</td>
-                                <td class="fw-bold">Vietcombank (VCB)</td>
-                            </tr>
-                            <tr>
-                                <td class="text-muted">{{ '::Cart:AccountNumber' | abpLocalization }}</td>
-                                <td class="fw-bold">9394235730</td>
-                            </tr>
-                            <tr>
-                                <td class="text-muted">{{ '::Cart:AccountHolder' | abpLocalization }}</td>
-                                <td class="fw-bold">TRAN DUC AN</td>
-                            </tr>
-                            @if (discountAmount() > 0) {
-                            <tr>
-                                <td class="text-muted">Mã giảm giá:</td>
-                                <td class="fw-bold text-success">🎟️ {{ appliedCoupon()?.code }} (-{{ discountAmount() | currency:'VND':'symbol':'1.0-0' }})</td>
-                            </tr>
-                            }
-                            <tr>
-                                <td class="text-muted">{{ '::Cart:Amount' | abpLocalization }}</td>
-                                <td class="fw-bold text-danger fs-5">{{ createdOrderAmount() |
-                                    currency:'VND':'symbol':'1.0-0' }}</td>
-                            </tr>
-                            <tr>
-                                <td class="text-muted">{{ '::Cart:TransferContent' | abpLocalization }}</td>
-                                <td class="fw-bold text-primary">{{ createdOrderNo() }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <!-- Cảnh báo -->
-                <div class="alert alert-warning py-2 px-3 mb-0 d-flex align-items-start gap-2">
-                    <span class="fs-5">⚠️</span>
-                    <small class="text-start">{{ '::Cart:QrWarning' | abpLocalization }}</small>
-                </div>
+
+            @if (discountAmount() > 0) {
+              <div class="d-flex justify-content-between align-items-center mb-2 fs-7 text-success">
+                <span>Chiết khấu mã giảm:</span>
+                <span class="fw-bold">-{{ formatCurrency(discountAmount()) }}</span>
+              </div>
+            }
+
+            <!-- TỔNG THANH TOÁN -->
+            <div class="total-box pt-3 border-top mb-4">
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="fw-bold text-dark fs-6">Tổng thanh toán:</span>
+                <span class="fw-extrabold text-primary fs-4">{{ formatCurrency(grandTotal()) }}</span>
+              </div>
+              <div class="fs-9 text-muted text-end">(Đã bao gồm thuế VAT nếu có)</div>
             </div>
-            <!-- Footer -->
-            <div class="modal-footer d-flex justify-content-between align-items-center p-3">
-                <button type="button" class="btn btn-outline-secondary rounded-pill px-4 py-2 fw-semibold"
-                    (click)="backToPaymentSelection()">
-                    ⬅️ {{ '::Cart:BackToPaymentSelection' | abpLocalization }}
-                </button>
-                <button type="button" class="btn btn-primary rounded-pill fw-bold px-4 py-2" (click)="closeQrModal()">
-                    👍 {{ '::Cart:QrDoneBtn' | abpLocalization }}
-                </button>
+
+            <!-- NÚT TIẾN HÀNH THANH TOÁN (ĐIỀU HƯỚNG SANG /checkout) -->
+            <button type="button"
+                    class="btn btn-primary btn-lg w-100 rounded-pill py-3 fw-bold fs-7 shadow d-flex align-items-center justify-content-center gap-2"
+                    (click)="proceedToCheckout()">
+              <span>Tiến hành thanh toán</span>
+              <i class="fas fa-arrow-right fs-8"></i>
+            </button>
+
+            <!-- Tiêu chí đảm bảo -->
+            <div class="mt-3 text-center fs-9 text-muted">
+              <i class="fas fa-shield-alt text-success me-1"></i> Thanh toán an toàn & bảo mật 100%
             </div>
+
+          </div>
         </div>
-    </div>
+
+      </div>
+    }
+
+  </div>
 </div>
-}

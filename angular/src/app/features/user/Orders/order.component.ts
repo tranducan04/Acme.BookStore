@@ -133,7 +133,7 @@ export class OrderComponent implements OnInit {
       {
         stepIndex: 1,
         status: 'Placed',
-        title: 'Đặt hàng',
+        title: 'Đã đặt hàng',
         description: 'Tạo đơn thành công',
         isCurrent: currentStatus === 0,
         isCompleted: currentStatus > 0
@@ -141,7 +141,7 @@ export class OrderComponent implements OnInit {
       {
         stepIndex: 2,
         status: 'Processing',
-        title: 'Xử lý',
+        title: 'Đang đóng gói',
         description: 'Đóng gói bưu phẩm',
         isCurrent: currentStatus === 1,
         isCompleted: currentStatus > 1
@@ -149,7 +149,7 @@ export class OrderComponent implements OnInit {
       {
         stepIndex: 3,
         status: 'Shipped',
-        title: 'Đang giao',
+        title: 'Đang vận chuyển',
         description: 'Bàn giao đơn vị vận chuyển',
         isCurrent: currentStatus === 2,
         isCompleted: currentStatus > 2
@@ -157,7 +157,7 @@ export class OrderComponent implements OnInit {
       {
         stepIndex: 4,
         status: 'Completed',
-        title: 'Hoàn thành',
+        title: 'Giao thành công',
         description: 'Đã nhận hàng thành công',
         isCurrent: currentStatus === 3,
         isCompleted: currentStatus >= 3

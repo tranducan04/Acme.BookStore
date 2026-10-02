@@ -1,6 +1,6 @@
 # Feature Specification: Live Chat Support (Hỗ Trợ Khách Hàng Trực Tuyến)
 
-**Feature Branch**: `002-live-chat-support`  
+**Feature Branch**: `005-live-chat-support`  
 **Created**: 2026-09-28 | **Last Clarified**: 2026-09-28  
 **Status**: Specified  
 

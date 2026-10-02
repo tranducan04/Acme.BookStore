@@ -1,6 +1,6 @@
 # Feature Specification: AI Virtual Assistant / Chatbot (Trợ Lý Ảo Tư Vấn Sách AI Gemini)
 
-**Feature Branch**: `008-chat-bot`  
+**Feature Branch**: `007-chat-bot`  
 **Created**: 2026-09-29 | **Last Clarified**: 2026-09-29  
 **Status**: Clarified & Implemented (Reverse Specification)  
 **Tài liệu liên quan**:

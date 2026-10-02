@@ -1,6 +1,6 @@
 # Feature Specification: Coupons and Promotions Management (Mã Giảm Giá & Khuyến Mãi)
 
-**Feature Branch**: `001-coupons-promotions`
+**Feature Branch**: `004-coupons-promotions`
 
 **Created**: 2026-09-28 | **Last Clarified**: 2026-09-28
 

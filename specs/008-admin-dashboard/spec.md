@@ -1,6 +1,6 @@
 # Feature Specification: Admin Analytics Dashboard (Bảng Điều Khiển & Thống Kê Doanh Thu)
 
-**Feature Branch**: `006-admin-dashboard`  
+**Feature Branch**: `008-admin-dashboard`  
 **Created**: 2026-09-29 | **Last Clarified**: 2026-09-29  
 **Status**: Clarified & Implemented (Reverse Specification)  
 **Tài liệu liên quan**:

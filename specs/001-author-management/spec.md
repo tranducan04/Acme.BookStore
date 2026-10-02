@@ -1,6 +1,6 @@
 # Feature Specification: Author Management (Quản Lý Tác Giả)
 
-**Feature Branch**: `004-author-management`  
+**Feature Branch**: `001-author-management`  
 **Created**: 2026-09-29 | **Last Clarified**: 2026-09-29  
 **Status**: Clarified & Implemented (Reverse Specification)  
 **Tài liệu liên quan**:

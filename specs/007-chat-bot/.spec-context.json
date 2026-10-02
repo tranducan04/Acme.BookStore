@@ -1,0 +1,10 @@
+{
+  "workflow": "speckit",
+  "specName": "008-chat-bot",
+  "branch": "008-chat-bot",
+  "selectedAt": "2026-10-01T07:05:57.314Z",
+  "currentStep": "specify",
+  "status": "draft",
+  "history": [],
+  "telemetryInstanceId": "985580bf-f543-46d6-862d-863c27834dc1"
+}

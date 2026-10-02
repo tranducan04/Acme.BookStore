@@ -1,6 +1,6 @@
 # Feature Specification: Shopping Cart & Order Processing (Giỏ Hàng & Xử Lý Đơn Hàng)
 
-**Feature Branch**: `005-shopping-cart-orders`  
+**Feature Branch**: `003-shopping-cart-orders`  
 **Created**: 2026-09-29 | **Last Clarified**: 2026-09-29  
 **Status**: Clarified & Implemented (Reverse Specification)  
 **Tài liệu liên quan**:

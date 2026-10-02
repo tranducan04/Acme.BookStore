@@ -1,6 +1,6 @@
 # Feature Specification: Book Management & Catalog (Quản Lý Sách & Danh Mục Sách)
 
-**Feature Branch**: `003-book-management`  
+**Feature Branch**: `002-book-management`  
 **Created**: 2026-09-29 | **Last Clarified**: 2026-09-29  
 **Status**: Clarified & Implemented (Reverse Specification)  
 **Tài liệu liên quan**:

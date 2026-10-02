@@ -222,3 +222,19 @@ a {
 }
 
 /* Hiệu ứng chuyển trang được quản lý thống nhất bởi Angular Animations (@pageEnter) */
+
+/* 9. Ẩn hoàn toàn Footer mặc định của ABP / LeptonX Theme */
+lpx-footer,
+.lpx-footer,
+.lpx-footbar-container,
+.lpx-footbar {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  max-height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+}

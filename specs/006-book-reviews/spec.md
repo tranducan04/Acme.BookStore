@@ -1,6 +1,6 @@
 # Feature Specification: Book Reviews & Ratings (Đánh Giá & Nhận Xét Sách)
 
-**Feature Branch**: `007-book-reviews`  
+**Feature Branch**: `006-book-reviews`  
 **Created**: 2026-09-29 | **Last Clarified**: 2026-09-29  
 **Status**: Clarified & Implemented (Reverse Specification)  
 **Tài liệu liên quan**:
